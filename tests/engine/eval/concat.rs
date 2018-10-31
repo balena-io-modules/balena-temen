@@ -10,14 +10,6 @@ macro_rules! test_eval {
     }};
 }
 
-macro_rules! test_eval_fail {
-    ($e:expr) => {{
-        let engine = Engine::default();
-        let context = Context::default();
-        assert!(engine.eval(&$e.parse().unwrap(), &context).is_err());
-    }};
-}
-
 #[test]
 fn test_strings() {
     test_eval!("`a` ~ `b` ~ `c`", json!("abc"));

@@ -3,8 +3,6 @@ use serde_json::Value;
 use std::collections::HashMap;
 use uuid::Uuid;
 
-// TODO Sync filters with specification (add filters, add to spec, ...)
-
 pub type FunctionFn = Box<dyn Fn(&HashMap<String, Value>) -> Result<Value>>;
 
 pub(crate) fn uuidv4(_args: &HashMap<String, Value>) -> Result<Value> {

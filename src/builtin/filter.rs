@@ -1,7 +1,5 @@
-use crate::error::{bail, Result};
+use crate::error::Result;
 use serde_json::Value;
-
-// TODO Sync filters with specification (add filters, add to spec, ...)
 
 pub type FilterFn = Box<dyn Fn(&Value) -> Result<Value>>;
 
@@ -18,7 +16,7 @@ pub(crate) fn upper(value: &Value) -> Result<Value> {
 #[cfg(test)]
 mod tests {
     use super::{lower, upper};
-    use serde_json::{json, Value};
+    use serde_json::json;
 
     macro_rules! test_filter {
         ($f:ident, $e:expr, $r:expr) => {{

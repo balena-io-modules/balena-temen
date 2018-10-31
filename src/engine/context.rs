@@ -1,6 +1,7 @@
 use serde_json::Value;
 
 pub struct Context {
+    #[allow(dead_code)]
     data: Value,
 }
 
