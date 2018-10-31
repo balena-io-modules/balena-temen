@@ -125,7 +125,7 @@ impl Engine {
         Ok(result)
     }
 
-    fn eval_function(&self, name: &String, args: &HashMap<String, Expression>, context: &Context) -> Result<Value> {
+    fn eval_function(&self, name: &str, args: &HashMap<String, Expression>, context: &Context) -> Result<Value> {
         let args = self.eval_args(args, context)?;
 
         let f = self.functions.get(name);
@@ -137,7 +137,7 @@ impl Engine {
         (f.unwrap())(&args)
     }
 
-    fn eval_filter(&self, name: &String, value: &Value) -> Result<Value> {
+    fn eval_filter(&self, name: &str, value: &Value) -> Result<Value> {
         let f = self.filters.get(name);
 
         if f.is_none() {
