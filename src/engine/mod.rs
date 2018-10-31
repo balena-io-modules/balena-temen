@@ -211,6 +211,14 @@ impl Engine {
             result = self.eval_filter(&filter.name, &result)?;
         }
 
+        if expression.negated {
+            if let Value::Bool(x) = result {
+                result = Value::Bool(!x);
+            } else {
+                bail!("unable to negate non bool value");
+            }
+        }
+
         Ok(result)
     }
 
