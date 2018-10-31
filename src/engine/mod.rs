@@ -274,7 +274,14 @@ impl Engine {
                     }
                 }
             },
-            ExpressionValue::FunctionCall(_) => unimplemented!("TODO"),
+            ExpressionValue::FunctionCall(FunctionCall { ref name, ref args }) => {
+                match self.eval_function(name, args, context)? {
+                    Value::Number(ref x) => x.as_f64().unwrap() != 0.0,
+                    Value::Bool(x) => x,
+                    Value::String(ref x) => !x.is_empty(),
+                    _ => bail!("unable to evaluate `{}` function result as bool", name),
+                }
+            }
             ExpressionValue::StringConcat(_) => unimplemented!("TODO"),
         };
 

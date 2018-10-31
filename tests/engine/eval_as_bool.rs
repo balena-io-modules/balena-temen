@@ -111,3 +111,7 @@ fn test_math() {
     test_as_bool!("2 - 1", true);
 }
 
+#[test]
+fn test_function() {
+    test_as_bool!("uuidv4()", true);
+}
