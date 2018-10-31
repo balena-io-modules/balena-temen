@@ -204,7 +204,21 @@ impl Engine {
             ExpressionValue::FunctionCall(FunctionCall { ref name, ref args }) => {
                 self.eval_function(name, args, context)?
             }
-            ExpressionValue::StringConcat(_) => unimplemented!("TODO"),
+            ExpressionValue::StringConcat(StringConcat { ref values }) => {
+                let mut result = String::new();
+
+                for value in values {
+                    match value {
+                        ExpressionValue::String(ref x) => result.push_str(x),
+                        ExpressionValue::Integer(x) => result.push_str(&format!("{}", x)),
+                        ExpressionValue::Float(x) => result.push_str(&format!("{}", x)),
+                        ExpressionValue::Identifier(_) => unimplemented!("TODO"),
+                        _ => bail!("unable to concatenate string (string, number or identifiers supported only)"),
+                    };
+                }
+
+                Value::String(result)
+            }
         };
 
         for filter in expression.filters.iter() {
