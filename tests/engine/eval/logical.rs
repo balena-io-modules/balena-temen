@@ -51,6 +51,7 @@ fn test_not_equal() {
 #[test]
 fn test_not() {
     test_eval!("not false", json!(true));
+    test_eval!("not 1 + 1 == 3", json!(true));
 }
 
 #[test]

@@ -9,6 +9,14 @@ macro_rules! test_as_bool {
     }};
 }
 
+macro_rules! test_as_bool_fail {
+    ($e:expr) => {{
+        let engine = Engine::default();
+        let context = Context::default();
+        assert!(engine.eval_as_bool(&$e.parse().unwrap(), &context).is_err());
+    }};
+}
+
 #[test]
 fn test_boolean() {
     test_as_bool!("true", true);
@@ -17,22 +25,22 @@ fn test_boolean() {
 
 #[test]
 fn test_string() {
-    test_as_bool!("\"\"", false);
-    test_as_bool!("\"hallo\"", true);
+    test_as_bool_fail!("\"\"");
+    test_as_bool_fail!("\"hallo\"");
 }
 
 #[test]
 fn test_integer() {
-    test_as_bool!("10", true);
-    test_as_bool!("-12", true);
-    test_as_bool!("0", false);
+    test_as_bool_fail!("10");
+    test_as_bool_fail!("-12");
+    test_as_bool_fail!("0");
 }
 
 #[test]
 fn test_float() {
-    test_as_bool!("10.2", true);
-    test_as_bool!("-3.2", true);
-    test_as_bool!("0.0", false);
+    test_as_bool_fail!("10.2");
+    test_as_bool_fail!("-3.2");
+    test_as_bool_fail!("0.0");
 }
 
 #[test]
@@ -49,6 +57,12 @@ fn test_logical_or() {
     test_as_bool!("true or false", true);
     test_as_bool!("false or true", true);
     test_as_bool!("false or false", false);
+}
+
+#[test]
+fn test_logical_not() {
+    test_as_bool!("not false", true);
+    test_as_bool!("not 1 == 2", true);
 }
 
 #[test]
@@ -107,11 +121,11 @@ fn test_relational_lower_than_or_equal() {
 
 #[test]
 fn test_math() {
-    test_as_bool!("1 - 1", false);
-    test_as_bool!("2 - 1", true);
+    test_as_bool_fail!("1 - 1");
+    test_as_bool_fail!("2 - 1");
 }
 
 #[test]
 fn test_function() {
-    test_as_bool!("uuidv4()", true);
+    test_as_bool_fail!("uuidv4()");
 }

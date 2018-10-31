@@ -200,7 +200,7 @@ impl Engine {
             ExpressionValue::String(ref x) => Value::String(x.to_string()),
             ExpressionValue::Identifier(_) => unimplemented!("TODO"),
             ExpressionValue::Math(_) => Value::Number(self.eval_as_number(expression, context)?),
-            ExpressionValue::Logical(_) => Value::Bool(self.eval_as_bool(expression, context)?),
+            ExpressionValue::Logical(_) => Value::Bool(self.eval_value_as_bool(&expression.value, context)?),
             ExpressionValue::FunctionCall(FunctionCall { ref name, ref args }) => {
                 self.eval_function(name, args, context)?
             }
@@ -222,17 +222,14 @@ impl Engine {
         Ok(result)
     }
 
-    pub fn eval_as_bool(&self, expression: &Expression, context: &Context) -> Result<bool> {
-        let mut value = match expression.value {
-            ExpressionValue::Integer(x) => x != 0,
-            ExpressionValue::Float(x) => x != 0.0,
-            ExpressionValue::Boolean(x) => x,
-            ExpressionValue::String(ref x) => !x.is_empty(),
+    fn eval_value_as_bool(&self, value: &ExpressionValue, context: &Context) -> Result<bool> {
+        let result = match value {
+            ExpressionValue::Integer(_) => bail!("integer can't be evaluated as bool"),
+            ExpressionValue::Float(_) => bail!("float can't be evaluated as bool"),
+            ExpressionValue::Boolean(x) => *x,
+            ExpressionValue::String(_) => bail!("string can't be evaluated as bool"),
             ExpressionValue::Identifier(_) => unimplemented!("TODO"),
-            ExpressionValue::Math(_) => {
-                let n = self.eval_as_number(expression, context)?;
-                n.as_f64().unwrap() != 0.0
-            }
+            ExpressionValue::Math(_) => bail!("math expression can't be evaluated as bool"),
             ExpressionValue::Logical(LogicalExpression {
                 ref lhs,
                 ref rhs,
@@ -276,14 +273,18 @@ impl Engine {
             },
             ExpressionValue::FunctionCall(FunctionCall { ref name, ref args }) => {
                 match self.eval_function(name, args, context)? {
-                    Value::Number(ref x) => x.as_f64().unwrap() != 0.0,
                     Value::Bool(x) => x,
-                    Value::String(ref x) => !x.is_empty(),
                     _ => bail!("unable to evaluate `{}` function result as bool", name),
                 }
             }
-            ExpressionValue::StringConcat(_) => unimplemented!("TODO"),
+            ExpressionValue::StringConcat(_) => bail!("string concatenation can't be evaluated as bool"),
         };
+
+        Ok(result)
+    }
+
+    pub fn eval_as_bool(&self, expression: &Expression, context: &Context) -> Result<bool> {
+        let mut value = self.eval_value_as_bool(&expression.value, context)?;
 
         if expression.negated {
             value = !value;
