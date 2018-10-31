@@ -1,0 +1,55 @@
+use balena_template::engine::context::Context;
+use balena_template::engine::Engine;
+use serde_json::json;
+
+macro_rules! test_eval {
+    ($e:expr, $r:expr) => {{
+        let engine = Engine::default();
+        let context = Context::default();
+        assert_eq!(engine.eval(&$e.parse().unwrap(), &context).unwrap(), $r);
+    }};
+}
+
+macro_rules! test_eval_fail {
+    ($e:expr) => {{
+        let engine = Engine::default();
+        let context = Context::default();
+        assert!(engine.eval(&$e.parse().unwrap(), &context).is_err());
+    }};
+}
+
+// TODO Add better comparison of numbers, especially floats
+
+#[test]
+fn test_integer_math_operations() {
+    test_eval!("1 + 1", json!(2));
+    test_eval!("2 - 1", json!(1));
+    test_eval!("3 * 3", json!(9));
+    test_eval!("6 / 3", json!(2.0));
+    test_eval!("8 % 3", json!(2));
+}
+
+#[test]
+fn test_float_math_operation() {
+    test_eval!("1.0 + 1.1", json!(2.1));
+    test_eval!("2.0 - 1.3", json!(0.7));
+    test_eval!("3.5 * 2.0", json!(7.0));
+    test_eval!("6.1 / 3.05", json!(2.0));
+    test_eval!("8.0 % 3.0", json!(2.0));
+}
+
+#[test]
+fn test_math_operator_precedence() {
+    test_eval!("1 + 2 * 3", json!(7));
+    test_eval!("1 - 2 * 3", json!(-5));
+    test_eval!("1 + 6 / 3", json!(3.0));
+    test_eval!("1 - 6 / 3", json!(-1.0));
+    test_eval!("1 + 6 % 3", json!(1));
+    test_eval!("1 - 6 % 3", json!(1));
+}
+
+#[test]
+fn test_zero_division() {
+    test_eval_fail!("8 / 0");
+    test_eval_fail!("8.0 % 0.0");
+}
