@@ -200,7 +200,7 @@ impl Engine {
             ExpressionValue::String(ref x) => Value::String(x.to_string()),
             ExpressionValue::Identifier(_) => unimplemented!("TODO"),
             ExpressionValue::Math(_) => Value::Number(self.eval_as_number(expression, context)?),
-            ExpressionValue::Logical(_) => unimplemented!("TODO"),
+            ExpressionValue::Logical(_) => Value::Bool(self.eval_as_bool(expression, context)?),
             ExpressionValue::FunctionCall(FunctionCall { ref name, ref args }) => {
                 self.eval_function(name, args, context)?
             }
