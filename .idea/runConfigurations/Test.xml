@@ -2,7 +2,7 @@
   <configuration default="false" name="Test" type="CargoCommandRunConfiguration" factoryName="Cargo Command">
     <option name="channel" value="DEFAULT" />
     <option name="command" value="test" />
-    <option name="nocapture" value="true" />
+    <option name="allFeatures" value="true" />
     <option name="backtrace" value="SHORT" />
     <option name="workingDirectory" value="file://$PROJECT_DIR$" />
     <envs />
