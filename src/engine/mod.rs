@@ -229,7 +229,10 @@ impl Engine {
             ExpressionValue::Boolean(x) => x,
             ExpressionValue::String(ref x) => !x.is_empty(),
             ExpressionValue::Identifier(_) => unimplemented!("TODO"),
-            ExpressionValue::Math(_) => unimplemented!("TODO"),
+            ExpressionValue::Math(_) => {
+                let n = self.eval_as_number(expression, context)?;
+                n.as_f64().unwrap() != 0.0
+            }
             ExpressionValue::Logical(LogicalExpression {
                 ref lhs,
                 ref rhs,

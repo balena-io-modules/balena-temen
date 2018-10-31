@@ -104,3 +104,10 @@ fn test_relational_lower_than_or_equal() {
     test_as_bool!("3.1 <= 3.1", true);
     test_as_bool!("3 <= 3.0", true);
 }
+
+#[test]
+fn test_math() {
+    test_as_bool!("1 - 1", false);
+    test_as_bool!("2 - 1", true);
+}
+
