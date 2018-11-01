@@ -131,7 +131,7 @@ fn parse_basic_expression(pair: Pair<Rule>) -> ExpressionValue {
         },
         Rule::function_call => ExpressionValue::FunctionCall(parse_function_call(pair)),
         Rule::string => ExpressionValue::String(remove_string_quotes(pair.as_str())),
-        Rule::dotted_square_bracket_identifier => ExpressionValue::Identifier(pair.as_str().to_string()),
+        Rule::dotted_square_bracket_identifier => parse_dotted_square_bracket_identifier(pair),
         Rule::string_concat => parse_string_concat(pair),
         Rule::basic_expression => MATH_CLIMBER.climb(pair.into_inner(), primary, infix),
         _ => unreachable!("parse_basic_expression: {:?}", pair.as_rule()),
@@ -222,6 +222,31 @@ fn remove_string_quotes(input: &str) -> String {
 }
 
 //
+// all_chars = _{'a'..'z' | 'A'..'Z' | "_" | '0'..'9'}
+// identifier = @{
+//     ('a'..'z' | 'A'..'Z' | "_") ~
+//     all_chars*
+// }
+//
+// dotted_identifier = @{
+//     ('a'..'z' | 'A'..'Z' | "_") ~
+//     all_chars* ~
+//     ("." ~ all_chars+)*
+// }
+//
+// square_brackets = @{
+//     "[" ~ (integer | string | dotted_square_bracket_identifier) ~ "]"
+// }
+//
+// dotted_square_bracket_identifier = @{
+//     dotted_identifier ~ ( ("." ~ all_chars+) | square_brackets )*
+// }
+//
+fn parse_dotted_square_bracket_identifier(pair: Pair<Rule>) -> ExpressionValue {
+    ExpressionValue::Identifier(pair.as_str().to_string())
+}
+
+//
 // string_concat = { (string | dotted_square_bracket_identifier) ~ ("~" ~ (float | integer | string | dotted_square_bracket_identifier))+ }
 //
 fn parse_string_concat(pair: Pair<Rule>) -> ExpressionValue {
@@ -231,7 +256,7 @@ fn parse_string_concat(pair: Pair<Rule>) -> ExpressionValue {
             Rule::string => ExpressionValue::String(remove_string_quotes(p.as_str())),
             Rule::integer => ExpressionValue::Integer(p.as_str().parse().unwrap()),
             Rule::float => ExpressionValue::Float(p.as_str().parse().unwrap()),
-            Rule::dotted_square_bracket_identifier => ExpressionValue::Identifier(p.as_str().to_string()),
+            Rule::dotted_square_bracket_identifier => parse_dotted_square_bracket_identifier(p),
             _ => unreachable!("parse_string_concat: {:?}", p),
         })
         .collect();
