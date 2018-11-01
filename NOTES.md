@@ -10,7 +10,3 @@
 
 * there's no clear structure
 * the whole grammar isn't covered
-
-## Identifier
-
-* is parsed as a string, should be parsed into some structure with indexes, etc.

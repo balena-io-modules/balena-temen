@@ -32,18 +32,12 @@ identifier = @{
     all_chars*
 }
 
-dotted_identifier = @{
-    ('a'..'z' | 'A'..'Z' | "_") ~
-    all_chars* ~
-    ("." ~ all_chars+)*
-}
-
-square_brackets = @{
+square_brackets = _{
     "[" ~ (integer | string | dotted_square_bracket_identifier) ~ "]"
 }
 
-dotted_square_bracket_identifier = @{
-    dotted_identifier ~ ( ("." ~ all_chars+) | square_brackets )*
+dotted_square_bracket_identifier = ${
+    identifier ~ ( ("." ~ identifier) | square_brackets )*
 }
 
 string_concat = { (string | dotted_square_bracket_identifier) ~ ("~" ~ (float | integer | string | dotted_square_bracket_identifier))+ }

@@ -141,6 +141,36 @@ impl StringConcat {
     }
 }
 
+/// Identifier
+#[derive(Clone, Debug, PartialEq)]
+pub struct Identifier {
+    pub values: Vec<IdentifierValue>,
+}
+
+impl Identifier {
+    /// Create new identifier
+    ///
+    /// # Arguments
+    ///
+    /// * `values` - List of identifier values
+    pub fn new(values: Vec<IdentifierValue>) -> Identifier {
+        Identifier { values }
+    }
+}
+
+/// Identifier value
+#[derive(Clone, Debug, PartialEq)]
+pub enum IdentifierValue {
+    /// Name (variable/property name)
+    Name(String),
+    /// Integer index (arrays)
+    IntegerIndex(i64),
+    /// String index (dictionaries)
+    StringIndex(String),
+    /// Indirect index (value of another identifier)
+    IdentifierIndex(Identifier),
+}
+
 /// Expression value
 #[derive(Clone, Debug, PartialEq)]
 pub enum ExpressionValue {
@@ -153,7 +183,7 @@ pub enum ExpressionValue {
     /// String
     String(String),
     /// Identifier (variable name, array index, ...)
-    Identifier(String), // TODO This shouldn't be a String, we have to parse it as well
+    Identifier(Identifier),
     /// Mathematical expression
     Math(MathExpression),
     /// Logical expression

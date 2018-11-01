@@ -221,29 +221,41 @@ fn remove_string_quotes(input: &str) -> String {
     }
 }
 
-//
 // all_chars = _{'a'..'z' | 'A'..'Z' | "_" | '0'..'9'}
 // identifier = @{
 //     ('a'..'z' | 'A'..'Z' | "_") ~
 //     all_chars*
 // }
 //
-// dotted_identifier = @{
-//     ('a'..'z' | 'A'..'Z' | "_") ~
-//     all_chars* ~
-//     ("." ~ all_chars+)*
-// }
-//
-// square_brackets = @{
+// square_brackets = _{
 //     "[" ~ (integer | string | dotted_square_bracket_identifier) ~ "]"
 // }
 //
-// dotted_square_bracket_identifier = @{
-//     dotted_identifier ~ ( ("." ~ all_chars+) | square_brackets )*
+// dotted_square_bracket_identifier = ${
+//     identifier ~ ( ("." ~ identifier) | square_brackets )*
 // }
 //
+fn _parse_dotted_square_bracket_identifier(pair: Pair<Rule>) -> Identifier {
+    let mut values = Vec::new();
+
+    for p in pair.into_inner() {
+        let value = match p.as_rule() {
+            Rule::identifier => IdentifierValue::Name(p.as_str().to_string()),
+            Rule::string => IdentifierValue::StringIndex(remove_string_quotes(p.as_str())),
+            Rule::integer => IdentifierValue::IntegerIndex(p.as_str().parse().unwrap()),
+            Rule::dotted_square_bracket_identifier => {
+                IdentifierValue::IdentifierIndex(_parse_dotted_square_bracket_identifier(p))
+            }
+            _ => unreachable!(),
+        };
+        values.push(value);
+    }
+
+    Identifier::new(values)
+}
+
 fn parse_dotted_square_bracket_identifier(pair: Pair<Rule>) -> ExpressionValue {
-    ExpressionValue::Identifier(pair.as_str().to_string())
+    ExpressionValue::Identifier(_parse_dotted_square_bracket_identifier(pair))
 }
 
 //
