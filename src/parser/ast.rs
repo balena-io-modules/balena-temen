@@ -164,7 +164,7 @@ pub enum IdentifierValue {
     /// Name (variable/property name)
     Name(String),
     /// Integer index (arrays)
-    IntegerIndex(i64),
+    IntegerIndex(isize),
     /// String index (dictionaries)
     StringIndex(String),
     /// Indirect index (value of another identifier)
