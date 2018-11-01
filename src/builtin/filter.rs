@@ -18,13 +18,13 @@ mod tests {
     use super::{lower, upper};
     use serde_json::json;
 
-    macro_rules! test_filter {
+    macro_rules! test_filter_eq {
         ($f:ident, $e:expr, $r:expr) => {{
             assert_eq!($f(&$e).unwrap(), $r);
         }};
     }
 
-    macro_rules! test_filter_fail {
+    macro_rules! test_filter_err {
         ($f:ident, $e:expr) => {{
             assert!($f(&$e).is_err());
         }};
@@ -32,27 +32,27 @@ mod tests {
 
     #[test]
     fn test_lower() {
-        test_filter!(lower, json!("ABC"), json!("abc"));
-        test_filter!(lower, json!("abc"), json!("abc"));
+        test_filter_eq!(lower, json!("ABC"), json!("abc"));
+        test_filter_eq!(lower, json!("abc"), json!("abc"));
 
-        test_filter_fail!(lower, json!(true));
-        test_filter_fail!(lower, json!(10));
-        test_filter_fail!(lower, json!(22.3));
-        test_filter_fail!(lower, json!(null));
-        test_filter_fail!(lower, json!(["a", "b"]));
-        test_filter_fail!(lower, json!({"a": "b"}));
+        test_filter_err!(lower, json!(true));
+        test_filter_err!(lower, json!(10));
+        test_filter_err!(lower, json!(22.3));
+        test_filter_err!(lower, json!(null));
+        test_filter_err!(lower, json!(["a", "b"]));
+        test_filter_err!(lower, json!({"a": "b"}));
     }
 
     #[test]
     fn test_upper() {
-        test_filter!(upper, json!("ABC"), json!("ABC"));
-        test_filter!(upper, json!("abc"), json!("ABC"));
+        test_filter_eq!(upper, json!("ABC"), json!("ABC"));
+        test_filter_eq!(upper, json!("abc"), json!("ABC"));
 
-        test_filter_fail!(upper, json!(true));
-        test_filter_fail!(upper, json!(10));
-        test_filter_fail!(upper, json!(22.3));
-        test_filter_fail!(upper, json!(null));
-        test_filter_fail!(upper, json!(["a", "b"]));
-        test_filter_fail!(upper, json!({"a": "b"}));
+        test_filter_err!(upper, json!(true));
+        test_filter_err!(upper, json!(10));
+        test_filter_err!(upper, json!(22.3));
+        test_filter_err!(upper, json!(null));
+        test_filter_err!(upper, json!(["a", "b"]));
+        test_filter_err!(upper, json!({"a": "b"}));
     }
 }
