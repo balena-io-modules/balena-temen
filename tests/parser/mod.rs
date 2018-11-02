@@ -1,6 +1,8 @@
 use balena_template::{error::Error, parser::ast::*};
 use std::collections::HashMap;
 
+mod primitive;
+
 macro_rules! test_parse_eq {
     ($e:expr, $r:expr) => {{
         assert_eq!(($e.parse() as Result<Expression, Error>).unwrap(), $r);
@@ -81,65 +83,6 @@ fn test_identifier_indirect_index() {
             ])),
             IdentifierValue::Name("first".to_string())
         ])))
-    );
-}
-
-#[test]
-fn test_boolean() {
-    test_parse_eq!("true", Expression::new(ExpressionValue::Boolean(true)));
-    test_parse_eq!("false", Expression::new(ExpressionValue::Boolean(false)));
-}
-
-#[test]
-fn test_integer() {
-    test_parse_eq!("0", Expression::new(ExpressionValue::Integer(0)));
-    test_parse_eq!("00000", Expression::new(ExpressionValue::Integer(0)));
-    test_parse_eq!("00001", Expression::new(ExpressionValue::Integer(1)));
-    test_parse_eq!("-1234", Expression::new(ExpressionValue::Integer(-1234)));
-    test_parse_eq!("-00001234", Expression::new(ExpressionValue::Integer(-1234)));
-}
-
-#[test]
-fn test_float() {
-    test_parse_eq!("0.0", Expression::new(ExpressionValue::Float(0.0)));
-    test_parse_eq!("0000.0000", Expression::new(ExpressionValue::Float(0.0)));
-    test_parse_eq!("-1.3", Expression::new(ExpressionValue::Float(-1.3)));
-    test_parse_eq!("-01.30", Expression::new(ExpressionValue::Float(-1.3)));
-    test_parse_eq!("2.9", Expression::new(ExpressionValue::Float(2.9)));
-    test_parse_eq!("002.900", Expression::new(ExpressionValue::Float(2.9)));
-}
-
-#[test]
-fn test_string() {
-    test_parse_eq!(
-        "\"hallo\"",
-        Expression::new(ExpressionValue::String("hallo".to_string()))
-    );
-    test_parse_eq!(
-        "\"ha'l'lo\"",
-        Expression::new(ExpressionValue::String("ha'l'lo".to_string()))
-    );
-    test_parse_eq!(
-        "\"ha`l`lo\"",
-        Expression::new(ExpressionValue::String("ha`l`lo".to_string()))
-    );
-    test_parse_eq!("'hallo'", Expression::new(ExpressionValue::String("hallo".to_string())));
-    test_parse_eq!(
-        "'ha\"l\"lo'",
-        Expression::new(ExpressionValue::String("ha\"l\"lo".to_string()))
-    );
-    test_parse_eq!(
-        "'ha`l`lo'",
-        Expression::new(ExpressionValue::String("ha`l`lo".to_string()))
-    );
-    test_parse_eq!("`hallo`", Expression::new(ExpressionValue::String("hallo".to_string())));
-    test_parse_eq!(
-        "`ha'l'lo`",
-        Expression::new(ExpressionValue::String("ha'l'lo".to_string()))
-    );
-    test_parse_eq!(
-        "`ha\"l\"lo`",
-        Expression::new(ExpressionValue::String("ha\"l\"lo".to_string()))
     );
 }
 
