@@ -292,7 +292,7 @@ impl Engine {
                         LogicalOperator::GreaterThanOrEqual => lhs >= rhs,
                         LogicalOperator::LowerThan => lhs < rhs,
                         LogicalOperator::LowerThanOrEqual => lhs <= rhs,
-                        _ => unreachable!(),
+                        _ => bail!("grammar error?"),
                     }
                 }
             },
