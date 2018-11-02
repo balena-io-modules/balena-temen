@@ -121,7 +121,4 @@ kwargs = _{ kwarg ~ ("," ~ kwarg )* }
 function_call = { identifier ~ "(" ~ kwargs? ~ ")" }
 filter  = { "|" ~ (function_call | identifier) }
 
-content = {
-    logical_expression |
-    basic_expression_filter
-}
+content = { SOI ~ (logical_expression | basic_expression_filter) ~ EOI }
