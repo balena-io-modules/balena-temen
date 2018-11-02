@@ -62,12 +62,12 @@ fn parse_kwarg(pair: Pair<Rule>) -> Result<(String, Expression)> {
             Rule::identifier => name = Some(p.into_span().as_str().to_string()),
             Rule::logical_expression => value = Some(parse_logical_expression(p)?),
             Rule::basic_expression_filter => value = Some(parse_basic_expression_with_filters(p)?),
-            _ => unreachable!("parse_kwarg: {:?}", p.as_rule()),
+            _ => bail!("parse_kwarg: invalid grammar? - {:?}", p.as_rule()),
         };
     }
 
-    let n = name.ok_or_else(|| "parse_kwarg: invalid grammar, no name found")?;
-    let v = value.ok_or_else(|| "parse_kwarg: invalid grammar, no value found")?;
+    let n = name.ok_or_else(|| "parse_kwarg: invalid grammar? no name found")?;
+    let v = value.ok_or_else(|| "parse_kwarg: invalid grammar? no value found")?;
     Ok((n, v))
 }
 
@@ -85,11 +85,11 @@ fn parse_function_call(pair: Pair<Rule>) -> Result<FunctionCall> {
                 let (name, value) = parse_kwarg(p)?;
                 args.insert(name, value);
             }
-            _ => unreachable!("parse_function_call: {:?}", p.as_rule()),
+            _ => bail!("parse_function_call: invalid grammar? {:?}", p.as_rule()),
         };
     }
 
-    let n = name.ok_or_else(|| "parse_function_call: invalid grammer, no name found")?;
+    let n = name.ok_or_else(|| "parse_function_call: invalid grammar, no name found")?;
     Ok(FunctionCall::new(n, args))
 }
 
@@ -109,11 +109,11 @@ fn parse_filter(pair: Pair<Rule>) -> Result<FunctionCall> {
             Rule::function_call => {
                 return parse_function_call(p);
             }
-            _ => unreachable!("parse_filter: {:?}", p.as_rule()),
+            _ => bail!("parse_filter: invalid grammar? {:?}", p.as_rule()),
         };
     }
 
-    let n = name.ok_or_else(|| "parse_filter: invalid grammer, no name found")?;
+    let n = name.ok_or_else(|| "parse_filter: invalid grammar, no name found")?;
     Ok(FunctionCall::new(n, args))
 }
 
@@ -130,7 +130,7 @@ fn parse_basic_expression(pair: Pair<Rule>) -> Result<ExpressionValue> {
             Rule::math_multiplication => MathOperator::Multiplication,
             Rule::math_division => MathOperator::Division,
             Rule::math_modulo => MathOperator::Modulo,
-            _ => unreachable!("parse_basic_expression(infix): {:?}", op),
+            _ => bail!("parse_basic_expression(infix): invalid grammar? {:?}", op),
         };
 
         Ok(ExpressionValue::Math(MathExpression::new(
@@ -146,14 +146,14 @@ fn parse_basic_expression(pair: Pair<Rule>) -> Result<ExpressionValue> {
         Rule::boolean => match pair.as_str() {
             "true" => ExpressionValue::Boolean(true),
             "false" => ExpressionValue::Boolean(false),
-            _ => unreachable!("parse_basic_expression(boolean): {:?}", pair.as_rule()),
+            _ => bail!("parse_basic_expression(boolean): invalid grammar? {:?}", pair.as_rule()),
         },
         Rule::function_call => ExpressionValue::FunctionCall(parse_function_call(pair)?),
         Rule::string => ExpressionValue::String(remove_string_quotes(pair.as_str())?),
         Rule::dotted_square_bracket_identifier => parse_dotted_square_bracket_identifier(pair)?,
         Rule::string_concat => parse_string_concat(pair)?,
         Rule::basic_expression => MATH_CLIMBER.climb(pair.into_inner(), primary, infix)?,
-        _ => unreachable!("parse_basic_expression: {:?}", pair.as_rule()),
+        _ => bail!("parse_basic_expression: invalid grammer? {:?}", pair.as_rule()),
     };
 
     Ok(result)
@@ -170,7 +170,7 @@ fn parse_logical_value(pair: Pair<Rule>) -> Result<Expression> {
         match p.as_rule() {
             Rule::logical_not => negated = true,
             Rule::comparison_expression => expression = Some(parse_comparison_expression(p)?),
-            _ => unreachable!("parse_logical_value: {:?}", p.as_rule()),
+            _ => bail!("parse_logical_value: invalid grammar? {:?}", p.as_rule()),
         };
     }
 
@@ -200,7 +200,7 @@ fn parse_logical_expression(pair: Pair<Rule>) -> Result<Expression> {
                 rhs?,
                 LogicalOperator::And,
             ))),
-            _ => unreachable!("parse_logical_expression(infix): {:?}", op.as_rule()),
+            _ => bail!("parse_logical_expression(infix): invalid grammar? {:?}", op.as_rule()),
         };
         Ok(result)
     };
@@ -208,7 +208,7 @@ fn parse_logical_expression(pair: Pair<Rule>) -> Result<Expression> {
     match pair.as_rule() {
         Rule::logical_value => parse_logical_value(pair),
         Rule::logical_expression => LOGICAL_CLIMBER.climb(pair.into_inner(), primary, infix),
-        _ => unreachable!("parse_logical_expression: {:?}", pair.as_rule()),
+        _ => bail!("parse_logical_expression: invalid grammar? {:?}", pair.as_rule()),
     }
 }
 
@@ -223,7 +223,7 @@ fn parse_basic_expression_with_filters(pair: Pair<Rule>) -> Result<Expression> {
         match p.as_rule() {
             Rule::basic_expression => expression = Some(parse_basic_expression(p)?),
             Rule::filter => filters.push(parse_filter(p)?),
-            _ => unreachable!("parse_basic_expression_with_filters: {:?}", p),
+            _ => bail!("parse_basic_expression_with_filters: invalid grammar? {:?}", p),
         };
     }
 
@@ -248,7 +248,7 @@ fn remove_string_quotes(input: &str) -> Result<String> {
         '"' => input.replace('"', "").to_string(),
         '\'' => input.replace('\'', "").to_string(),
         '`' => input.replace('`', "").to_string(),
-        _ => bail!("remove_string_quotes: {}", input),
+        _ => bail!("remove_string_quotes: invalid grammar? {}", input),
     };
     Ok(result)
 }
@@ -278,7 +278,7 @@ fn _parse_dotted_square_bracket_identifier(pair: Pair<Rule>) -> Result<Identifie
             Rule::dotted_square_bracket_identifier => {
                 IdentifierValue::IdentifierIndex(_parse_dotted_square_bracket_identifier(p)?)
             }
-            _ => unreachable!(),
+            _ => bail!("_parse_dotted_square_bracket_identifier: invalid grammar?"),
         };
         values.push(value);
     }
@@ -304,7 +304,7 @@ fn parse_string_concat(pair: Pair<Rule>) -> Result<ExpressionValue> {
             Rule::integer => ExpressionValue::Integer(p.as_str().parse()?),
             Rule::float => ExpressionValue::Float(check_f64(p.as_str().parse()?)?),
             Rule::dotted_square_bracket_identifier => parse_dotted_square_bracket_identifier(p)?,
-            _ => unreachable!("parse_string_concat: {:?}", p),
+            _ => bail!("parse_string_concat: invalid grammar?"),
         };
         values.push(result);
     }
@@ -325,7 +325,7 @@ fn parse_comparison_value(pair: Pair<Rule>) -> Result<Expression> {
             Rule::math_multiplication => MathOperator::Multiplication,
             Rule::math_division => MathOperator::Division,
             Rule::math_modulo => MathOperator::Modulo,
-            _ => unreachable!("parse_comparison_value(infix): {:?}", op),
+            _ => bail!("parse_comparison_value(infix): invalid grammar? {:?}", op),
         };
 
         Ok(Expression::new(ExpressionValue::Math(MathExpression::new(
@@ -336,7 +336,7 @@ fn parse_comparison_value(pair: Pair<Rule>) -> Result<Expression> {
     match pair.as_rule() {
         Rule::basic_expression_filter => parse_basic_expression_with_filters(pair),
         Rule::comparison_value => MATH_CLIMBER.climb(pair.into_inner(), primary, infix),
-        _ => unreachable!("parse_comparison_value: {:?}", pair.as_rule()),
+        _ => bail!("parse_comparison_value: invalid grammar? {:?}", pair.as_rule()),
     }
 }
 
@@ -354,7 +354,7 @@ fn parse_comparison_expression(pair: Pair<Rule>) -> Result<Expression> {
             Rule::relational_greater_than_or_equal => LogicalOperator::GreaterThanOrEqual,
             Rule::relational_not_equal => LogicalOperator::NotEqual,
             Rule::relational_equal => LogicalOperator::Equal,
-            _ => unreachable!("parse_comparison_expression(infix): {:?}", op),
+            _ => bail!("parse_comparison_expression(infix): invalid grammar? {:?}", op),
         };
 
         Ok(Expression::new(ExpressionValue::Logical(LogicalExpression::new(
@@ -365,7 +365,7 @@ fn parse_comparison_expression(pair: Pair<Rule>) -> Result<Expression> {
     match pair.as_rule() {
         Rule::comparison_value => parse_comparison_value(pair),
         Rule::comparison_expression => RELATIONAL_CLIMBER.climb(pair.into_inner(), primary, infix),
-        _ => unreachable!("parse_comparison_expression: {:?}", pair.as_rule()),
+        _ => bail!("parse_comparison_expression: invalid grammar? {:?}", pair.as_rule()),
     }
 }
 
@@ -384,7 +384,7 @@ fn parse_content(pair: Pair<Rule>) -> Result<Expression> {
     match inner.as_rule() {
         Rule::logical_expression => parse_logical_expression(inner),
         Rule::basic_expression_filter => parse_basic_expression_with_filters(inner),
-        _ => unreachable!(),
+        _ => bail!("parse_content: invalid grammar?"),
     }
 }
 
