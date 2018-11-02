@@ -13,7 +13,7 @@ use rand::{thread_rng, Rng};
 fn test_random() {
     let mut rng = thread_rng();
 
-    for _ in 0..100 {
+    for _ in 0..10 {
         let length = rng.gen::<u16>() as usize;
         let expression: String = rng
             .sample_iter::<char, Standard>(&Standard)
