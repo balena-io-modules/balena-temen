@@ -1,4 +1,5 @@
 use self::context::Context;
+use self::equal::RelativeEq;
 use crate::{
     builtin::{
         filter::{self, FilterFn},
@@ -12,6 +13,7 @@ use serde_json::{Number, Value};
 use std::collections::HashMap;
 
 pub mod context;
+mod equal;
 
 pub struct Engine {
     functions: HashMap<String, FunctionFn>,
@@ -258,21 +260,24 @@ impl Engine {
                     lhs || rhs
                 }
                 LogicalOperator::Equal | LogicalOperator::NotEqual => {
-                    let mut lhs = self.eval(lhs, context)?;
-                    let mut rhs = self.eval(rhs, context)?;
+                    let lhs = self.eval(lhs, context)?;
+                    let rhs = self.eval(rhs, context)?;
 
-                    if lhs.is_number() {
-                        lhs = Value::Number(Number::from_f64(lhs.as_f64().unwrap()).unwrap());
-                    }
-
-                    if rhs.is_number() {
-                        rhs = Value::Number(Number::from_f64(rhs.as_f64().unwrap()).unwrap());
-                    }
-
-                    if operator == &LogicalOperator::Equal {
-                        lhs == rhs
-                    } else {
-                        lhs != rhs
+                    match (&lhs, &rhs) {
+                        (Value::Number(ref lhs), Value::Number(ref rhs)) => {
+                            if operator == &LogicalOperator::Equal {
+                                lhs.relative_eq(rhs)
+                            } else {
+                                lhs.relative_ne(rhs)
+                            }
+                        }
+                        _ => {
+                            if operator == &LogicalOperator::Equal {
+                                lhs == rhs
+                            } else {
+                                lhs != rhs
+                            }
+                        }
                     }
                 }
                 LogicalOperator::GreaterThan
