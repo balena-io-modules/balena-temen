@@ -37,9 +37,8 @@ fn test_integer_boundaries() {
     test_parse_eq!(format!("{}", std::i64::MIN), ExpressionValue::Integer(std::i64::MIN));
     test_parse_eq!(format!("{}", std::i64::MAX), ExpressionValue::Integer(std::i64::MAX));
 
-    //    TODO Fix parser and return Result<Expression> instead of Result
-    //    test_parse_err!(format!("{}00", std::i64::MIN));
-    //    test_parse_err!(format!("{}00", std::i64::MAX));
+    test_parse_err!(format!("{}9999", std::i64::MIN));
+    test_parse_err!(format!("{}9999", std::i64::MAX));
 }
 
 #[test]
