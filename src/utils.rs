@@ -1,3 +1,4 @@
+//! Various utilities shared across the whole crate.
 use crate::error::{bail, Result};
 
 /// Check that the float is not infinite or NaN
