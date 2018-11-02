@@ -25,7 +25,7 @@ fn test_integer_math_operations() {
     test_eval_eq!("1 + 1", json!(2));
     test_eval_eq!("2 - 1", json!(1));
     test_eval_eq!("3 * 3", json!(9));
-    test_eval_eq!("6 / 3", json!(2.0));
+    test_eval_eq!("6 / 3", json!(2));
     test_eval_eq!("8 % 3", json!(2));
 }
 
@@ -42,8 +42,8 @@ fn test_float_math_operation() {
 fn test_math_operator_precedence() {
     test_eval_eq!("1 + 2 * 3", json!(7));
     test_eval_eq!("1 - 2 * 3", json!(-5));
-    test_eval_eq!("1 + 6 / 3", json!(3.0));
-    test_eval_eq!("1 - 6 / 3", json!(-1.0));
+    test_eval_eq!("1 + 6 / 3", json!(3));
+    test_eval_eq!("1 - 6 / 3", json!(-1));
     test_eval_eq!("1 + 6 % 3", json!(1));
     test_eval_eq!("1 - 6 % 3", json!(1));
 }

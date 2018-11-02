@@ -87,6 +87,15 @@ impl Engine {
                 Ok(Number::from_f64(validate_f64(result)?).unwrap())
             }
             MathOperator::Division => {
+                if lhs.is_i64() && rhs.is_i64() {
+                    // Try to divide integers and if there's no remained, return result as integer as well
+                    if let Some(0) = lhs.as_i64().unwrap().checked_rem(rhs.as_i64().unwrap()) {
+                        if let Some(x) = lhs.as_i64().unwrap().checked_div(rhs.as_i64().unwrap()) {
+                            return Ok(Number::from(x));
+                        }
+                    }
+                }
+
                 let lhs = lhs.as_f64().unwrap();
                 let rhs = rhs.as_f64().unwrap();
                 let result = lhs / rhs;
