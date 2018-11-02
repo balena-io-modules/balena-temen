@@ -1,6 +1,7 @@
 use crate::{
     error::{bail, Result},
     parser::ast::*,
+    utils::validate_f64,
 };
 use lazy_static::lazy_static;
 use pest::{
@@ -37,18 +38,6 @@ lazy_static! {
 #[derive(Parser)]
 #[grammar = "parser/grammar.pest"]
 struct ExpressionParser;
-
-fn check_f64(number: f64) -> Result<f64> {
-    if number.is_nan() {
-        bail!("parse_f64: NaN not supported");
-    }
-
-    if number.is_infinite() {
-        bail!("parse_f64: infinite not supported");
-    }
-
-    Ok(number)
-}
 
 //
 // kwarg = { identifier ~ "=" ~ (logical_expression | basic_expression_filter) }
@@ -142,7 +131,7 @@ fn parse_basic_expression(pair: Pair<Rule>) -> Result<ExpressionValue> {
 
     let result = match pair.as_rule() {
         Rule::integer => ExpressionValue::Integer(pair.as_str().parse()?),
-        Rule::float => ExpressionValue::Float(check_f64(pair.as_str().parse()?)?),
+        Rule::float => ExpressionValue::Float(validate_f64(pair.as_str().parse()?)?),
         Rule::boolean => match pair.as_str() {
             "true" => ExpressionValue::Boolean(true),
             "false" => ExpressionValue::Boolean(false),
@@ -302,7 +291,7 @@ fn parse_string_concat(pair: Pair<Rule>) -> Result<ExpressionValue> {
         let result = match p.as_rule() {
             Rule::string => ExpressionValue::String(remove_string_quotes(p.as_str())?),
             Rule::integer => ExpressionValue::Integer(p.as_str().parse()?),
-            Rule::float => ExpressionValue::Float(check_f64(p.as_str().parse()?)?),
+            Rule::float => ExpressionValue::Float(validate_f64(p.as_str().parse()?)?),
             Rule::dotted_square_bracket_identifier => parse_dotted_square_bracket_identifier(p)?,
             _ => bail!("parse_string_concat: invalid grammar?"),
         };

@@ -6,6 +6,7 @@ use crate::{
     },
     error::{bail, Result},
     parser::ast::*,
+    utils::validate_f64,
 };
 use serde_json::{Number, Value};
 use std::collections::HashMap;
@@ -44,11 +45,7 @@ impl Engine {
                 let rhs = rhs.as_f64().unwrap();
                 let result = lhs + rhs;
 
-                if result.is_finite() {
-                    Ok(Number::from_f64(result).unwrap())
-                } else {
-                    bail!("result of `{} + {}` is not finite", lhs, rhs);
-                }
+                Ok(Number::from_f64(validate_f64(result)?).unwrap())
             }
             MathOperator::Subtraction => {
                 if lhs.is_i64() && rhs.is_i64() {
@@ -61,11 +58,7 @@ impl Engine {
                 let rhs = rhs.as_f64().unwrap();
                 let result = lhs - rhs;
 
-                if result.is_finite() {
-                    Ok(Number::from_f64(result).unwrap())
-                } else {
-                    bail!("result of `{} - {}` is not finite", lhs, rhs);
-                }
+                Ok(Number::from_f64(validate_f64(result)?).unwrap())
             }
             MathOperator::Multiplication => {
                 if lhs.is_i64() && rhs.is_i64() {
@@ -78,11 +71,7 @@ impl Engine {
                 let rhs = rhs.as_f64().unwrap();
                 let result = lhs * rhs;
 
-                if result.is_finite() {
-                    Ok(Number::from_f64(result).unwrap())
-                } else {
-                    bail!("result of `{} * {}` is not finite", lhs, rhs);
-                }
+                Ok(Number::from_f64(validate_f64(result)?).unwrap())
             }
             MathOperator::Modulo => {
                 if lhs.is_i64() && rhs.is_i64() {
@@ -95,22 +84,14 @@ impl Engine {
                 let rhs = rhs.as_f64().unwrap();
                 let result = lhs % rhs;
 
-                if result.is_finite() {
-                    Ok(Number::from_f64(result).unwrap())
-                } else {
-                    bail!("result of `{} % {}` is not finite", lhs, rhs);
-                }
+                Ok(Number::from_f64(validate_f64(result)?).unwrap())
             }
             MathOperator::Division => {
                 let lhs = lhs.as_f64().unwrap();
                 let rhs = rhs.as_f64().unwrap();
                 let result = lhs / rhs;
 
-                if result.is_finite() {
-                    Ok(Number::from_f64(result).unwrap())
-                } else {
-                    bail!("result of `{} / {}` is not finite", lhs, rhs);
-                }
+                Ok(Number::from_f64(validate_f64(result)?).unwrap())
             }
         }
     }
