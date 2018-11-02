@@ -377,7 +377,7 @@ fn parse_content(pair: Pair<Rule>) -> Result<Expression> {
     }
 }
 
-pub fn parse(expression: &str) -> Result<Expression> {
+pub(crate) fn parse(expression: &str) -> Result<Expression> {
     let mut pairs = ExpressionParser::parse(Rule::content, expression)?;
     parse_content(pairs.next().ok_or_else(|| "parse: invalid grammar, no pair?")?)
 }
