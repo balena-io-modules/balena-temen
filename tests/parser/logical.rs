@@ -28,8 +28,12 @@ fn test_logical_operator() {
 }
 
 #[test]
-fn test_invalid_usage() {
-    test_parse_err!("true or");
+fn test_invalid_syntax() {
     test_parse_err!("true and");
+    test_parse_err!("and true");
+    test_parse_err!("true or");
+    test_parse_err!("or true");
+    test_parse_err!("or");
+    test_parse_err!("and");
     test_parse_err!("not");
 }

@@ -86,7 +86,7 @@ fn test_string() {
 }
 
 #[test]
-fn test_unclosed_string() {
+fn test_invalid_string_syntax() {
     test_parse_err!("\"hallo");
     test_parse_err!("\"ha'l'lo");
     test_parse_err!("\"ha`l`lo");

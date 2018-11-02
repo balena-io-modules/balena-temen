@@ -28,7 +28,7 @@ fn test_math_operator() {
 }
 
 #[test]
-fn test_invalid_usage() {
+fn test_invalid_syntax() {
     test_parse_err!("1+");
     test_parse_err!("1*");
     test_parse_err!("1/");
