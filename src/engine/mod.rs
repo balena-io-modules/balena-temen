@@ -262,7 +262,11 @@ impl Engine {
                 ref operator,
             }) => match operator {
                 LogicalOperator::And => self.eval_as_bool(lhs, context)? && self.eval_as_bool(rhs, context)?,
-                LogicalOperator::Or => self.eval_as_bool(lhs, context)? || self.eval_as_bool(rhs, context)?,
+                LogicalOperator::Or => {
+                    let lhs = self.eval_as_bool(lhs, context)?;
+                    let rhs = self.eval_as_bool(rhs, context)?;
+                    lhs || rhs
+                },
                 LogicalOperator::Equal | LogicalOperator::NotEqual => {
                     let mut lhs = self.eval(lhs, context)?;
                     let mut rhs = self.eval(rhs, context)?;
