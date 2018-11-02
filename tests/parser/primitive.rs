@@ -56,6 +56,24 @@ fn test_float_must_start_with_digit() {
 }
 
 #[test]
+fn test_float_leading_and_trailing_zeroes() {
+    test_parse_eq!("00000.0000", ExpressionValue::Float(0.0));
+    test_parse_eq!("-00001.30000", ExpressionValue::Float(-1.3));
+    test_parse_eq!("0002.9000", ExpressionValue::Float(2.9));
+}
+
+#[test]
+fn test_float_boundaries() {
+    // We have to format with at least one decimal digit otherwise it's parsed as int
+    test_parse_eq!(format!("{:.1}", std::f64::MIN), ExpressionValue::Float(std::f64::MIN));
+    test_parse_eq!(format!("{:.1}", std::f64::MAX), ExpressionValue::Float(std::f64::MAX));
+
+    // Infinite numbers are not supported
+    test_parse_err!(format!("{:.0}999.99", std::f64::MAX));
+    test_parse_err!(format!("{:.0}999.99", std::f64::MIN));
+}
+
+#[test]
 fn test_string() {
     test_parse_eq!("\"hallo\"", ExpressionValue::String("hallo".to_string()));
     test_parse_eq!("\"ha'l'lo\"", ExpressionValue::String("ha'l'lo".to_string()));
