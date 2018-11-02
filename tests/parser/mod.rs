@@ -1,4 +1,5 @@
 mod function;
+mod fuzzer;
 mod identifier;
 mod logical;
 mod math;
