@@ -1,6 +1,6 @@
-// Value implements PartialEq, but the implementation does use == operator.
-// It's not enough for doubles (f64), especially when templating engine
-// does math operations as well. We have to compare doubles in a better way.
+//! `serde_json::Value` implements `PartialEq`, but the implementation does
+//! use `==` operator. It's enough for `i64`, `u64`, but definitely not for
+//! `f64`.
 
 use approx::Relative;
 use serde_json::Number;
@@ -14,12 +14,13 @@ pub trait RelativeEq {
 }
 
 impl RelativeEq for Number {
-    /// Check equality of two numbers
+    /// Check the equality of two numbers
     ///
-    /// # Notes
+    /// Standard `==` operator is used if both numbers are either `i64` or `u64`
+    /// (both must of the same type).
     ///
-    /// Operator `==` is used for `i64` & `u64` types. `Relative` (from `approx` crate)
-    /// is used for `f64` comparison.
+    /// Numbers are converted to `f64` and `approx::Relative` is used for the
+    /// comparison if types differ or at least number is `f64`.
     ///
     /// # Arguments
     ///
