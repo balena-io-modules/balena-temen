@@ -37,9 +37,9 @@ fn test_integer_boundaries() {
     test_parse_eq!(format!("{}", std::i64::MIN), ExpressionValue::Integer(std::i64::MIN));
     test_parse_eq!(format!("{}", std::i64::MAX), ExpressionValue::Integer(std::i64::MAX));
 
-//    TODO Fix parser and return Result<Expression> instead of Result
-//    test_parse_err!(format!("{}00", std::i64::MIN));
-//    test_parse_err!(format!("{}00", std::i64::MAX));
+    //    TODO Fix parser and return Result<Expression> instead of Result
+    //    test_parse_err!(format!("{}00", std::i64::MIN));
+    //    test_parse_err!(format!("{}00", std::i64::MAX));
 }
 
 #[test]
@@ -55,37 +55,15 @@ fn test_float_must_start_with_digit() {
     test_parse_err!(".0");
 }
 
-
 #[test]
 fn test_string() {
-    test_parse_eq!(
-        "\"hallo\"",
-        ExpressionValue::String("hallo".to_string())
-    );
-    test_parse_eq!(
-        "\"ha'l'lo\"",
-        ExpressionValue::String("ha'l'lo".to_string())
-    );
-    test_parse_eq!(
-        "\"ha`l`lo\"",
-        ExpressionValue::String("ha`l`lo".to_string())
-    );
+    test_parse_eq!("\"hallo\"", ExpressionValue::String("hallo".to_string()));
+    test_parse_eq!("\"ha'l'lo\"", ExpressionValue::String("ha'l'lo".to_string()));
+    test_parse_eq!("\"ha`l`lo\"", ExpressionValue::String("ha`l`lo".to_string()));
     test_parse_eq!("'hallo'", ExpressionValue::String("hallo".to_string()));
-    test_parse_eq!(
-        "'ha\"l\"lo'",
-        ExpressionValue::String("ha\"l\"lo".to_string())
-    );
-    test_parse_eq!(
-        "'ha`l`lo'",
-        ExpressionValue::String("ha`l`lo".to_string())
-    );
+    test_parse_eq!("'ha\"l\"lo'", ExpressionValue::String("ha\"l\"lo".to_string()));
+    test_parse_eq!("'ha`l`lo'", ExpressionValue::String("ha`l`lo".to_string()));
     test_parse_eq!("`hallo`", ExpressionValue::String("hallo".to_string()));
-    test_parse_eq!(
-        "`ha'l'lo`",
-        ExpressionValue::String("ha'l'lo".to_string())
-    );
-    test_parse_eq!(
-        "`ha\"l\"lo`",
-        ExpressionValue::String("ha\"l\"lo".to_string())
-    );
+    test_parse_eq!("`ha'l'lo`", ExpressionValue::String("ha'l'lo".to_string()));
+    test_parse_eq!("`ha\"l\"lo`", ExpressionValue::String("ha\"l\"lo".to_string()));
 }
