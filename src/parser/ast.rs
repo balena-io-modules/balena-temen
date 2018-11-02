@@ -1,6 +1,21 @@
-//! AST = Abstract Syntax Tree.
+//! Expression Abstract Syntax Tree.
 //!
-//! AST is considered as a part of the public API and follows semantic Versioning.
+//! # Example
+//!
+//! ```rust
+//! use balena_temen::parser::ast::*;
+//!
+//! let parsed: Expression = "1 + 2".parse().unwrap();
+//! let manual = Expression::new(
+//!     ExpressionValue::Math(
+//!         MathExpression::new(
+//!             Expression::new(ExpressionValue::Integer(1)),
+//!             Expression::new(ExpressionValue::Integer(2)),
+//!             MathOperator::Addition
+//!         )
+//!     )
+//! );
+//! assert_eq!(parsed, manual);
 use crate::{error::Error, parser::parse};
 use std::{collections::HashMap, str::FromStr};
 
