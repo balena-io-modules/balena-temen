@@ -84,3 +84,16 @@ fn test_string() {
     test_parse_eq!("`ha'l'lo`", ExpressionValue::String("ha'l'lo".to_string()));
     test_parse_eq!("`ha\"l\"lo`", ExpressionValue::String("ha\"l\"lo".to_string()));
 }
+
+#[test]
+fn test_unclosed_string() {
+    test_parse_err!("\"hallo");
+    test_parse_err!("\"ha'l'lo");
+    test_parse_err!("\"ha`l`lo");
+    test_parse_err!("'hallo");
+    test_parse_err!("'ha\"l\"lo");
+    test_parse_err!("'ha`l`lo");
+    test_parse_err!("`hallo");
+    test_parse_err!("`ha'l'lo");
+    test_parse_err!("`ha\"l\"lo");
+}
