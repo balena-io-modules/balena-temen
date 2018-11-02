@@ -1,5 +1,5 @@
 [package]
-name = "balena-template"
+name = "balena-temen"
 version = "0.1.0"
 authors = ["Robert Vojta <robert@balena.io>"]
 edition = "2018"

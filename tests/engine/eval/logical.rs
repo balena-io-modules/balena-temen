@@ -1,5 +1,5 @@
-use balena_template::engine::context::Context;
-use balena_template::engine::Engine;
+use balena_temen::engine::context::Context;
+use balena_temen::engine::Engine;
 use serde_json::json;
 
 macro_rules! test_eval_eq {

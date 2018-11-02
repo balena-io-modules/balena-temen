@@ -1,4 +1,4 @@
-use balena_template::{error::Result, parser::ast::*};
+use balena_temen::{error::Result, parser::ast::*};
 use rand::distributions::Standard;
 use rand::{thread_rng, Rng};
 

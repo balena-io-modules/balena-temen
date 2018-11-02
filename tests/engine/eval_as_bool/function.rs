@@ -1,5 +1,5 @@
-use balena_template::engine::context::Context;
-use balena_template::engine::Engine;
+use balena_temen::engine::context::Context;
+use balena_temen::engine::Engine;
 
 macro_rules! test_eval_err {
     ($e:expr) => {{

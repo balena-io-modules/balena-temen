@@ -1,4 +1,4 @@
-use balena_template::{error::Error, parser::ast::*};
+use balena_temen::{error::Error, parser::ast::*};
 
 macro_rules! test_parse_eq {
     ($e:expr, $r:expr) => {{
