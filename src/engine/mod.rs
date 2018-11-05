@@ -22,14 +22,37 @@ pub struct Engine {
 
 impl Default for Engine {
     fn default() -> Engine {
-        let mut filters = HashMap::new();
-        filters.insert("upper".into(), Box::new(filter::upper) as FilterFn);
-        filters.insert("lower".into(), Box::new(filter::lower) as FilterFn);
+        let mut engine = Engine::new();
 
-        let mut functions = HashMap::new();
-        functions.insert("uuidv4".into(), Box::new(function::uuidv4) as FunctionFn);
+        engine.register_filter("upper", filter::upper);
+        engine.register_filter("lower", filter::lower);
 
-        Engine { functions, filters }
+        engine.register_function("uuidv4", function::uuidv4);
+
+        engine
+    }
+}
+
+impl Engine {
+    fn new() -> Engine {
+        Engine {
+            functions: HashMap::new(),
+            filters: HashMap::new(),
+        }
+    }
+
+    pub fn register_filter<S>(&mut self, name: S, filter: FilterFn)
+    where
+        S: Into<String>,
+    {
+        self.filters.insert(name.into(), filter);
+    }
+
+    pub fn register_function<S>(&mut self, name: S, function: FunctionFn)
+    where
+        S: Into<String>,
+    {
+        self.functions.insert(name.into(), function);
     }
 }
 
@@ -121,23 +144,19 @@ impl Engine {
     fn eval_function(&self, name: &str, args: &HashMap<String, Expression>, context: &Context) -> Result<Value> {
         let args = self.eval_args(args, context)?;
 
-        let f = self.functions.get(name);
-
-        if f.is_none() {
+        if let Some(f) = self.functions.get(name) {
+            f(&args)
+        } else {
             bail!("function `{}` not found", name);
         }
-
-        (f.unwrap())(&args)
     }
 
     fn eval_filter(&self, name: &str, value: &Value) -> Result<Value> {
-        let f = self.filters.get(name);
-
-        if f.is_none() {
+        if let Some(f) = self.filters.get(name) {
+            f(value)
+        } else {
             bail!("filter `{}` not found", name);
         }
-
-        (f.unwrap())(value)
     }
 
     fn eval_value_as_number(&self, value: &ExpressionValue, context: &Context) -> Result<Number> {
