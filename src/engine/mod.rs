@@ -15,23 +15,23 @@ use std::collections::HashMap;
 pub mod context;
 mod equal;
 
-pub struct Engine {
+pub struct EngineBuilder {
     functions: HashMap<String, FunctionFn>,
     filters: HashMap<String, FilterFn>,
 }
 
-impl Default for Engine {
-    fn default() -> Engine {
-        let mut engine = Engine::new();
-        engine.register_builtin_filters();
-        engine.register_builtin_functions();
-        engine
+impl Default for EngineBuilder {
+    fn default() -> EngineBuilder {
+        EngineBuilder::new()
+            .filter("upper", filter::upper)
+            .filter("lower", filter::lower)
+            .function("uuidv4", function::uuidv4)
     }
 }
 
-impl Engine {
-    fn new() -> Engine {
-        Engine {
+impl EngineBuilder {
+    fn new() -> EngineBuilder {
+        EngineBuilder {
             functions: HashMap::new(),
             filters: HashMap::new(),
         }
@@ -45,11 +45,16 @@ impl Engine {
     ///
     /// * `name` - Filter name
     /// * `filter` - Filter function
-    pub fn register_filter<S>(&mut self, name: S, filter: FilterFn)
+    pub fn filter<S>(self, name: S, filter: FilterFn) -> EngineBuilder
     where
         S: Into<String>,
     {
-        self.filters.insert(name.into(), filter);
+        let mut filters = self.filters;
+        filters.insert(name.into(), filter);
+        EngineBuilder {
+            functions: self.functions,
+            filters,
+        }
     }
 
     /// Register custom function
@@ -60,20 +65,36 @@ impl Engine {
     ///
     /// * `name` - Function name
     /// * `function` - Function
-    pub fn register_function<S>(&mut self, name: S, function: FunctionFn)
+    pub fn function<S>(self, name: S, function: FunctionFn) -> EngineBuilder
     where
         S: Into<String>,
     {
-        self.functions.insert(name.into(), function);
+        let mut functions = self.functions;
+        functions.insert(name.into(), function);
+        EngineBuilder {
+            functions,
+            filters: self.filters,
+        }
     }
+}
 
-    fn register_builtin_filters(&mut self) {
-        self.register_filter("upper", filter::upper);
-        self.register_filter("lower", filter::lower);
+impl From<EngineBuilder> for Engine {
+    fn from(builder: EngineBuilder) -> Engine {
+        Engine {
+            functions: builder.functions,
+            filters: builder.filters,
+        }
     }
+}
 
-    fn register_builtin_functions(&mut self) {
-        self.register_function("uuidv4", function::uuidv4);
+pub struct Engine {
+    functions: HashMap<String, FunctionFn>,
+    filters: HashMap<String, FilterFn>,
+}
+
+impl Default for Engine {
+    fn default() -> Engine {
+        EngineBuilder::default().into()
     }
 }
 

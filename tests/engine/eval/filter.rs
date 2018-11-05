@@ -1,5 +1,5 @@
 use balena_temen::engine::context::Context;
-use balena_temen::engine::Engine;
+use balena_temen::engine::{Engine, EngineBuilder};
 use serde_json::{json, Value};
 
 macro_rules! test_eval_eq {
@@ -54,8 +54,7 @@ fn test_custom_filter() {
         }
     };
 
-    let mut engine = Engine::default();
-    engine.register_filter("atob", cf);
+    let engine: Engine = EngineBuilder::default().filter("atob", cf).into();
     let ctx = Context::default();
 
     assert_eq!(

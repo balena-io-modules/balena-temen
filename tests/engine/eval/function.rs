@@ -1,5 +1,5 @@
 use balena_temen::engine::context::Context;
-use balena_temen::engine::Engine;
+use balena_temen::engine::{Engine, EngineBuilder};
 use serde_json::{json, Value};
 use std::collections::HashMap;
 use uuid::{Uuid, Version};
@@ -26,8 +26,7 @@ fn test_custom_function() {
         }
     };
 
-    let mut engine = Engine::default();
-    engine.register_function("echo", cf);
+    let engine: Engine = EngineBuilder::default().function("echo", cf).into();
     let ctx = Context::default();
 
     assert_eq!(
