@@ -1,4 +1,18 @@
 - commits:
+    - subject: Add dotted integer index
+      hash: 0013dcfa5c66fabec6ff683efd52c076f72b97b7
+      body: >
+        It’s possible to use array[1] or array.1 according to specification. The
+        second possibility wasn’t implemeneted and is added by this commit.
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Robert Vojta <robert@balena.io>
+        signed-off-by: Robert Vojta <robert@balena.io>
+      author: Robert Vojta
+  version: 0.0.4
+  date: 2018-11-05T13:52:37.481Z
+- commits:
     - subject: Allow to register custom function / filter
       hash: 4657d6f3dd712e34995911b5b8ea85267d57b739
       body: |
