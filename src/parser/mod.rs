@@ -253,7 +253,7 @@ fn remove_string_quotes(input: &str) -> Result<String> {
 // }
 //
 // dotted_square_bracket_identifier = ${
-//     identifier ~ ( ("." ~ identifier) | square_brackets )*
+//     identifier ~ ( ("." ~ ( identifier | positive_integer ) ) | square_brackets )*
 // }
 //
 fn parse_dotted_square_bracket_identifier_value(pair: Pair<Rule>) -> Result<Identifier> {
@@ -263,7 +263,7 @@ fn parse_dotted_square_bracket_identifier_value(pair: Pair<Rule>) -> Result<Iden
         let value = match p.as_rule() {
             Rule::identifier => IdentifierValue::Name(p.as_str().to_string()),
             Rule::string => IdentifierValue::StringIndex(remove_string_quotes(p.as_str())?),
-            Rule::integer => IdentifierValue::IntegerIndex(p.as_str().parse()?),
+            Rule::integer | Rule::positive_integer => IdentifierValue::IntegerIndex(p.as_str().parse()?),
             Rule::dotted_square_bracket_identifier => {
                 IdentifierValue::IdentifierIndex(parse_dotted_square_bracket_identifier_value(p)?)
             }

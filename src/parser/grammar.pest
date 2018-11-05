@@ -17,7 +17,9 @@ reserved = _{
 //
 
 // Allow leading 0 - "0001" => 1
-integer = @{ "-" ? ~ ASCII_DIGIT +}
+integer = @{ "-" ? ~ ASCII_DIGIT + }
+
+positive_integer = @{ ASCII_DIGIT + }
 
 // Allow leading 0 - "000.1" => 0.1
 float = @{ "-" ? ~ ASCII_DIGIT + ~ "." ~ ASCII_DIGIT + }
@@ -48,7 +50,7 @@ square_brackets = _{
 }
 
 dotted_square_bracket_identifier = ${
-    identifier ~ ( ("." ~ identifier) | square_brackets )*
+    identifier ~ ( ("." ~ ( identifier | positive_integer ) ) | square_brackets )*
 }
 
 string_concat = { (string | dotted_square_bracket_identifier) ~ ("~" ~ (float | integer | string | dotted_square_bracket_identifier))+ }
