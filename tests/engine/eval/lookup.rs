@@ -69,6 +69,48 @@ fn test_dotted() {
 }
 
 #[test]
+fn test_dotted_integer_index() {
+    let ctx = Context::new(json!({
+        "root": [
+            "hallo",
+            10,
+            3.2,
+            true,
+            ["a", "b"],
+            {"a": "b"},
+            null
+        ]}));
+
+    test_eval_eq!("root.0", ctx, json!("hallo"));
+    test_eval_eq!("root.1", ctx, json!(10));
+    test_eval_eq!("root.2", ctx, json!(3.2));
+    test_eval_eq!("root.3", ctx, json!(true));
+    test_eval_eq!("root.4", ctx, json!(["a", "b"]));
+    test_eval_eq!("root.5", ctx, json!({"a": "b"}));
+    test_eval_eq!("root.6", ctx, json!(null));
+
+    test_eval_err!("root.7", ctx);
+}
+
+#[test]
+fn test_dotted_integer_index_mixed() {
+    let ctx = Context::new(json!({
+        "people": [
+            {
+                "name": "Robert"
+            },
+            {
+                "name": "Cyryl"
+            }
+        ]}));
+
+    test_eval_eq!("people.0[`name`]", ctx, json!("Robert"));
+    test_eval_eq!("people.0.name", ctx, json!("Robert"));
+    test_eval_eq!("people.1[`name`]", ctx, json!("Cyryl"));
+    test_eval_eq!("people.1.name", ctx, json!("Cyryl"));
+}
+
+#[test]
 fn test_square_bracket_string() {
     let ctx = Context::new(json!({
         "root": {
