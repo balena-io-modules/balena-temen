@@ -1,0 +1,124 @@
+//
+// https://docs.rs/pest_derive/2.0.1/pest_derive/
+//
+
+WHITESPACE = _{ " " | "\t" | "\r" | "\n" }
+
+//
+// Reserved keywords
+//
+
+reserved = _{
+    "not" | "or" | "and" | "true" | "false"
+}
+
+//
+// Primitive types
+//
+
+// Allow leading 0 - "0001" => 1
+integer = @{ "-" ? ~ ASCII_DIGIT +}
+
+// Allow leading 0 - "000.1" => 0.1
+float = @{ "-" ? ~ ASCII_DIGIT + ~ "." ~ ASCII_DIGIT + }
+
+boolean = { "true" | "false" }
+
+double_quoted_string  = @{ "\"" ~ (!("\"") ~ ANY)* ~ "\""}
+single_quoted_string  = @{ "\'" ~ (!("\'") ~ ANY)* ~ "\'"}
+backquoted_quoted_string  = @{ "`" ~ (!("`") ~ ANY)* ~ "`"}
+
+string = @{ double_quoted_string | single_quoted_string | backquoted_quoted_string }
+
+//
+// Identifiers
+//
+// Identifier does not match if it matches one of the reserved keywords.
+//
+
+all_chars = _{'a'..'z' | 'A'..'Z' | "_" | '0'..'9'}
+identifier = @{
+    !reserved ~
+    ('a'..'z' | 'A'..'Z' | "_") ~
+    all_chars{,63}
+}
+
+square_brackets = _{
+    "[" ~ (integer | string | dotted_square_bracket_identifier) ~ "]"
+}
+
+dotted_square_bracket_identifier = ${
+    identifier ~ ( ("." ~ identifier) | square_brackets )*
+}
+
+string_concat = { (string | dotted_square_bracket_identifier) ~ ("~" ~ (float | integer | string | dotted_square_bracket_identifier))+ }
+
+//
+// Math operators
+//
+
+math_addition = { "+" }
+math_subtraction = { "-" }
+math_multiplication = { "*" }
+math_division = { "/" }
+math_modulo = { "%" }
+math_operator = _{
+    math_addition |
+    math_subtraction |
+    math_multiplication |
+    math_division |
+    math_modulo
+}
+
+//
+// Logic operators
+//
+
+logical_and = { "and" }
+logical_or = { "or" }
+logical_not = { "not" }
+logical_operator = _{
+    logical_and |
+    logical_or |
+    logical_not
+}
+
+//
+// Relational operators
+//
+
+relational_equal = { "==" }
+relational_not_equal = { "!=" }
+relational_greater_than = { ">" }
+relational_greater_than_or_equal = { ">=" }
+relational_lower_than = { "<" }
+relational_lower_than_or_equal = { "<=" }
+
+// NOTE Maintain the order! gte then gt, etc. Otherwise > is consumed and >= is never parsed!
+relational_operator = _{
+    relational_equal |
+    relational_not_equal |
+    relational_greater_than_or_equal |
+    relational_greater_than |
+    relational_lower_than_or_equal |
+    relational_lower_than
+}
+
+basic_value  = _{ boolean | function_call | string_concat | dotted_square_bracket_identifier | float | integer | string }
+basic_operator   = _{ math_operator }
+basic_expression = { ("(" ~ basic_expression ~ ")" | basic_value) ~ (basic_operator ~ ("(" ~ basic_expression ~ ")" | basic_value))* }
+basic_expression_filter = { basic_expression ~ filter* }
+
+comparison_value  = { basic_expression_filter ~ (basic_operator ~ basic_expression_filter)* }
+comparison_operator   = _{ relational_operator }
+comparison_expression = { comparison_value ~ (comparison_operator ~ comparison_value)* }
+
+logical_value  = { logical_not? ~ comparison_expression }
+logical_expression = { logical_value ~ ((logical_or | logical_and) ~ logical_value)* }
+
+kwarg = { identifier ~ "=" ~ (logical_expression | basic_expression_filter) }
+kwargs = _{ kwarg ~ ("," ~ kwarg )* }
+function_call = { identifier ~ "(" ~ kwargs? ~ ")" }
+filter  = { "|" ~ (function_call | identifier) }
+
+content = { SOI ~ (logical_expression | basic_expression_filter) ~ EOI }
