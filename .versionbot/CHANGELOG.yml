@@ -1,4 +1,17 @@
 - commits:
+    - subject: Allow to register custom function / filter
+      hash: 4657d6f3dd712e34995911b5b8ea85267d57b739
+      body: |
+        Fixes #8
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Robert Vojta <robert@balena.io>
+        signed-off-by: Robert Vojta <robert@balena.io>
+      author: Robert Vojta
+  version: 0.0.3
+  date: 2018-11-05T13:27:09.607Z
+- commits:
     - subject: Change type only
       hash: 79e78d810475840cab5164831604233af6285b8c
       body: ''
