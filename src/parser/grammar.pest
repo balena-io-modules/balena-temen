@@ -1,5 +1,5 @@
 //
-// https://docs.rs/pest_derive/2.0.1/pest_derive/#modifiers
+// https://docs.rs/pest_derive/2.0.1/pest_derive/
 //
 
 WHITESPACE = _{ " " | "\t" | "\r" | "\n" }
