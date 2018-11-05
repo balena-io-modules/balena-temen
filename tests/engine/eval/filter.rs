@@ -1,6 +1,6 @@
 use balena_temen::engine::context::Context;
-use balena_temen::engine::Engine;
-use serde_json::json;
+use balena_temen::engine::{Engine, EngineBuilder};
+use serde_json::{json, Value};
 
 macro_rules! test_eval_eq {
     ($e:expr, $r:expr) => {{
@@ -42,4 +42,24 @@ fn test_lower() {
 fn test_filter_chain() {
     test_eval_eq!("`a` | lower | upper", json!("A"));
     test_eval_eq!("`A` | lower | upper", json!("A"));
+}
+
+#[test]
+fn test_custom_filter() {
+    let cf = |value: &Value| {
+        if value.is_string() {
+            Ok(Value::String(value.as_str().unwrap().replace("a", "b")))
+        } else {
+            Err("no string, no fun".into())
+        }
+    };
+
+    let engine: Engine = EngineBuilder::default().filter("atob", cf).into();
+    let ctx = Context::default();
+
+    assert_eq!(
+        engine.eval(&"`abc` | atob".parse().unwrap(), &ctx).unwrap(),
+        json!("bbc")
+    );
+    assert!(engine.eval(&"true | atob".parse().unwrap(), &ctx).is_err());
 }

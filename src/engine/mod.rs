@@ -15,6 +15,78 @@ use std::collections::HashMap;
 pub mod context;
 mod equal;
 
+pub struct EngineBuilder {
+    functions: HashMap<String, FunctionFn>,
+    filters: HashMap<String, FilterFn>,
+}
+
+impl Default for EngineBuilder {
+    fn default() -> EngineBuilder {
+        EngineBuilder::new()
+            .filter("upper", filter::upper)
+            .filter("lower", filter::lower)
+            .function("uuidv4", function::uuidv4)
+    }
+}
+
+impl EngineBuilder {
+    fn new() -> EngineBuilder {
+        EngineBuilder {
+            functions: HashMap::new(),
+            filters: HashMap::new(),
+        }
+    }
+
+    /// Register custom filter
+    ///
+    /// If a filter with the name already exists, it will be overwritten.
+    ///
+    /// # Arguments
+    ///
+    /// * `name` - Filter name
+    /// * `filter` - Filter function
+    pub fn filter<S>(self, name: S, filter: FilterFn) -> EngineBuilder
+    where
+        S: Into<String>,
+    {
+        let mut filters = self.filters;
+        filters.insert(name.into(), filter);
+        EngineBuilder {
+            functions: self.functions,
+            filters,
+        }
+    }
+
+    /// Register custom function
+    ///
+    /// If a function with the name already exists, it will be overwritten.
+    ///
+    /// # Arguments
+    ///
+    /// * `name` - Function name
+    /// * `function` - Function
+    pub fn function<S>(self, name: S, function: FunctionFn) -> EngineBuilder
+    where
+        S: Into<String>,
+    {
+        let mut functions = self.functions;
+        functions.insert(name.into(), function);
+        EngineBuilder {
+            functions,
+            filters: self.filters,
+        }
+    }
+}
+
+impl From<EngineBuilder> for Engine {
+    fn from(builder: EngineBuilder) -> Engine {
+        Engine {
+            functions: builder.functions,
+            filters: builder.filters,
+        }
+    }
+}
+
 pub struct Engine {
     functions: HashMap<String, FunctionFn>,
     filters: HashMap<String, FilterFn>,
@@ -22,14 +94,7 @@ pub struct Engine {
 
 impl Default for Engine {
     fn default() -> Engine {
-        let mut filters = HashMap::new();
-        filters.insert("upper".into(), Box::new(filter::upper) as FilterFn);
-        filters.insert("lower".into(), Box::new(filter::lower) as FilterFn);
-
-        let mut functions = HashMap::new();
-        functions.insert("uuidv4".into(), Box::new(function::uuidv4) as FunctionFn);
-
-        Engine { functions, filters }
+        EngineBuilder::default().into()
     }
 }
 
@@ -121,23 +186,19 @@ impl Engine {
     fn eval_function(&self, name: &str, args: &HashMap<String, Expression>, context: &Context) -> Result<Value> {
         let args = self.eval_args(args, context)?;
 
-        let f = self.functions.get(name);
-
-        if f.is_none() {
+        if let Some(f) = self.functions.get(name) {
+            f(&args)
+        } else {
             bail!("function `{}` not found", name);
         }
-
-        (f.unwrap())(&args)
     }
 
     fn eval_filter(&self, name: &str, value: &Value) -> Result<Value> {
-        let f = self.filters.get(name);
-
-        if f.is_none() {
+        if let Some(f) = self.filters.get(name) {
+            f(value)
+        } else {
             bail!("filter `{}` not found", name);
         }
-
-        (f.unwrap())(value)
     }
 
     fn eval_value_as_number(&self, value: &ExpressionValue, context: &Context) -> Result<Number> {

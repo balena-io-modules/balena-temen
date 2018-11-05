@@ -1,7 +1,7 @@
 use crate::error::Result;
 use serde_json::Value;
 
-pub type FilterFn = Box<dyn Fn(&Value) -> Result<Value>>;
+pub type FilterFn = fn(&Value) -> Result<Value>;
 
 pub(crate) fn lower(value: &Value) -> Result<Value> {
     let s = value.as_str().ok_or_else(|| "`lower` filter accepts string only")?;

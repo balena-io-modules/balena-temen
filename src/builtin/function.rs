@@ -3,7 +3,7 @@ use serde_json::Value;
 use std::collections::HashMap;
 use uuid::Uuid;
 
-pub type FunctionFn = Box<dyn Fn(&HashMap<String, Value>) -> Result<Value>>;
+pub type FunctionFn = fn(&HashMap<String, Value>) -> Result<Value>;
 
 pub(crate) fn uuidv4(_args: &HashMap<String, Value>) -> Result<Value> {
     Ok(Value::String(Uuid::new_v4().to_hyphenated().to_string()))
