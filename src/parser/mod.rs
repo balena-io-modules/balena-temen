@@ -256,7 +256,7 @@ fn remove_string_quotes(input: &str) -> Result<String> {
 //     identifier ~ ( ("." ~ identifier) | square_brackets )*
 // }
 //
-fn _parse_dotted_square_bracket_identifier(pair: Pair<Rule>) -> Result<Identifier> {
+fn parse_dotted_square_bracket_identifier_value(pair: Pair<Rule>) -> Result<Identifier> {
     let mut values = Vec::new();
 
     for p in pair.into_inner() {
@@ -265,9 +265,9 @@ fn _parse_dotted_square_bracket_identifier(pair: Pair<Rule>) -> Result<Identifie
             Rule::string => IdentifierValue::StringIndex(remove_string_quotes(p.as_str())?),
             Rule::integer => IdentifierValue::IntegerIndex(p.as_str().parse()?),
             Rule::dotted_square_bracket_identifier => {
-                IdentifierValue::IdentifierIndex(_parse_dotted_square_bracket_identifier(p)?)
+                IdentifierValue::IdentifierIndex(parse_dotted_square_bracket_identifier_value(p)?)
             }
-            _ => bail!("_parse_dotted_square_bracket_identifier: invalid grammar?"),
+            _ => bail!("parse_dotted_square_bracket_identifier_value: invalid grammar?"),
         };
         values.push(value);
     }
@@ -276,7 +276,7 @@ fn _parse_dotted_square_bracket_identifier(pair: Pair<Rule>) -> Result<Identifie
 }
 
 fn parse_dotted_square_bracket_identifier(pair: Pair<Rule>) -> Result<ExpressionValue> {
-    Ok(ExpressionValue::Identifier(_parse_dotted_square_bracket_identifier(
+    Ok(ExpressionValue::Identifier(parse_dotted_square_bracket_identifier_value(
         pair,
     )?))
 }
