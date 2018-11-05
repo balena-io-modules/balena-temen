@@ -23,12 +23,8 @@ pub struct Engine {
 impl Default for Engine {
     fn default() -> Engine {
         let mut engine = Engine::new();
-
-        engine.register_filter("upper", filter::upper);
-        engine.register_filter("lower", filter::lower);
-
-        engine.register_function("uuidv4", function::uuidv4);
-
+        engine.register_builtin_filters();
+        engine.register_builtin_functions();
         engine
     }
 }
@@ -69,6 +65,15 @@ impl Engine {
         S: Into<String>,
     {
         self.functions.insert(name.into(), function);
+    }
+
+    fn register_builtin_filters(&mut self) {
+        self.register_filter("upper", filter::upper);
+        self.register_filter("lower", filter::lower);
+    }
+
+    fn register_builtin_functions(&mut self) {
+        self.register_function("uuidv4", function::uuidv4);
     }
 }
 
