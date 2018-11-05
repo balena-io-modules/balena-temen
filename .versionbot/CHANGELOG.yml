@@ -1,1 +1,21 @@
-[]
+- commits:
+    - subject: Change type only
+      hash: 79e78d810475840cab5164831604233af6285b8c
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Robert Vojta <robert@balena.io>
+        signed-off-by: Robert Vojta <robert@balena.io>
+      author: Robert Vojta
+    - subject: Update email address
+      hash: 9af7c419fa4750c5f971b07de9a5c4d4213af4b2
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Robert Vojta <robert@balena.io>
+        signed-off-by: Robert Vojta <robert@balena.io>
+      author: Robert Vojta
+  version: 0.0.2
+  date: 2018-11-05T09:08:47.632Z
