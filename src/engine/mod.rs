@@ -35,6 +35,7 @@ impl Default for Engine {
 
 impl Engine {
     fn eval_math(&self, lhs: &Number, rhs: &Number, operator: MathOperator) -> Result<Number> {
+        // TODO Extract to a generic function
         match operator {
             MathOperator::Addition => {
                 if lhs.is_i64() && rhs.is_i64() {
