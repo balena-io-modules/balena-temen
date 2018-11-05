@@ -276,9 +276,9 @@ fn parse_dotted_square_bracket_identifier_value(pair: Pair<Rule>) -> Result<Iden
 }
 
 fn parse_dotted_square_bracket_identifier(pair: Pair<Rule>) -> Result<ExpressionValue> {
-    Ok(ExpressionValue::Identifier(parse_dotted_square_bracket_identifier_value(
-        pair,
-    )?))
+    Ok(ExpressionValue::Identifier(
+        parse_dotted_square_bracket_identifier_value(pair)?,
+    ))
 }
 
 //
