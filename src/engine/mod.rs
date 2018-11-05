@@ -41,6 +41,14 @@ impl Engine {
         }
     }
 
+    /// Register custom filter
+    ///
+    /// If a filter with the name already exists, it will be overwritten.
+    ///
+    /// # Arguments
+    ///
+    /// * `name` - Filter name
+    /// * `filter` - Filter function
     pub fn register_filter<S>(&mut self, name: S, filter: FilterFn)
     where
         S: Into<String>,
@@ -48,6 +56,14 @@ impl Engine {
         self.filters.insert(name.into(), filter);
     }
 
+    /// Register custom function
+    ///
+    /// If a function with the name already exists, it will be overwritten.
+    ///
+    /// # Arguments
+    ///
+    /// * `name` - Function name
+    /// * `function` - Function
     pub fn register_function<S>(&mut self, name: S, function: FunctionFn)
     where
         S: Into<String>,
