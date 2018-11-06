@@ -92,6 +92,10 @@ mod tests {
             now_with_cached(cached, &hashmap!("utc" => Value::Bool(true))).unwrap(),
             json!(cached.with_timezone(&Utc).to_rfc3339())
         );
+        assert_eq!(
+            now_with_cached(cached, &hashmap!("utc" => Value::Bool(true))).unwrap(),
+            json!("2018-11-06T06:23:00+00:00")
+        );
     }
 
     #[test]

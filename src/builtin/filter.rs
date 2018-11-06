@@ -1,33 +1,60 @@
+use chrono::{DateTime, NaiveDateTime, Utc};
 use crate::engine::context::Context;
 use crate::error::Result;
 use serde_json::Value;
+use std::collections::HashMap;
 
-pub type FilterFn = fn(&Value, &Context) -> Result<Value>;
+pub type FilterFn = fn(&Value, &HashMap<String, Value>, &Context) -> Result<Value>;
 
-pub(crate) fn lower(value: &Value, _context: &Context) -> Result<Value> {
+pub(crate) fn lower(value: &Value, _args: &HashMap<String, Value>, _context: &Context) -> Result<Value> {
     let s = value.as_str().ok_or_else(|| "`lower` filter accepts string only")?;
     Ok(Value::String(s.to_lowercase()))
 }
 
-pub(crate) fn upper(value: &Value, _context: &Context) -> Result<Value> {
+pub(crate) fn upper(value: &Value, _args: &HashMap<String, Value>, _context: &Context) -> Result<Value> {
     let s = value.as_str().ok_or_else(|| "`upper` filter accepts string only")?;
     Ok(Value::String(s.to_uppercase()))
+}
+
+fn format_timestamp(filter: &str, value: &Value, args: &HashMap<String, Value>, default: &str) -> Result<Value> {
+    let ts = value
+        .as_i64()
+        .ok_or_else(|| format!("`{}` accepts integer only", filter))?;
+
+    let format = args.get("format").and_then(|x| x.as_str()).unwrap_or(default);
+
+    let dt = DateTime::<Utc>::from_utc(NaiveDateTime::from_timestamp(ts, 0), Utc);
+
+    Ok(Value::String(dt.format(format).to_string()))
+}
+
+pub(crate) fn time(value: &Value, args: &HashMap<String, Value>, _context: &Context) -> Result<Value> {
+    format_timestamp("time", value, args, "%H:%M:%S")
+}
+
+pub(crate) fn date(value: &Value, args: &HashMap<String, Value>, _context: &Context) -> Result<Value> {
+    format_timestamp("date", value, args, "%Y-%m-%d")
+}
+
+pub(crate) fn datetime(value: &Value, args: &HashMap<String, Value>, _context: &Context) -> Result<Value> {
+    format_timestamp("datetime", value, args, "%Y-%m-%dT%H:%M:%S%:z")
 }
 
 #[cfg(test)]
 mod tests {
     use super::{lower, upper, Context};
     use serde_json::json;
+    use std::collections::HashMap;
 
     macro_rules! test_filter_eq {
         ($f:ident, $e:expr, $r:expr) => {{
-            assert_eq!($f(&$e, &Context::default()).unwrap(), $r);
+            assert_eq!($f(&$e, &HashMap::new(), &Context::default()).unwrap(), $r);
         }};
     }
 
     macro_rules! test_filter_err {
         ($f:ident, $e:expr) => {{
-            assert!($f(&$e, &Context::default()).is_err());
+            assert!($f(&$e, &HashMap::new(), &Context::default()).is_err());
         }};
     }
 

@@ -1,6 +1,7 @@
 use balena_temen::engine::context::Context;
 use balena_temen::engine::{Engine, EngineBuilder};
 use serde_json::{json, Value};
+use std::collections::HashMap;
 
 macro_rules! test_eval_eq {
     ($e:expr, $r:expr) => {{
@@ -39,6 +40,55 @@ fn test_lower() {
 }
 
 #[test]
+fn test_time() {
+    test_eval_eq!("1541485381 | time", json!("06:23:01"));
+    test_eval_eq!("1541485381 | time == 1541485381 | time(format=`%H:%M:%S`)", json!(true));
+
+    test_eval_eq!("1541485381 | time(format=`%H`)", json!("06"));
+    test_eval_eq!("1541485381 | time(format=`%M`)", json!("23"));
+    test_eval_eq!("1541485381 | time(format=`%S`)", json!("01"));
+
+    // Invalid format is ignored
+    test_eval_eq!("1541485381 | time(format=1)", json!("06:23:01"));
+    test_eval_eq!("1541485381 | time(format=true)", json!("06:23:01"));
+}
+
+#[test]
+fn test_date() {
+    test_eval_eq!("1541485381 | date", json!("2018-11-06"));
+    test_eval_eq!("1541485381 | date == 1541485381 | date(format=`%Y-%m-%d`)", json!(true));
+
+    test_eval_eq!("1541485381 | date(format=`%Y`)", json!("2018"));
+    test_eval_eq!("1541485381 | date(format=`%m`)", json!("11"));
+    test_eval_eq!("1541485381 | date(format=`%d`)", json!("06"));
+
+    // Invalid format is ignored
+    test_eval_eq!("1541485381 | date(format=1)", json!("2018-11-06"));
+    test_eval_eq!("1541485381 | date(format=true)", json!("2018-11-06"));
+}
+
+#[test]
+fn test_date_time() {
+    test_eval_eq!("1541485381 | datetime", json!("2018-11-06T06:23:01+00:00"));
+    test_eval_eq!(
+        "1541485381 | datetime == 1541485381 | datetime(format=`%Y-%m-%dT%H:%M:%S%:z`)",
+        json!(true)
+    );
+
+    test_eval_eq!("1541485381 | datetime(format=`%Y`)", json!("2018"));
+    test_eval_eq!("1541485381 | datetime(format=`%m`)", json!("11"));
+    test_eval_eq!("1541485381 | datetime(format=`%d`)", json!("06"));
+    test_eval_eq!("1541485381 | datetime(format=`%H`)", json!("06"));
+    test_eval_eq!("1541485381 | datetime(format=`%M`)", json!("23"));
+    test_eval_eq!("1541485381 | datetime(format=`%S`)", json!("01"));
+    test_eval_eq!("1541485381 | datetime(format=`%:z`)", json!("+00:00"));
+
+    // Invalid format is ignored
+    test_eval_eq!("1541485381 | datetime(format=1)", json!("2018-11-06T06:23:01+00:00"));
+    test_eval_eq!("1541485381 | datetime(format=true)", json!("2018-11-06T06:23:01+00:00"));
+}
+
+#[test]
 fn test_filter_chain() {
     test_eval_eq!("`a` | lower | upper", json!("A"));
     test_eval_eq!("`A` | lower | upper", json!("A"));
@@ -46,7 +96,7 @@ fn test_filter_chain() {
 
 #[test]
 fn test_custom_filter() {
-    let cf = |value: &Value, _: &Context| {
+    let cf = |value: &Value, _: &HashMap<String, Value>, _: &Context| {
         if value.is_string() {
             Ok(Value::String(value.as_str().unwrap().replace("a", "b")))
         } else {
