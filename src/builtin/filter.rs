@@ -1,32 +1,33 @@
+use crate::engine::context::Context;
 use crate::error::Result;
 use serde_json::Value;
 
-pub type FilterFn = fn(&Value) -> Result<Value>;
+pub type FilterFn = fn(&Value, &Context) -> Result<Value>;
 
-pub(crate) fn lower(value: &Value) -> Result<Value> {
+pub(crate) fn lower(value: &Value, _context: &Context) -> Result<Value> {
     let s = value.as_str().ok_or_else(|| "`lower` filter accepts string only")?;
     Ok(Value::String(s.to_lowercase()))
 }
 
-pub(crate) fn upper(value: &Value) -> Result<Value> {
+pub(crate) fn upper(value: &Value, _context: &Context) -> Result<Value> {
     let s = value.as_str().ok_or_else(|| "`upper` filter accepts string only")?;
     Ok(Value::String(s.to_uppercase()))
 }
 
 #[cfg(test)]
 mod tests {
-    use super::{lower, upper};
+    use super::{lower, upper, Context};
     use serde_json::json;
 
     macro_rules! test_filter_eq {
         ($f:ident, $e:expr, $r:expr) => {{
-            assert_eq!($f(&$e).unwrap(), $r);
+            assert_eq!($f(&$e, &Context::default()).unwrap(), $r);
         }};
     }
 
     macro_rules! test_filter_err {
         ($f:ident, $e:expr) => {{
-            assert!($f(&$e).is_err());
+            assert!($f(&$e, &Context::default()).is_err());
         }};
     }
 

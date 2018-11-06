@@ -26,6 +26,7 @@ impl Default for EngineBuilder {
             .filter("upper", filter::upper)
             .filter("lower", filter::lower)
             .function("uuidv4", function::uuidv4)
+            .function("now", function::now)
     }
 }
 
@@ -187,15 +188,15 @@ impl Engine {
         let args = self.eval_args(args, context)?;
 
         if let Some(f) = self.functions.get(name) {
-            f(&args)
+            f(&args, context)
         } else {
             bail!("function `{}` not found", name);
         }
     }
 
-    fn eval_filter(&self, name: &str, value: &Value) -> Result<Value> {
+    fn eval_filter(&self, name: &str, value: &Value, context: &Context) -> Result<Value> {
         if let Some(f) = self.filters.get(name) {
-            f(value)
+            f(value, context)
         } else {
             bail!("filter `{}` not found", name);
         }
@@ -285,7 +286,7 @@ impl Engine {
         };
 
         for filter in expression.filters.iter() {
-            result = self.eval_filter(&filter.name, &result)?;
+            result = self.eval_filter(&filter.name, &result, context)?;
         }
 
         if expression.negated {

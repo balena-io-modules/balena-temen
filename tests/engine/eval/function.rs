@@ -17,8 +17,41 @@ fn test_uuidv4() {
 }
 
 #[test]
+fn test_now() {
+    let engine = Engine::default();
+    let context = Context::default();
+
+    // now() has unit tests covering return value validity, so, it's enough to check result type here
+
+    assert_eq!(
+        engine.eval(&"now()".parse().unwrap(), &context).unwrap(),
+        engine.eval(&"now()".parse().unwrap(), &context).unwrap()
+    );
+    assert_eq!(
+        engine
+            .eval(&"now() == now(timestamp=false, utc=false)".parse().unwrap(), &context)
+            .unwrap(),
+        Value::Bool(true)
+    );
+
+    assert!(engine.eval(&"now()".parse().unwrap(), &context).unwrap().is_string());
+    assert!(engine
+        .eval(&"now(utc=true)".parse().unwrap(), &context)
+        .unwrap()
+        .is_string());
+    assert!(engine
+        .eval(&"now(timestamp=true)".parse().unwrap(), &context)
+        .unwrap()
+        .is_number());
+    assert!(engine
+        .eval(&"now(timestamp=true, utc=true)".parse().unwrap(), &context)
+        .unwrap()
+        .is_number());
+}
+
+#[test]
 fn test_custom_function() {
-    let cf = |args: &HashMap<String, Value>| {
+    let cf = |args: &HashMap<String, Value>, _: &Context| {
         if let Some(name) = args.get("name") {
             Ok(name.clone())
         } else {

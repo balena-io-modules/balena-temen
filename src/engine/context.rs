@@ -1,17 +1,52 @@
+use chrono::{DateTime, Utc};
 use crate::error::{bail, Result};
 use crate::parser::ast::*;
 use serde_json::Value;
+use std::sync::{Arc, Mutex};
+
+#[derive(Default)]
+struct Internal {
+    cached_now: Option<DateTime<Utc>>,
+}
+
+impl Internal {
+    fn cached_now(&mut self) -> DateTime<Utc> {
+        if let Some(x) = self.cached_now {
+            return x;
+        }
+
+        let x = Utc::now();
+        self.cached_now = Some(x);
+        x
+    }
+}
 
 pub struct Context {
-    #[allow(dead_code)]
     data: Value,
+    internal: Arc<Mutex<Internal>>,
 }
 
 impl Context {
     pub fn new(data: Value) -> Context {
-        Context { data }
+        Context {
+            data,
+            internal: Arc::new(Mutex::new(Internal::default())),
+        }
     }
+}
 
+impl Context {
+    /// Get current date time
+    ///
+    /// # Warning
+    ///
+    /// The result is cached and subsequent calls return same value!
+    pub(crate) fn cached_now(&self) -> DateTime<Utc> {
+        self.internal.lock().unwrap().cached_now()
+    }
+}
+
+impl Context {
     fn lookup_variable_value<'a>(&self, value: &'a Value, identifier: &IdentifierValue) -> Result<&'a Value> {
         match identifier {
             IdentifierValue::Name(ref id) | IdentifierValue::StringIndex(ref id) => value

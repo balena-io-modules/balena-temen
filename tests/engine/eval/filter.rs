@@ -46,7 +46,7 @@ fn test_filter_chain() {
 
 #[test]
 fn test_custom_filter() {
-    let cf = |value: &Value| {
+    let cf = |value: &Value, _: &Context| {
         if value.is_string() {
             Ok(Value::String(value.as_str().unwrap().replace("a", "b")))
         } else {
