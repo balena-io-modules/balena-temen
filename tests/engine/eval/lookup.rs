@@ -1,5 +1,6 @@
 use balena_temen::engine::context::Context;
 use balena_temen::engine::Engine;
+use balena_temen::parser::ast::*;
 use serde_json::json;
 
 macro_rules! test_eval_eq {
@@ -269,4 +270,39 @@ fn test_square_bracket_nested_indirect() {
         }}));
 
     test_eval_eq!("data.country[country[name]]['rust-developers']", ctx, json!(2));
+}
+
+#[test]
+fn test_relative_lookup() {
+    let position_expression: Expression = "country.czech".parse().unwrap();
+
+    match position_expression.value {
+        ExpressionValue::Identifier(ref identifier) => {
+            let ctx = Context::new_with_position(
+                json!({
+                    "name": "czech",
+                    "country": {
+                        "czech": "Czech Republic"
+                    },
+                    "data": {
+                        "country": {
+                            "Czech Republic": {
+                                "rust-developers": 2
+                            }
+                        }
+                    }}),
+                identifier.clone(),
+            );
+            test_eval_eq!("this", ctx, json!("Czech Republic"));
+            test_eval_eq!("this.super", ctx, json!({"czech" : "Czech Republic"}));
+            test_eval_eq!("super", ctx, json!({"czech" : "Czech Republic"}));
+            test_eval_eq!("this.super.super.name", ctx, json!("czech"));
+            test_eval_eq!(
+                "data.country[country[this.super.super.name]][`rust-developers`]",
+                ctx,
+                json!(2)
+            );
+        }
+        _ => panic!(),
+    };
 }
