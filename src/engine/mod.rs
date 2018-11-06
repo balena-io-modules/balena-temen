@@ -29,6 +29,7 @@ impl Default for EngineBuilder {
             .filter("date", filter::date)
             .filter("datetime", filter::datetime)
             .filter("trim", filter::trim)
+            .filter("slugify", filter::slugify)
             .function("uuidv4", function::uuidv4)
             .function("now", function::now)
     }

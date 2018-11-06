@@ -52,6 +52,25 @@ fn test_trim() {
 }
 
 #[test]
+fn test_slugify() {
+    test_eval_eq!("`abc` | slugify", json!("abc"));
+    test_eval_eq!("`abc--def` | slugify", json!("abc-def"));
+    test_eval_eq!("`ěščřžýáíé` | slugify", json!("escrzyaie"));
+    test_eval_eq!("`Robert & Cyryl` | slugify", json!("robert-cyryl"));
+    test_eval_eq!("`some white\tspace here` | slugify", json!("some-white-space-here"));
+    test_eval_eq!("`what about !@#$%^&*()` | slugify", json!("what-about"));
+    test_eval_eq!("`-abc` | slugify", json!("abc"));
+    test_eval_eq!("`-abc-` | slugify", json!("abc"));
+    test_eval_eq!("`abc-` | slugify", json!("abc"));
+
+    test_eval_err!("`-` | slugify");
+
+    test_eval_err!("1 | slugify");
+    test_eval_err!("1.0 | slugify");
+    test_eval_err!("true | slugify");
+}
+
+#[test]
 fn test_time() {
     test_eval_eq!("1541485381 | time", json!("06:23:01"));
     test_eval_eq!("1541485381 | time == 1541485381 | time(format=`%H:%M:%S`)", json!(true));

@@ -2,6 +2,7 @@ use chrono::{DateTime, NaiveDateTime, Utc};
 use crate::engine::context::Context;
 use crate::error::Result;
 use serde_json::Value;
+use slug;
 use std::collections::HashMap;
 
 pub type FilterFn = fn(&Value, &HashMap<String, Value>, &Context) -> Result<Value>;
@@ -53,4 +54,19 @@ pub(crate) fn trim(value: &Value, _args: &HashMap<String, Value>, _context: &Con
             .trim()
             .to_string(),
     ))
+}
+
+pub(crate) fn slugify(value: &Value, _args: &HashMap<String, Value>, _context: &Context) -> Result<Value> {
+    let s = value.as_str().ok_or_else(|| "`slugify` filter accepts string only")?;
+
+    if s.is_empty() {
+        return Ok(value.clone());
+    }
+
+    let result = slug::slugify(s);
+    if result.is_empty() {
+        return Err(format!("unable to slugify `{}`", s).into());
+    }
+
+    Ok(Value::String(result))
 }
