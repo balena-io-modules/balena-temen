@@ -1,4 +1,43 @@
 - commits:
+    - subject: Add slugify filter
+      hash: 4c8c299dac3118dd589ec6b231070b5e769c3298
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Robert Vojta <robert@balena.io>
+        signed-off-by: Robert Vojta <robert@balena.io>
+      author: Robert Vojta
+    - subject: Add trim filter
+      hash: 4db93ac4ea24dfb77a0f164fdf3b9b90ccda0167
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Robert Vojta <robert@balena.io>
+        signed-off-by: Robert Vojta <robert@balena.io>
+      author: Robert Vojta
+    - subject: 'Add time, date, datetime filters'
+      hash: 625716b237c014f603d50b7fa019f1de3b2f6550
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Robert Vojta <robert@balena.io>
+        signed-off-by: Robert Vojta <robert@balena.io>
+      author: Robert Vojta
+    - subject: Add now() function
+      hash: 832b4dfa6dd968bfee940d2656196ac033d96270
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Robert Vojta <robert@balena.io>
+        signed-off-by: Robert Vojta <robert@balena.io>
+      author: Robert Vojta
+  version: 0.0.5
+  date: 2018-11-06T08:30:18.657Z
+- commits:
     - subject: Add dotted integer index
       hash: 0013dcfa5c66fabec6ff683efd52c076f72b97b7
       body: >
