@@ -184,6 +184,10 @@ pub enum IdentifierValue {
     StringIndex(String),
     /// Indirect index (value of another identifier)
     IdentifierIndex(Identifier),
+    /// Points to current object
+    This,
+    /// Points to parent object
+    Super,
 }
 
 /// Expression value

@@ -81,6 +81,8 @@ impl Context {
                     .and_then(|idx| self.lookup_variable_value(value, &IdentifierValue::IntegerIndex(idx as isize))),
                 _ => bail!("unable to lookup variable: result of indirect lookup is not a number / string"),
             },
+            IdentifierValue::This => unimplemented!(),
+            IdentifierValue::Super => unimplemented!(),
         }
     }
 

@@ -128,3 +128,47 @@ fn test_identifier_float_index() {
 fn test_identifier_bool_index() {
     test_parse_err!("networks[true].wifi");
 }
+
+#[test]
+fn test_this() {
+    test_parse_eq!(
+        "this",
+        Expression::new(ExpressionValue::Identifier(Identifier::new(vec![
+            IdentifierValue::This
+        ])))
+    );
+    test_parse_eq!(
+        "this.ssid",
+        Expression::new(ExpressionValue::Identifier(Identifier::new(vec![
+            IdentifierValue::This,
+            IdentifierValue::Name("ssid".to_string())
+        ])))
+    );
+}
+
+#[test]
+fn test_super() {
+    test_parse_eq!(
+        "super.ssid",
+        Expression::new(ExpressionValue::Identifier(Identifier::new(vec![
+            IdentifierValue::Super,
+            IdentifierValue::Name("ssid".to_string())
+        ])))
+    );
+    test_parse_eq!(
+        "networks[0].super",
+        Expression::new(ExpressionValue::Identifier(Identifier::new(vec![
+            IdentifierValue::Name("networks".to_string()),
+            IdentifierValue::IntegerIndex(0),
+            IdentifierValue::Super
+        ])))
+    );
+    test_parse_eq!(
+        "super.super.super",
+        Expression::new(ExpressionValue::Identifier(Identifier::new(vec![
+            IdentifierValue::Super,
+            IdentifierValue::Super,
+            IdentifierValue::Super
+        ])))
+    );
+}
