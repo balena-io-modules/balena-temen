@@ -25,7 +25,13 @@ impl Default for EngineBuilder {
         EngineBuilder::new()
             .filter("upper", filter::upper)
             .filter("lower", filter::lower)
+            .filter("time", filter::time)
+            .filter("date", filter::date)
+            .filter("datetime", filter::datetime)
+            .filter("trim", filter::trim)
+            .filter("slugify", filter::slugify)
             .function("uuidv4", function::uuidv4)
+            .function("now", function::now)
     }
 }
 
@@ -187,15 +193,23 @@ impl Engine {
         let args = self.eval_args(args, context)?;
 
         if let Some(f) = self.functions.get(name) {
-            f(&args)
+            f(&args, context)
         } else {
             bail!("function `{}` not found", name);
         }
     }
 
-    fn eval_filter(&self, name: &str, value: &Value) -> Result<Value> {
+    fn eval_filter(
+        &self,
+        name: &str,
+        value: &Value,
+        args: &HashMap<String, Expression>,
+        context: &Context,
+    ) -> Result<Value> {
+        let args = self.eval_args(args, context)?;
+
         if let Some(f) = self.filters.get(name) {
-            f(value)
+            f(value, &args, context)
         } else {
             bail!("filter `{}` not found", name);
         }
@@ -285,7 +299,7 @@ impl Engine {
         };
 
         for filter in expression.filters.iter() {
-            result = self.eval_filter(&filter.name, &result)?;
+            result = self.eval_filter(&filter.name, &result, &filter.args, context)?;
         }
 
         if expression.negated {
