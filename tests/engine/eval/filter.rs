@@ -60,9 +60,8 @@ fn test_time() {
     test_eval_eq!("1541485381 | time(format=`%M`)", json!("23"));
     test_eval_eq!("1541485381 | time(format=`%S`)", json!("01"));
 
-    // Invalid format is ignored
-    test_eval_eq!("1541485381 | time(format=1)", json!("06:23:01"));
-    test_eval_eq!("1541485381 | time(format=true)", json!("06:23:01"));
+    test_eval_err!("1541485381 | time(format=1)");
+    test_eval_err!("1541485381 | time(format=true)");
 }
 
 #[test]
@@ -74,9 +73,8 @@ fn test_date() {
     test_eval_eq!("1541485381 | date(format=`%m`)", json!("11"));
     test_eval_eq!("1541485381 | date(format=`%d`)", json!("06"));
 
-    // Invalid format is ignored
-    test_eval_eq!("1541485381 | date(format=1)", json!("2018-11-06"));
-    test_eval_eq!("1541485381 | date(format=true)", json!("2018-11-06"));
+    test_eval_err!("1541485381 | date(format=1)");
+    test_eval_err!("1541485381 | date(format=true)");
 }
 
 #[test]
@@ -95,9 +93,8 @@ fn test_date_time() {
     test_eval_eq!("1541485381 | datetime(format=`%S`)", json!("01"));
     test_eval_eq!("1541485381 | datetime(format=`%:z`)", json!("+00:00"));
 
-    // Invalid format is ignored
-    test_eval_eq!("1541485381 | datetime(format=1)", json!("2018-11-06T06:23:01+00:00"));
-    test_eval_eq!("1541485381 | datetime(format=true)", json!("2018-11-06T06:23:01+00:00"));
+    test_eval_err!("1541485381 | datetime(format=1)");
+    test_eval_err!("1541485381 | datetime(format=true)");
 }
 
 #[test]

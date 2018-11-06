@@ -21,7 +21,12 @@ fn format_timestamp(filter: &str, value: &Value, args: &HashMap<String, Value>, 
         .as_i64()
         .ok_or_else(|| format!("`{}` accepts integer only", filter))?;
 
-    let format = args.get("format").and_then(|x| x.as_str()).unwrap_or(default);
+    let format = match args.get("format") {
+        Some(x) => x
+            .as_str()
+            .ok_or_else(|| format!("`{}` format must be a string", filter))?,
+        None => default,
+    };
 
     let dt = DateTime::<Utc>::from_utc(NaiveDateTime::from_timestamp(ts, 0), Utc);
 
