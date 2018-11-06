@@ -40,6 +40,16 @@ pub(crate) fn datetime(value: &Value, args: &HashMap<String, Value>, _context: &
     format_timestamp("datetime", value, args, "%Y-%m-%dT%H:%M:%S%:z")
 }
 
+pub(crate) fn trim(value: &Value, _args: &HashMap<String, Value>, _context: &Context) -> Result<Value> {
+    Ok(Value::String(
+        value
+            .as_str()
+            .ok_or_else(|| "`trim` filter accepts string only")?
+            .trim()
+            .to_string(),
+    ))
+}
+
 #[cfg(test)]
 mod tests {
     use super::{lower, upper, Context};

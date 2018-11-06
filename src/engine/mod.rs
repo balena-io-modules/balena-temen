@@ -28,6 +28,7 @@ impl Default for EngineBuilder {
             .filter("time", filter::time)
             .filter("date", filter::date)
             .filter("datetime", filter::datetime)
+            .filter("trim", filter::trim)
             .function("uuidv4", function::uuidv4)
             .function("now", function::now)
     }

@@ -40,6 +40,18 @@ fn test_lower() {
 }
 
 #[test]
+fn test_trim() {
+    test_eval_eq!("`a` | trim", json!("a"));
+    test_eval_eq!("`a  ` | trim", json!("a"));
+    test_eval_eq!("`   a` | trim", json!("a"));
+    test_eval_eq!("`   a    ` | trim", json!("a"));
+
+    test_eval_err!("1 | trim");
+    test_eval_err!("1.0 | trim");
+    test_eval_err!("true | trim");
+}
+
+#[test]
 fn test_time() {
     test_eval_eq!("1541485381 | time", json!("06:23:01"));
     test_eval_eq!("1541485381 | time == 1541485381 | time(format=`%H:%M:%S`)", json!(true));
