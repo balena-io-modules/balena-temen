@@ -272,37 +272,41 @@ fn test_square_bracket_nested_indirect() {
     test_eval_eq!("data.country[country[name]]['rust-developers']", ctx, json!(2));
 }
 
+macro_rules! test_relative_eval_eq {
+    ($e:expr, $d:expr, $p:expr, $r:expr) => {{
+        let expression: Expression = $p.parse().unwrap();
+        let engine = Engine::default();
+        let context = Context::new_with_position($d, expression.identifier().unwrap().clone());
+        assert_eq!(engine.eval(&$e.parse().unwrap(), &context).unwrap(), $r);
+    }};
+}
+
 #[test]
 fn test_relative_lookup() {
-    let position_expression: Expression = "country.czech".parse().unwrap();
+    let data = json!({
+        "first": 0,
+        "second": 1,
+        "names": [
+            "Robert",
+            "Cyryl"
+        ]});
 
-    match position_expression.value {
-        ExpressionValue::Identifier(ref identifier) => {
-            let ctx = Context::new_with_position(
-                json!({
-                    "name": "czech",
-                    "country": {
-                        "czech": "Czech Republic"
-                    },
-                    "data": {
-                        "country": {
-                            "Czech Republic": {
-                                "rust-developers": 2
-                            }
-                        }
-                    }}),
-                identifier.clone(),
-            );
-            test_eval_eq!("this", ctx, json!("Czech Republic"));
-            test_eval_eq!("this.super", ctx, json!({"czech" : "Czech Republic"}));
-            test_eval_eq!("super", ctx, json!({"czech" : "Czech Republic"}));
-            test_eval_eq!("this.super.super.name", ctx, json!("czech"));
-            test_eval_eq!(
-                "data.country[country[this.super.super.name]][`rust-developers`]",
-                ctx,
-                json!(2)
-            );
-        }
-        _ => panic!(),
-    };
+    test_relative_eval_eq!("this", data.clone(), "first", json!(0));
+    test_relative_eval_eq!("this.this.this", data.clone(), "first", json!(0));
+    test_relative_eval_eq!("this == this.this", data.clone(), "first", json!(true));
+
+    test_relative_eval_eq!("this.super", data.clone(), "names[0]", json!(["Robert", "Cyryl"]));
+    test_relative_eval_eq!("super", data.clone(), "names[0]", json!(["Robert", "Cyryl"]));
+    test_relative_eval_eq!("super == this.super", data.clone(), "names[0]", json!(true));
+    test_relative_eval_eq!("this.super.super", data.clone(), "names[0]", data.clone());
+
+    test_relative_eval_eq!("this[0]", data.clone(), "names", json!("Robert"));
+    test_relative_eval_eq!("this[1]", data.clone(), "names", json!("Cyryl"));
+    test_relative_eval_eq!("this[first]", data.clone(), "names", json!("Robert"));
+    test_relative_eval_eq!("this[second]", data.clone(), "names", json!("Cyryl"));
+
+    test_relative_eval_eq!("names[this]", data.clone(), "first", json!("Robert"));
+    test_relative_eval_eq!("names[this]", data.clone(), "second", json!("Cyryl"));
+
+    test_relative_eval_eq!("this == names[second]", data.clone(), "names[1]", json!(true));
 }

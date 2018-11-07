@@ -219,7 +219,7 @@ impl Engine {
         let number = match value {
             ExpressionValue::Integer(x) => Number::from(*x),
             ExpressionValue::Float(x) => Number::from_f64(*x).unwrap(),
-            ExpressionValue::Identifier(x) => match context.lookup_variable(x)? {
+            ExpressionValue::Identifier(x) => match context.lookup_identifier(x)? {
                 Value::Number(ref x) => x.clone(),
                 _ => bail!("identifier does not evaluate to a number"),
             },
@@ -269,7 +269,7 @@ impl Engine {
             ExpressionValue::Float(x) => Value::Number(Number::from_f64(x).unwrap()),
             ExpressionValue::Boolean(x) => Value::Bool(x),
             ExpressionValue::String(ref x) => Value::String(x.to_string()),
-            ExpressionValue::Identifier(ref x) => context.lookup_variable(x)?.clone(),
+            ExpressionValue::Identifier(ref x) => context.lookup_identifier(x)?.clone(),
             ExpressionValue::Math(_) => Value::Number(self.eval_as_number(expression, context)?),
             ExpressionValue::Logical(_) => Value::Bool(self.eval_value_as_bool(&expression.value, context)?),
             ExpressionValue::FunctionCall(FunctionCall { ref name, ref args }) => {
@@ -283,7 +283,7 @@ impl Engine {
                         ExpressionValue::String(ref x) => result.push_str(x),
                         ExpressionValue::Integer(x) => result.push_str(&format!("{}", x)),
                         ExpressionValue::Float(x) => result.push_str(&format!("{}", x)),
-                        ExpressionValue::Identifier(ref x) => match context.lookup_variable(x)? {
+                        ExpressionValue::Identifier(ref x) => match context.lookup_identifier(x)? {
                             Value::String(ref x) => result.push_str(x),
                             Value::Number(ref x) => result.push_str(&format!("{}", x)),
                             _ => bail!(
@@ -319,7 +319,7 @@ impl Engine {
             ExpressionValue::Float(_) => bail!("float can't be evaluated as bool"),
             ExpressionValue::Boolean(x) => *x,
             ExpressionValue::String(_) => bail!("string can't be evaluated as bool"),
-            ExpressionValue::Identifier(x) => match context.lookup_variable(x)? {
+            ExpressionValue::Identifier(x) => match context.lookup_identifier(x)? {
                 Value::Bool(x) => *x,
                 _ => bail!("identifier does not evaluated to a boolean"),
             },
