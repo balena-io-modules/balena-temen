@@ -1,18 +1,19 @@
 use balena_temen::engine::context::Context;
 use balena_temen::engine::Engine;
+use balena_temen::parser::ast::*;
 use serde_json::json;
 
 macro_rules! test_eval_eq {
     ($e:expr, $c:ident, $r:expr) => {{
         let engine = Engine::default();
-        assert_eq!(engine.eval(&$e.parse().unwrap(), &$c).unwrap(), $r);
+        assert_eq!(engine.eval(&$e.parse().unwrap(), &$c, None).unwrap(), $r);
     }};
 }
 
 macro_rules! test_eval_err {
     ($e:expr, $c:ident) => {{
         let engine = Engine::default();
-        assert!(engine.eval(&$e.parse().unwrap(), &$c).is_err());
+        assert!(engine.eval(&$e.parse().unwrap(), &$c, None).is_err());
     }};
 }
 
@@ -269,4 +270,48 @@ fn test_square_bracket_nested_indirect() {
         }}));
 
     test_eval_eq!("data.country[country[name]]['rust-developers']", ctx, json!(2));
+}
+
+macro_rules! test_relative_eval_eq {
+    ($e:expr, $d:expr, $p:expr, $r:expr) => {{
+        let expression: Expression = $p.parse().unwrap();
+        let engine = Engine::default();
+        let context = Context::new($d);
+        assert_eq!(
+            engine
+                .eval(&$e.parse().unwrap(), &context, Some(expression.identifier().unwrap()))
+                .unwrap(),
+            $r
+        );
+    }};
+}
+
+#[test]
+fn test_relative_lookup() {
+    let data = json!({
+        "first": 0,
+        "second": 1,
+        "names": [
+            "Robert",
+            "Cyryl"
+        ]});
+
+    test_relative_eval_eq!("this", data.clone(), "first", json!(0));
+    test_relative_eval_eq!("this.this.this", data.clone(), "first", json!(0));
+    test_relative_eval_eq!("this == this.this", data.clone(), "first", json!(true));
+
+    test_relative_eval_eq!("this.super", data.clone(), "names[0]", json!(["Robert", "Cyryl"]));
+    test_relative_eval_eq!("super", data.clone(), "names[0]", json!(["Robert", "Cyryl"]));
+    test_relative_eval_eq!("super == this.super", data.clone(), "names[0]", json!(true));
+    test_relative_eval_eq!("this.super.super", data.clone(), "names[0]", data.clone());
+
+    test_relative_eval_eq!("this[0]", data.clone(), "names", json!("Robert"));
+    test_relative_eval_eq!("this[1]", data.clone(), "names", json!("Cyryl"));
+    test_relative_eval_eq!("this[first]", data.clone(), "names", json!("Robert"));
+    test_relative_eval_eq!("this[second]", data.clone(), "names", json!("Cyryl"));
+
+    test_relative_eval_eq!("names[this]", data.clone(), "first", json!("Robert"));
+    test_relative_eval_eq!("names[this]", data.clone(), "second", json!("Cyryl"));
+
+    test_relative_eval_eq!("this == names[second]", data.clone(), "names[1]", json!(true));
 }

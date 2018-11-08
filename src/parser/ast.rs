@@ -171,6 +171,20 @@ impl Identifier {
     pub fn new(values: Vec<IdentifierValue>) -> Identifier {
         Identifier { values }
     }
+
+    /// Check if an identifier is relative
+    pub fn is_relative(&self) -> bool {
+        if let Some(first) = self.values.first() {
+            first == &IdentifierValue::This || first == &IdentifierValue::Super
+        } else {
+            false
+        }
+    }
+
+    /// Check if an identifier is absolute
+    pub fn is_absolute(&self) -> bool {
+        !self.is_relative()
+    }
 }
 
 /// Identifier value
@@ -184,6 +198,10 @@ pub enum IdentifierValue {
     StringIndex(String),
     /// Indirect index (value of another identifier)
     IdentifierIndex(Identifier),
+    /// Points to current object
+    This,
+    /// Points to parent object
+    Super,
 }
 
 /// Expression value
@@ -273,6 +291,14 @@ impl Expression {
             value: self.value,
             negated: !self.negated,
             filters: self.filters,
+        }
+    }
+
+    /// Get identifier from an expression value
+    pub fn identifier(&self) -> Option<&Identifier> {
+        match &self.value {
+            ExpressionValue::Identifier(ref identifier) => Some(identifier),
+            _ => None,
         }
     }
 }

@@ -179,18 +179,29 @@ impl Engine {
         }
     }
 
-    fn eval_args(&self, args: &HashMap<String, Expression>, context: &Context) -> Result<HashMap<String, Value>> {
+    fn eval_args(
+        &self,
+        args: &HashMap<String, Expression>,
+        context: &Context,
+        position: Option<&Identifier>,
+    ) -> Result<HashMap<String, Value>> {
         let mut result = HashMap::new();
 
         for (k, v) in args.iter() {
-            result.insert(k.to_string(), self.eval(v, context)?);
+            result.insert(k.to_string(), self.eval(v, context, position)?);
         }
 
         Ok(result)
     }
 
-    fn eval_function(&self, name: &str, args: &HashMap<String, Expression>, context: &Context) -> Result<Value> {
-        let args = self.eval_args(args, context)?;
+    fn eval_function(
+        &self,
+        name: &str,
+        args: &HashMap<String, Expression>,
+        context: &Context,
+        position: Option<&Identifier>,
+    ) -> Result<Value> {
+        let args = self.eval_args(args, context, position)?;
 
         if let Some(f) = self.functions.get(name) {
             f(&args, context)
@@ -205,8 +216,9 @@ impl Engine {
         value: &Value,
         args: &HashMap<String, Expression>,
         context: &Context,
+        position: Option<&Identifier>,
     ) -> Result<Value> {
-        let args = self.eval_args(args, context)?;
+        let args = self.eval_args(args, context, position)?;
 
         if let Some(f) = self.filters.get(name) {
             f(value, &args, context)
@@ -215,11 +227,16 @@ impl Engine {
         }
     }
 
-    fn eval_value_as_number(&self, value: &ExpressionValue, context: &Context) -> Result<Number> {
+    fn eval_value_as_number(
+        &self,
+        value: &ExpressionValue,
+        context: &Context,
+        position: Option<&Identifier>,
+    ) -> Result<Number> {
         let number = match value {
             ExpressionValue::Integer(x) => Number::from(*x),
             ExpressionValue::Float(x) => Number::from_f64(*x).unwrap(),
-            ExpressionValue::Identifier(x) => match context.lookup_variable(x)? {
+            ExpressionValue::Identifier(x) => match context.lookup_identifier(x, position)? {
                 Value::Number(ref x) => x.clone(),
                 _ => bail!("identifier does not evaluate to a number"),
             },
@@ -228,12 +245,12 @@ impl Engine {
                 ref rhs,
                 ref operator,
             }) => {
-                let lhs = self.eval_as_number(lhs, context)?;
-                let rhs = self.eval_as_number(rhs, context)?;
+                let lhs = self.eval_as_number(lhs, context, position)?;
+                let rhs = self.eval_as_number(rhs, context, position)?;
                 self.eval_math(&lhs, &rhs, *operator)?
             }
             ExpressionValue::FunctionCall(FunctionCall { ref name, ref args }) => {
-                match self.eval_function(name, args, context)? {
+                match self.eval_function(name, args, context, position)? {
                     Value::Number(x) => x,
                     _ => bail!("result of `{}` is not a number", name),
                 }
@@ -247,33 +264,40 @@ impl Engine {
         Ok(number)
     }
 
-    fn eval_as_number(&self, expression: &Expression, context: &Context) -> Result<Number> {
+    fn eval_as_number(
+        &self,
+        expression: &Expression,
+        context: &Context,
+        position: Option<&Identifier>,
+    ) -> Result<Number> {
         if expression.filters.is_empty() {
             // We can directly evaluate the value as a number, because
             // we have no filters
-            return self.eval_value_as_number(&expression.value, context);
+            return self.eval_value_as_number(&expression.value, context, position);
         }
 
         // In case of filters, just evaluate the expression as a generic one
         // and check if the result is a Number
-        if let Value::Number(number) = self.eval(expression, context)? {
+        if let Value::Number(number) = self.eval(expression, context, position)? {
             return Ok(number);
         }
 
         bail!("unable to evaluate expression as a number: {:?}", expression)
     }
 
-    pub fn eval(&self, expression: &Expression, context: &Context) -> Result<Value> {
+    pub fn eval(&self, expression: &Expression, context: &Context, position: Option<&Identifier>) -> Result<Value> {
         let mut result = match expression.value {
             ExpressionValue::Integer(x) => Value::Number(Number::from(x)),
             ExpressionValue::Float(x) => Value::Number(Number::from_f64(x).unwrap()),
             ExpressionValue::Boolean(x) => Value::Bool(x),
             ExpressionValue::String(ref x) => Value::String(x.to_string()),
-            ExpressionValue::Identifier(ref x) => context.lookup_variable(x)?.clone(),
-            ExpressionValue::Math(_) => Value::Number(self.eval_as_number(expression, context)?),
-            ExpressionValue::Logical(_) => Value::Bool(self.eval_value_as_bool(&expression.value, context)?),
+            ExpressionValue::Identifier(ref x) => context.lookup_identifier(x, position)?.clone(),
+            ExpressionValue::Math(_) => Value::Number(self.eval_as_number(expression, context, position)?),
+            ExpressionValue::Logical(_) => {
+                Value::Bool(self.eval_value_as_bool(&expression.value, context, position)?)
+            }
             ExpressionValue::FunctionCall(FunctionCall { ref name, ref args }) => {
-                self.eval_function(name, args, context)?
+                self.eval_function(name, args, context, position)?
             }
             ExpressionValue::StringConcat(StringConcat { ref values }) => {
                 let mut result = String::new();
@@ -283,7 +307,7 @@ impl Engine {
                         ExpressionValue::String(ref x) => result.push_str(x),
                         ExpressionValue::Integer(x) => result.push_str(&format!("{}", x)),
                         ExpressionValue::Float(x) => result.push_str(&format!("{}", x)),
-                        ExpressionValue::Identifier(ref x) => match context.lookup_variable(x)? {
+                        ExpressionValue::Identifier(ref x) => match context.lookup_identifier(x, position)? {
                             Value::String(ref x) => result.push_str(x),
                             Value::Number(ref x) => result.push_str(&format!("{}", x)),
                             _ => bail!(
@@ -299,7 +323,7 @@ impl Engine {
         };
 
         for filter in expression.filters.iter() {
-            result = self.eval_filter(&filter.name, &result, &filter.args, context)?;
+            result = self.eval_filter(&filter.name, &result, &filter.args, context, position)?;
         }
 
         if expression.negated {
@@ -313,13 +337,18 @@ impl Engine {
         Ok(result)
     }
 
-    fn eval_value_as_bool(&self, value: &ExpressionValue, context: &Context) -> Result<bool> {
+    fn eval_value_as_bool(
+        &self,
+        value: &ExpressionValue,
+        context: &Context,
+        position: Option<&Identifier>,
+    ) -> Result<bool> {
         let result = match value {
             ExpressionValue::Integer(_) => bail!("integer can't be evaluated as bool"),
             ExpressionValue::Float(_) => bail!("float can't be evaluated as bool"),
             ExpressionValue::Boolean(x) => *x,
             ExpressionValue::String(_) => bail!("string can't be evaluated as bool"),
-            ExpressionValue::Identifier(x) => match context.lookup_variable(x)? {
+            ExpressionValue::Identifier(x) => match context.lookup_identifier(x, position)? {
                 Value::Bool(x) => *x,
                 _ => bail!("identifier does not evaluated to a boolean"),
             },
@@ -329,15 +358,17 @@ impl Engine {
                 ref rhs,
                 ref operator,
             }) => match operator {
-                LogicalOperator::And => self.eval_as_bool(lhs, context)? && self.eval_as_bool(rhs, context)?,
+                LogicalOperator::And => {
+                    self.eval_as_bool(lhs, context, position)? && self.eval_as_bool(rhs, context, position)?
+                }
                 LogicalOperator::Or => {
-                    let lhs = self.eval_as_bool(lhs, context)?;
-                    let rhs = self.eval_as_bool(rhs, context)?;
+                    let lhs = self.eval_as_bool(lhs, context, position)?;
+                    let rhs = self.eval_as_bool(rhs, context, position)?;
                     lhs || rhs
                 }
                 LogicalOperator::Equal | LogicalOperator::NotEqual => {
-                    let lhs = self.eval(lhs, context)?;
-                    let rhs = self.eval(rhs, context)?;
+                    let lhs = self.eval(lhs, context, position)?;
+                    let rhs = self.eval(rhs, context, position)?;
 
                     match (&lhs, &rhs) {
                         (Value::Number(ref lhs), Value::Number(ref rhs)) => {
@@ -360,8 +391,8 @@ impl Engine {
                 | LogicalOperator::GreaterThanOrEqual
                 | LogicalOperator::LowerThan
                 | LogicalOperator::LowerThanOrEqual => {
-                    let lhs = self.eval_as_number(lhs, context)?.as_f64().unwrap();
-                    let rhs = self.eval_as_number(rhs, context)?.as_f64().unwrap();
+                    let lhs = self.eval_as_number(lhs, context, position)?.as_f64().unwrap();
+                    let rhs = self.eval_as_number(rhs, context, position)?.as_f64().unwrap();
 
                     match operator {
                         LogicalOperator::GreaterThan => lhs > rhs,
@@ -373,7 +404,7 @@ impl Engine {
                 }
             },
             ExpressionValue::FunctionCall(FunctionCall { ref name, ref args }) => {
-                match self.eval_function(name, args, context)? {
+                match self.eval_function(name, args, context, position)? {
                     Value::Bool(x) => x,
                     _ => bail!("unable to evaluate `{}` function result as bool", name),
                 }
@@ -384,8 +415,13 @@ impl Engine {
         Ok(result)
     }
 
-    pub fn eval_as_bool(&self, expression: &Expression, context: &Context) -> Result<bool> {
-        let mut value = self.eval_value_as_bool(&expression.value, context)?;
+    pub fn eval_as_bool(
+        &self,
+        expression: &Expression,
+        context: &Context,
+        position: Option<&Identifier>,
+    ) -> Result<bool> {
+        let mut value = self.eval_value_as_bool(&expression.value, context, position)?;
 
         if expression.negated {
             value = !value;

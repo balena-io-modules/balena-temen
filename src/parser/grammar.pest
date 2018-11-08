@@ -41,8 +41,10 @@ string = @{ double_quoted_string | single_quoted_string | backquoted_quoted_stri
 all_chars = _{'a'..'z' | 'A'..'Z' | "_" | '0'..'9'}
 identifier = @{
     !reserved ~
-    ('a'..'z' | 'A'..'Z' | "_") ~
-    all_chars{,63}
+    (
+        "this" | "super" |
+        ( ('a'..'z' | 'A'..'Z' | "_") ~ all_chars{,63} )
+    )
 }
 
 square_brackets = _{

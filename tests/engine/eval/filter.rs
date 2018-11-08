@@ -7,7 +7,7 @@ macro_rules! test_eval_eq {
     ($e:expr, $r:expr) => {{
         let engine = Engine::default();
         let context = Context::default();
-        assert_eq!(engine.eval(&$e.parse().unwrap(), &context).unwrap(), $r);
+        assert_eq!(engine.eval(&$e.parse().unwrap(), &context, None).unwrap(), $r);
     }};
 }
 
@@ -15,7 +15,7 @@ macro_rules! test_eval_err {
     ($e:expr) => {{
         let engine = Engine::default();
         let context = Context::default();
-        assert!(engine.eval(&$e.parse().unwrap(), &context).is_err());
+        assert!(engine.eval(&$e.parse().unwrap(), &context, None).is_err());
     }};
 }
 
@@ -136,8 +136,8 @@ fn test_custom_filter() {
     let ctx = Context::default();
 
     assert_eq!(
-        engine.eval(&"`abc` | atob".parse().unwrap(), &ctx).unwrap(),
+        engine.eval(&"`abc` | atob".parse().unwrap(), &ctx, None).unwrap(),
         json!("bbc")
     );
-    assert!(engine.eval(&"true | atob".parse().unwrap(), &ctx).is_err());
+    assert!(engine.eval(&"true | atob".parse().unwrap(), &ctx, None).is_err());
 }

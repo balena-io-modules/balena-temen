@@ -261,7 +261,11 @@ fn parse_dotted_square_bracket_identifier_value(pair: Pair<Rule>) -> Result<Iden
 
     for p in pair.into_inner() {
         let value = match p.as_rule() {
-            Rule::identifier => IdentifierValue::Name(p.as_str().to_string()),
+            Rule::identifier => match p.as_str() {
+                "this" => IdentifierValue::This,
+                "super" => IdentifierValue::Super,
+                _ => IdentifierValue::Name(p.as_str().to_string()),
+            },
             Rule::string => IdentifierValue::StringIndex(remove_string_quotes(p.as_str())?),
             Rule::integer | Rule::positive_integer => IdentifierValue::IntegerIndex(p.as_str().parse()?),
             Rule::dotted_square_bracket_identifier => {

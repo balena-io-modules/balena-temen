@@ -9,7 +9,7 @@ fn test_uuidv4() {
     let engine = Engine::default();
     let context = Context::default();
 
-    let uuid_value = engine.eval(&"uuidv4()".parse().unwrap(), &context).unwrap();
+    let uuid_value = engine.eval(&"uuidv4()".parse().unwrap(), &context, None).unwrap();
     let uuid_str = uuid_value.as_str().unwrap();
     let uuid = Uuid::parse_str(&uuid_str).unwrap();
     // Version::Random == UUIDv4
@@ -24,27 +24,34 @@ fn test_now() {
     // now() has unit tests covering return value validity, so, it's enough to check result type here
 
     assert_eq!(
-        engine.eval(&"now()".parse().unwrap(), &context).unwrap(),
-        engine.eval(&"now()".parse().unwrap(), &context).unwrap()
+        engine.eval(&"now()".parse().unwrap(), &context, None).unwrap(),
+        engine.eval(&"now()".parse().unwrap(), &context, None).unwrap()
     );
     assert_eq!(
         engine
-            .eval(&"now() == now(timestamp=false, utc=false)".parse().unwrap(), &context)
+            .eval(
+                &"now() == now(timestamp=false, utc=false)".parse().unwrap(),
+                &context,
+                None
+            )
             .unwrap(),
         Value::Bool(true)
     );
 
-    assert!(engine.eval(&"now()".parse().unwrap(), &context).unwrap().is_string());
     assert!(engine
-        .eval(&"now(utc=true)".parse().unwrap(), &context)
+        .eval(&"now()".parse().unwrap(), &context, None)
         .unwrap()
         .is_string());
     assert!(engine
-        .eval(&"now(timestamp=true)".parse().unwrap(), &context)
+        .eval(&"now(utc=true)".parse().unwrap(), &context, None)
+        .unwrap()
+        .is_string());
+    assert!(engine
+        .eval(&"now(timestamp=true)".parse().unwrap(), &context, None)
         .unwrap()
         .is_number());
     assert!(engine
-        .eval(&"now(timestamp=true, utc=true)".parse().unwrap(), &context)
+        .eval(&"now(timestamp=true, utc=true)".parse().unwrap(), &context, None)
         .unwrap()
         .is_number());
 }
@@ -63,11 +70,11 @@ fn test_custom_function() {
     let ctx = Context::default();
 
     assert_eq!(
-        engine.eval(&"echo()".parse().unwrap(), &ctx).unwrap(),
+        engine.eval(&"echo()".parse().unwrap(), &ctx, None).unwrap(),
         json!("no-name-passed")
     );
     assert_eq!(
-        engine.eval(&"echo(name=`Zrzka`)".parse().unwrap(), &ctx).unwrap(),
+        engine.eval(&"echo(name=`Zrzka`)".parse().unwrap(), &ctx, None).unwrap(),
         json!("Zrzka")
     );
 }

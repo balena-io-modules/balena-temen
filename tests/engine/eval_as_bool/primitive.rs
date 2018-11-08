@@ -5,7 +5,7 @@ macro_rules! test_eval_eq {
     ($e:expr, $r:expr) => {{
         let engine = Engine::default();
         let context = Context::default();
-        assert_eq!(engine.eval_as_bool(&$e.parse().unwrap(), &context).unwrap(), $r);
+        assert_eq!(engine.eval_as_bool(&$e.parse().unwrap(), &context, None).unwrap(), $r);
     }};
 }
 
@@ -13,7 +13,7 @@ macro_rules! test_eval_err {
     ($e:expr) => {{
         let engine = Engine::default();
         let context = Context::default();
-        assert!(engine.eval_as_bool(&$e.parse().unwrap(), &context).is_err());
+        assert!(engine.eval_as_bool(&$e.parse().unwrap(), &context, None).is_err());
     }};
 }
 
