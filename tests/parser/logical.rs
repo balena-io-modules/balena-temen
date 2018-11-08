@@ -13,7 +13,7 @@ macro_rules! test_parse_err {
 }
 
 #[test]
-fn test_logical_operator() {
+fn operator() {
     let exp = |lhs: bool, rhs: bool, operator: LogicalOperator| {
         let lhs_exp = Expression::new(ExpressionValue::Boolean(lhs));
         let rhs_exp = Expression::new(ExpressionValue::Boolean(rhs));
@@ -28,7 +28,7 @@ fn test_logical_operator() {
 }
 
 #[test]
-fn test_invalid_syntax() {
+fn fail_on_invalid_syntax() {
     test_parse_err!("true and");
     test_parse_err!("and true");
     test_parse_err!("true or");

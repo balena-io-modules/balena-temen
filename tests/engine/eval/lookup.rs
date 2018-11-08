@@ -1,7 +1,8 @@
+use serde_json::json;
+
 use balena_temen::engine::context::Context;
 use balena_temen::engine::Engine;
 use balena_temen::parser::ast::*;
-use serde_json::json;
 
 macro_rules! test_eval_eq {
     ($e:expr, $c:ident, $r:expr) => {{
@@ -18,7 +19,7 @@ macro_rules! test_eval_err {
 }
 
 #[test]
-fn test_simple() {
+fn simple_identifier() {
     let ctx = Context::new(json!({
         "string": "hallo",
         "integer": 10,
@@ -36,12 +37,25 @@ fn test_simple() {
     test_eval_eq!("array", ctx, json!(["a", "b"]));
     test_eval_eq!("object", ctx, json!({"a": "b"}));
     test_eval_eq!("null", ctx, json!(null));
+}
+
+#[test]
+fn fail_on_unknown_identifier() {
+    let ctx = Context::new(json!({
+        "string": "hallo",
+        "integer": 10,
+        "float": 3.2,
+        "boolean": true,
+        "array": ["a", "b"],
+        "object": {"a": "b"},
+        "null": null,
+    }));
 
     test_eval_err!("na", ctx);
 }
 
 #[test]
-fn test_dotted() {
+fn dotted_identifier() {
     let ctx = Context::new(json!({
         "root": {
             "another": {
@@ -63,6 +77,23 @@ fn test_dotted() {
     test_eval_eq!("root.another.array", ctx, json!(["a", "b"]));
     test_eval_eq!("root.another.object", ctx, json!({"a": "b"}));
     test_eval_eq!("root.another.null", ctx, json!(null));
+}
+
+#[test]
+fn fail_on_unknown_dotted_identifier() {
+    let ctx = Context::new(json!({
+        "root": {
+            "another": {
+                "string": "hallo",
+                "integer": 10,
+                "float": 3.2,
+                "boolean": true,
+                "array": ["a", "b"],
+                "object": {"a": "b"},
+                "null": null,
+            }
+        }
+    }));
 
     test_eval_err!("root.another.na", ctx);
     test_eval_err!("root.na", ctx);
@@ -70,7 +101,7 @@ fn test_dotted() {
 }
 
 #[test]
-fn test_dotted_integer_index() {
+fn dotted_identifier_integer_index() {
     let ctx = Context::new(json!({
         "root": [
             "hallo",
@@ -89,12 +120,26 @@ fn test_dotted_integer_index() {
     test_eval_eq!("root.4", ctx, json!(["a", "b"]));
     test_eval_eq!("root.5", ctx, json!({"a": "b"}));
     test_eval_eq!("root.6", ctx, json!(null));
+}
+
+#[test]
+fn fail_on_dotted_identifier_integer_index_out_of_bounds() {
+    let ctx = Context::new(json!({
+        "root": [
+            "hallo",
+            10,
+            3.2,
+            true,
+            ["a", "b"],
+            {"a": "b"},
+            null
+        ]}));
 
     test_eval_err!("root.7", ctx);
 }
 
 #[test]
-fn test_dotted_integer_index_mixed() {
+fn dotted_identifier_integer_index_mixed() {
     let ctx = Context::new(json!({
         "people": [
             {
@@ -112,7 +157,7 @@ fn test_dotted_integer_index_mixed() {
 }
 
 #[test]
-fn test_square_bracket_string() {
+fn square_bracket_string() {
     let ctx = Context::new(json!({
         "root": {
             "another": {
@@ -134,13 +179,30 @@ fn test_square_bracket_string() {
     test_eval_eq!("root[`another`][`array`]", ctx, json!(["a", "b"]));
     test_eval_eq!("root[`another`][`object`]", ctx, json!({"a": "b"}));
     test_eval_eq!("root[`another`][`null`]", ctx, json!(null));
+}
+
+#[test]
+fn fail_on_square_bracket_string_invalid_index() {
+    let ctx = Context::new(json!({
+        "root": {
+            "another": {
+                "string": "hallo",
+                "integer": 10,
+                "float": 3.2,
+                "boolean": true,
+                "array": ["a", "b"],
+                "object": {"a": "b"},
+                "null": null,
+            }
+        }
+    }));
 
     test_eval_err!("root[`another`][`dummy`]", ctx);
     test_eval_err!("root[`dummy`]", ctx);
 }
 
 #[test]
-fn test_square_bracket_integer() {
+fn square_bracket_integer() {
     let ctx = Context::new(json!({
         "root": [
             "hallo",
@@ -159,12 +221,26 @@ fn test_square_bracket_integer() {
     test_eval_eq!("root[4]", ctx, json!(["a", "b"]));
     test_eval_eq!("root[5]", ctx, json!({"a": "b"}));
     test_eval_eq!("root[6]", ctx, json!(null));
+}
+
+#[test]
+fn fail_on_square_bracket_integer_out_of_bounds() {
+    let ctx = Context::new(json!({
+        "root": [
+            "hallo",
+            10,
+            3.2,
+            true,
+            ["a", "b"],
+            {"a": "b"},
+            null
+        ]}));
 
     test_eval_err!("root[7]", ctx);
 }
 
 #[test]
-fn test_square_bracket_negative_integer() {
+fn square_bracket_negative_integer() {
     let ctx = Context::new(json!({
         "root": [
             "hallo",
@@ -183,12 +259,26 @@ fn test_square_bracket_negative_integer() {
     test_eval_eq!("root[-3]", ctx, json!(["a", "b"]));
     test_eval_eq!("root[-2]", ctx, json!({"a": "b"}));
     test_eval_eq!("root[-1]", ctx, json!(null));
+}
+
+#[test]
+fn fail_on_square_bracket_negative_integer_out_of_bounds() {
+    let ctx = Context::new(json!({
+        "root": [
+            "hallo",
+            10,
+            3.2,
+            true,
+            ["a", "b"],
+            {"a": "b"},
+            null
+        ]}));
 
     test_eval_err!("root[-8]", ctx);
 }
 
 #[test]
-fn test_square_bracket_mixed() {
+fn square_bracket_mixed() {
     let ctx = Context::new(json!({
         "people": [
             {
@@ -206,7 +296,7 @@ fn test_square_bracket_mixed() {
 }
 
 #[test]
-fn test_square_bracket_indirect() {
+fn square_bracket_indirect() {
     let ctx = Context::new(json!({
         "first": 0,
         "second": 1,
@@ -227,6 +317,25 @@ fn test_square_bracket_indirect() {
     test_eval_eq!("people[first].name", ctx, json!("Robert"));
     test_eval_eq!("people[second][`name`]", ctx, json!("Cyryl"));
     test_eval_eq!("people[second].name", ctx, json!("Cyryl"));
+}
+
+#[test]
+fn fail_on_square_bracket_indirect_invalid_type() {
+    let ctx = Context::new(json!({
+        "first": 0,
+        "second": 1,
+        "boolean": true,
+        "array": ["a", "b"],
+        "object": {"a": "b"},
+        "null": null,
+        "people": [
+            {
+                "name": "Robert"
+            },
+            {
+                "name": "Cyryl"
+            }
+        ]}));
 
     test_eval_err!("people[boolean].name", ctx);
     test_eval_err!("people[array].name", ctx);
@@ -235,7 +344,7 @@ fn test_square_bracket_indirect() {
 }
 
 #[test]
-fn test_square_bracket_multiple_indirect() {
+fn square_bracket_multiple_indirect() {
     let ctx = Context::new(json!({
         "country": "Czech Republic",
         "city": "Hradec Kralove",
@@ -255,7 +364,7 @@ fn test_square_bracket_multiple_indirect() {
 }
 
 #[test]
-fn test_square_bracket_nested_indirect() {
+fn square_bracket_nested_indirect() {
     let ctx = Context::new(json!({
         "name": "czech",
         "country": {
@@ -287,7 +396,7 @@ macro_rules! test_relative_eval_eq {
 }
 
 #[test]
-fn test_relative_lookup() {
+fn relative_lookup() {
     let data = json!({
         "first": 0,
         "second": 1,

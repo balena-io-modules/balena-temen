@@ -18,17 +18,20 @@ macro_rules! test_eval_err {
 }
 
 #[test]
-fn test_math() {
+fn math() {
     test_eval_eq!("1 - 1 == 2 - 2", true);
     test_eval_eq!("3 * 9 == 27", true);
+}
 
+#[test]
+fn fail_on_math_result() {
     // Math expression -> number - can't be evaluated as bool
     test_eval_err!("1 - 1");
     test_eval_err!("2 - 1");
 }
 
 #[test]
-fn test_relative_eq() {
+fn float_relative_eq() {
     test_eval_eq!("2.1 - 2 == 0.1", true);
     test_eval_eq!("2.1 - 0.1 == 2", true);
     test_eval_eq!("0.1 == 0.1", true);

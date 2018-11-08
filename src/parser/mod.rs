@@ -1,16 +1,18 @@
+use std::collections::HashMap;
+
+use lazy_static::lazy_static;
+use pest::{
+    iterators::Pair,
+    Parser,
+    prec_climber::{Assoc, Operator, PrecClimber},
+};
+use pest_derive::Parser;
+
 use crate::{
     error::{bail, Result},
     parser::ast::*,
     utils::validate_f64,
 };
-use lazy_static::lazy_static;
-use pest::{
-    iterators::Pair,
-    prec_climber::{Assoc, Operator, PrecClimber},
-    Parser,
-};
-use pest_derive::Parser;
-use std::collections::HashMap;
 
 pub mod ast;
 

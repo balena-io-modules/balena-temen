@@ -16,8 +16,9 @@
 //!     )
 //! );
 //! assert_eq!(parsed, manual);
-use crate::{error::Error, parser::parse};
 use std::{collections::HashMap, str::FromStr};
+
+use crate::{error::Error, parser::parse};
 
 /// Mathematical operator
 #[derive(Copy, Clone, Debug, PartialEq)]

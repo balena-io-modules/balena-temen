@@ -1,5 +1,7 @@
-use self::context::Context;
-use self::equal::RelativeEq;
+use std::collections::HashMap;
+
+use serde_json::{Number, Value};
+
 use crate::{
     builtin::{
         filter::{self, FilterFn},
@@ -9,8 +11,9 @@ use crate::{
     parser::ast::*,
     utils::validate_f64,
 };
-use serde_json::{Number, Value};
-use std::collections::HashMap;
+
+use self::context::Context;
+use self::equal::RelativeEq;
 
 pub mod context;
 mod equal;

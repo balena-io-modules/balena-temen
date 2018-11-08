@@ -1,6 +1,7 @@
+use serde_json::json;
+
 use balena_temen::engine::context::Context;
 use balena_temen::engine::Engine;
-use serde_json::json;
 
 macro_rules! test_eval_eq {
     ($e:expr, $r:expr) => {{
@@ -11,7 +12,7 @@ macro_rules! test_eval_eq {
 }
 
 #[test]
-fn test_equal() {
+fn equal() {
     test_eval_eq!("true == true", json!(true));
     test_eval_eq!("true == false", json!(false));
 
@@ -26,7 +27,7 @@ fn test_equal() {
 }
 
 #[test]
-fn test_equal_with_filter() {
+fn equal_with_filter() {
     test_eval_eq!("`abc` | upper == 'ABC'", json!(true));
     test_eval_eq!("`ABC` | lower == 'abc'", json!(true));
     test_eval_eq!("`ABC` == 'abc' | upper", json!(true));
@@ -34,7 +35,7 @@ fn test_equal_with_filter() {
 }
 
 #[test]
-fn test_not_equal() {
+fn not_equal() {
     test_eval_eq!("true != true", json!(false));
     test_eval_eq!("true != false", json!(true));
 
@@ -49,13 +50,13 @@ fn test_not_equal() {
 }
 
 #[test]
-fn test_not() {
+fn not() {
     test_eval_eq!("not false", json!(true));
     test_eval_eq!("not 1 + 1 == 3", json!(true));
 }
 
 #[test]
-fn test_greater_than() {
+fn greater_than() {
     test_eval_eq!("1 > 1", json!(false));
     test_eval_eq!("1 > 2", json!(false));
     test_eval_eq!("3 > 2", json!(true));
@@ -65,7 +66,7 @@ fn test_greater_than() {
 }
 
 #[test]
-fn test_greater_than_or_equal() {
+fn greater_than_or_equal() {
     test_eval_eq!("1 >= 1", json!(true));
     test_eval_eq!("1 >= 2", json!(false));
     test_eval_eq!("3 >= 2", json!(true));
@@ -75,7 +76,7 @@ fn test_greater_than_or_equal() {
 }
 
 #[test]
-fn test_lower() {
+fn lower() {
     test_eval_eq!("1 < 1", json!(false));
     test_eval_eq!("1 < 2", json!(true));
     test_eval_eq!("3 < 2", json!(false));
@@ -85,7 +86,7 @@ fn test_lower() {
 }
 
 #[test]
-fn test_lower_or_equal() {
+fn lower_or_equal() {
     test_eval_eq!("1 <= 1", json!(true));
     test_eval_eq!("1 <= 2", json!(true));
     test_eval_eq!("3 <= 2", json!(false));
@@ -95,7 +96,7 @@ fn test_lower_or_equal() {
 }
 
 #[test]
-fn test_and() {
+fn and() {
     test_eval_eq!("true and true", json!(true));
     test_eval_eq!("true and false", json!(false));
 
@@ -104,7 +105,7 @@ fn test_and() {
 }
 
 #[test]
-fn test_or() {
+fn or() {
     test_eval_eq!("true or true", json!(true));
     test_eval_eq!("true or false", json!(true));
 
