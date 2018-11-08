@@ -1,6 +1,6 @@
 [package]
 name = "balena-temen"
-version = "0.0.6"
+version = "0.0.7"
 authors = ["Robert Vojta <robert@balena.io>"]
 edition = "2018"
 

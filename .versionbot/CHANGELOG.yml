@@ -1,4 +1,16 @@
 - commits:
+    - subject: Refactoring of tests
+      hash: cb67e2ae3af8e7aa95593a23c34368007907387f
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Robert Vojta <robert@balena.io>
+        signed-off-by: Robert Vojta <robert@balena.io>
+      author: Robert Vojta
+  version: 0.0.7
+  date: 2018-11-08T15:02:32.458Z
+- commits:
     - subject: 'Add context aware evaluation (this, super)'
       hash: dcf32f4317d0821d7f476967336c3e2d6a8cd9a6
       body: |
