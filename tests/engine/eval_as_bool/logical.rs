@@ -20,7 +20,7 @@ macro_rules! test_eval_err {
 }
 
 #[test]
-fn test_logical_and() {
+fn logical_and() {
     test_eval_eq!("true and true", true);
     test_eval_eq!("true and false", false);
     test_eval_eq!("false and true", false);
@@ -28,7 +28,7 @@ fn test_logical_and() {
 }
 
 #[test]
-fn test_logical_or() {
+fn logical_or() {
     test_eval_eq!("true or true", true);
     test_eval_eq!("true or false", true);
     test_eval_eq!("false or true", true);
@@ -36,13 +36,13 @@ fn test_logical_or() {
 }
 
 #[test]
-fn test_logical_not() {
+fn logical_not() {
     test_eval_eq!("not false", true);
     test_eval_eq!("not 1 == 2", true);
 }
 
 #[test]
-fn test_invalid_syntax() {
+fn fail_on_invalid_syntax() {
     test_eval_err!("true and");
     test_eval_err!("and true");
     test_eval_err!("true or");
@@ -53,7 +53,7 @@ fn test_invalid_syntax() {
 }
 
 #[test]
-fn test_bool_with_other_types() {
+fn fail_on_invalid_type() {
     test_eval_err!("true and 1");
     test_eval_err!("true and 1.2");
     test_eval_err!("true and `abc`");

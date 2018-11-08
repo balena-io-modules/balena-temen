@@ -1,8 +1,10 @@
+use std::sync::{Arc, Mutex};
+
 use chrono::{DateTime, Utc};
+use serde_json::Value;
+
 use crate::error::{bail, Result};
 use crate::parser::ast::*;
-use serde_json::Value;
-use std::sync::{Arc, Mutex};
 
 /// Provide a way to lookup an identifier (variable) value
 struct Lookup<'a> {

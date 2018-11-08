@@ -1,6 +1,7 @@
-use crate::parser::Rule;
-pub use error_chain::bail;
 use error_chain::*;
+pub use error_chain::bail;
+
+use crate::parser::Rule;
 
 error_chain! {
     errors {}

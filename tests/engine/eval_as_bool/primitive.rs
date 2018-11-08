@@ -18,26 +18,26 @@ macro_rules! test_eval_err {
 }
 
 #[test]
-fn test_boolean() {
+fn boolean() {
     test_eval_eq!("true", true);
     test_eval_eq!("false", false);
 }
 
 #[test]
-fn test_string() {
+fn fail_on_string() {
     test_eval_err!("\"\"");
     test_eval_err!("\"hallo\"");
 }
 
 #[test]
-fn test_integer() {
+fn fail_on_integer() {
     test_eval_err!("10");
     test_eval_err!("-12");
     test_eval_err!("0");
 }
 
 #[test]
-fn test_float() {
+fn fail_on_float() {
     test_eval_err!("10.2");
     test_eval_err!("-3.2");
     test_eval_err!("0.0");

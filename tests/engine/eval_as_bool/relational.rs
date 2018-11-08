@@ -10,7 +10,7 @@ macro_rules! test_eval_eq {
 }
 
 #[test]
-fn test_logical_equal() {
+fn equal() {
     test_eval_eq!("true == true", true);
     test_eval_eq!("1 == 1", true);
     test_eval_eq!("2.3 == 2.3", true);
@@ -20,7 +20,7 @@ fn test_logical_equal() {
 }
 
 #[test]
-fn test_logical_not_equal() {
+fn not_equal() {
     test_eval_eq!("true != true", false);
     test_eval_eq!("1 != 1", false);
     test_eval_eq!("2.3 != 2.3", false);
@@ -30,14 +30,14 @@ fn test_logical_not_equal() {
 }
 
 #[test]
-fn test_relational_greater_than() {
+fn greater_than() {
     test_eval_eq!("1 > 2", false);
     test_eval_eq!("3 > 2", true);
     test_eval_eq!("3.1 > 2", true);
 }
 
 #[test]
-fn test_relational_greater_than_or_equal() {
+fn greater_than_or_equal() {
     test_eval_eq!("1 >= 2", false);
     test_eval_eq!("3 >= 2", true);
     test_eval_eq!("3.1 >= 2", true);
@@ -46,7 +46,7 @@ fn test_relational_greater_than_or_equal() {
 }
 
 #[test]
-fn test_relational_lower_than() {
+fn lower_than() {
     test_eval_eq!("1 < 2", true);
     test_eval_eq!("3 < 2", false);
     test_eval_eq!("3.1 < 2", false);
@@ -55,7 +55,7 @@ fn test_relational_lower_than() {
 }
 
 #[test]
-fn test_relational_lower_than_or_equal() {
+fn lower_than_or_equal() {
     test_eval_eq!("1 <= 2", true);
     test_eval_eq!("3 <= 2", false);
     test_eval_eq!("2 <= 3.1", true);

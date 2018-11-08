@@ -12,5 +12,5 @@ macro_rules! test_eval_err {
 #[test]
 fn fail_on_invalid_output_type() {
     // Evaluates to String
-    test_eval_err!("uuidv4()");
+    test_eval_err!("`true` | lower");
 }

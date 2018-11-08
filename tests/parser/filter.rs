@@ -7,7 +7,7 @@ macro_rules! test_parse_eq {
 }
 
 #[test]
-fn test_single_filter() {
+fn single_filter() {
     let exp = Expression::new_with_filters(
         ExpressionValue::String("Abc".to_string()),
         vec![
@@ -18,7 +18,7 @@ fn test_single_filter() {
 }
 
 #[test]
-fn test_chained_filter() {
+fn chained_filter() {
     let exp = Expression::new_with_filters(
         ExpressionValue::String("Abc".to_string()),
         vec![

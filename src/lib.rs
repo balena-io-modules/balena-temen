@@ -7,6 +7,8 @@
 //! * retrieve AST of any expression for further validation
 #![allow(clippy::possible_missing_comma)]
 
+pub use serde_json::Value;
+
 pub(crate) mod builtin;
 
 pub mod engine;
@@ -15,5 +17,3 @@ pub mod parser;
 mod utils;
 
 // Re-Exports
-
-pub use serde_json::Value;

@@ -13,7 +13,7 @@ macro_rules! test_parse_err {
 }
 
 #[test]
-fn test_relational_operator() {
+fn operator() {
     let exp = |lhs: i64, rhs: i64, operator: LogicalOperator| {
         let lhs_exp = Expression::new(ExpressionValue::Integer(lhs));
         let rhs_exp = Expression::new(ExpressionValue::Integer(rhs));
@@ -31,7 +31,7 @@ fn test_relational_operator() {
 }
 
 #[test]
-fn test_invalid_syntax() {
+fn fail_on_invalid_syntax() {
     test_parse_err!("==1");
     test_parse_err!("!=1");
     test_parse_err!(">=1");

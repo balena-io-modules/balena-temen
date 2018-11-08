@@ -13,7 +13,7 @@ macro_rules! test_parse_err {
 }
 
 #[test]
-fn test_identifier_min_length() {
+fn min_length() {
     test_parse_eq!(
         "a",
         Expression::new(ExpressionValue::Identifier(Identifier::new(vec![
@@ -23,18 +23,22 @@ fn test_identifier_min_length() {
 }
 
 #[test]
-fn test_identifier_max_length() {
+fn max_length() {
     test_parse_eq!(
         "abcdefghijabcdefghijabcdefghijabcdefghijabcdefghijabcdefghijabcd",
         Expression::new(ExpressionValue::Identifier(Identifier::new(vec![
             IdentifierValue::Name("abcdefghijabcdefghijabcdefghijabcdefghijabcdefghijabcdefghijabcd".to_string())
         ])))
     );
+}
+
+#[test]
+fn fail_on_exceeded_max_length() {
     test_parse_err!("abcdefghijabcdefghijabcdefghijabcdefghijabcdefghijabcdefghijabcde");
 }
 
 #[test]
-fn test_identifier_allowed_characters() {
+fn allowed_characters() {
     test_parse_eq!(
         "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ01234567890_",
         Expression::new(ExpressionValue::Identifier(Identifier::new(vec![
@@ -44,14 +48,14 @@ fn test_identifier_allowed_characters() {
 }
 
 #[test]
-fn test_identifier_must_not_start_with_number() {
+fn fail_on_number_prefix() {
     for i in 0..10 {
         test_parse_err!(format!("{}abc", i));
     }
 }
 
 #[test]
-fn test_simple_identifier() {
+fn simple() {
     test_parse_eq!(
         "networks",
         Expression::new(ExpressionValue::Identifier(Identifier::new(vec![
@@ -61,7 +65,7 @@ fn test_simple_identifier() {
 }
 
 #[test]
-fn test_dotted_identifier() {
+fn dotted() {
     test_parse_eq!(
         "advanced.logging",
         Expression::new(ExpressionValue::Identifier(Identifier::new(vec![
@@ -80,7 +84,7 @@ fn test_dotted_identifier() {
 }
 
 #[test]
-fn test_identifier_integer_index() {
+fn integer_index() {
     test_parse_eq!(
         "networks[0].wifi",
         Expression::new(ExpressionValue::Identifier(Identifier::new(vec![
@@ -92,7 +96,7 @@ fn test_identifier_integer_index() {
 }
 
 #[test]
-fn test_identifier_string_index() {
+fn string_index() {
     test_parse_eq!(
         "people[`123-456-789`].first",
         Expression::new(ExpressionValue::Identifier(Identifier::new(vec![
@@ -104,7 +108,7 @@ fn test_identifier_string_index() {
 }
 
 #[test]
-fn test_identifier_indirect_index() {
+fn indirect_index() {
     test_parse_eq!(
         "people[people[0].id].first",
         Expression::new(ExpressionValue::Identifier(Identifier::new(vec![
@@ -120,17 +124,17 @@ fn test_identifier_indirect_index() {
 }
 
 #[test]
-fn test_identifier_float_index() {
+fn fail_on_float_index() {
     test_parse_err!("networks[2.3].wifi");
 }
 
 #[test]
-fn test_identifier_bool_index() {
+fn fail_on_bool_index() {
     test_parse_err!("networks[true].wifi");
 }
 
 #[test]
-fn test_this() {
+fn this_reserved_keyword() {
     test_parse_eq!(
         "this",
         Expression::new(ExpressionValue::Identifier(Identifier::new(vec![
@@ -147,7 +151,7 @@ fn test_this() {
 }
 
 #[test]
-fn test_super() {
+fn super_reserved_keyword() {
     test_parse_eq!(
         "super.ssid",
         Expression::new(ExpressionValue::Identifier(Identifier::new(vec![
