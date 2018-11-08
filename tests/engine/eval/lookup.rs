@@ -6,14 +6,14 @@ use serde_json::json;
 macro_rules! test_eval_eq {
     ($e:expr, $c:ident, $r:expr) => {{
         let engine = Engine::default();
-        assert_eq!(engine.eval(&$e.parse().unwrap(), &$c).unwrap(), $r);
+        assert_eq!(engine.eval(&$e.parse().unwrap(), &$c, None).unwrap(), $r);
     }};
 }
 
 macro_rules! test_eval_err {
     ($e:expr, $c:ident) => {{
         let engine = Engine::default();
-        assert!(engine.eval(&$e.parse().unwrap(), &$c).is_err());
+        assert!(engine.eval(&$e.parse().unwrap(), &$c, None).is_err());
     }};
 }
 
@@ -276,8 +276,13 @@ macro_rules! test_relative_eval_eq {
     ($e:expr, $d:expr, $p:expr, $r:expr) => {{
         let expression: Expression = $p.parse().unwrap();
         let engine = Engine::default();
-        let context = Context::new_with_position($d, expression.identifier().unwrap().clone());
-        assert_eq!(engine.eval(&$e.parse().unwrap(), &context).unwrap(), $r);
+        let context = Context::new($d);
+        assert_eq!(
+            engine
+                .eval(&$e.parse().unwrap(), &context, Some(expression.identifier().unwrap()))
+                .unwrap(),
+            $r
+        );
     }};
 }
 

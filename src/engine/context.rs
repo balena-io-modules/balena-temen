@@ -176,32 +176,14 @@ impl Internal {
 pub struct Context {
     /// Variable values, whole JSON
     data: Value,
-    /// Initial position for relative identifiers
-    position: Option<Identifier>,
     /// Internal data structure
     internal: Arc<Mutex<Internal>>,
 }
 
 impl Context {
-    /// Create new context without initial position
-    ///
-    /// This context can't be used for relative identifier value lookup.
     pub fn new(data: Value) -> Context {
         Context {
             data,
-            position: None,
-            internal: Arc::new(Mutex::new(Internal::default())),
-        }
-    }
-
-    /// Create new context with initial position
-    ///
-    /// This context can be used for either relative or absolute identifier
-    /// value lookup.
-    pub fn new_with_position(data: Value, position: Identifier) -> Context {
-        Context {
-            data,
-            position: Some(position),
             internal: Arc::new(Mutex::new(Internal::default())),
         }
     }
@@ -225,8 +207,9 @@ impl Context {
     /// # Arguments
     ///
     /// * `identifier` - An identifier to lookup value for
-    pub(crate) fn lookup_identifier(&self, identifier: &Identifier) -> Result<&Value> {
-        Lookup::lookup_identifier(&self.data, identifier, self.position.as_ref())
+    /// * `position` - An position for relative identifier lookup (ignored for absolute identifier)
+    pub(crate) fn lookup_identifier(&self, identifier: &Identifier, position: Option<&Identifier>) -> Result<&Value> {
+        Lookup::lookup_identifier(&self.data, identifier, position)
     }
 }
 
