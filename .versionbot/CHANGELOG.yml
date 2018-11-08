@@ -1,4 +1,17 @@
 - commits:
+    - subject: 'Add context aware evaluation (this, super)'
+      hash: dcf32f4317d0821d7f476967336c3e2d6a8cd9a6
+      body: |
+        AST enhanced, rest is unimplemented!().
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Robert Vojta <robert@balena.io>
+        signed-off-by: Robert Vojta <robert@balena.io>
+      author: Robert Vojta
+  version: 0.0.6
+  date: 2018-11-08T11:10:52.911Z
+- commits:
     - subject: Add slugify filter
       hash: 4c8c299dac3118dd589ec6b231070b5e769c3298
       body: ''
