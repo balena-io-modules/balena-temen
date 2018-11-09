@@ -10,7 +10,8 @@ use crate::parser::ast::*;
 /// Internal context structure
 ///
 /// It's in a separate structure because these data are mutable and
-/// the whole structure should be behind `Arc` & `Mutex`.
+/// the whole structure is behind `Arc` & `Mutex`. Then we can
+/// mutate it even if it's behind immutable `Context`.
 ///
 /// Not sure if it's a good idea yet, because the whole project is in
 /// early stage, evolving pretty quickly, ...
