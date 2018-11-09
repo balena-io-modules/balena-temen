@@ -11,12 +11,11 @@ use crate::{
     parser::ast::*,
     utils::validate_f64,
 };
+use crate::utils::RelativeEq;
 
 use self::context::Context;
-use self::equal::RelativeEq;
 
 pub mod context;
-mod equal;
 
 pub struct EngineBuilder {
     functions: HashMap<String, FunctionFn>,
