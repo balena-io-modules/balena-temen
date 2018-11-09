@@ -1,5 +1,5 @@
 use error_chain::*;
-pub use error_chain::bail;
+pub(crate) use error_chain::bail;
 
 use crate::parser::Rule;
 

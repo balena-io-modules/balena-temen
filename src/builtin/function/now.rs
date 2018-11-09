@@ -3,7 +3,7 @@ use std::collections::HashMap;
 use chrono::{DateTime, Local, Utc};
 use serde_json::{Number, Value};
 
-use crate::engine::context::Context;
+use crate::context::Context;
 use crate::error::Result;
 
 fn now_with_cached(cached: DateTime<Utc>, args: &HashMap<String, Value>) -> Result<Value> {
@@ -38,7 +38,7 @@ mod tests {
     use chrono::{DateTime, Local, NaiveDateTime, Utc};
     use serde_json::{json, Value};
 
-    use crate::engine::context::Context;
+    use crate::context::Context;
 
     use super::{now, now_with_cached};
 

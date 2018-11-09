@@ -2,7 +2,7 @@ use std::collections::HashMap;
 
 use serde_json::Value;
 
-use crate::engine::context::Context;
+use crate::context::Context;
 use crate::error::Result;
 
 pub(crate) fn upper(value: &Value, _args: &HashMap<String, Value>, _context: &Context) -> Result<Value> {

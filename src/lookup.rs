@@ -1,13 +1,10 @@
-use std::sync::{Arc, Mutex};
-
-use chrono::{DateTime, Utc};
 use serde_json::Value;
 
 use crate::error::{bail, Result};
 use crate::parser::ast::*;
 
 /// Provide a way to lookup an identifier (variable) value
-struct Lookup<'a> {
+pub struct Lookup<'a> {
     /// Whole structure (JSON) with variable values
     root: &'a Value,
     /// Stack of values for every identifier component (variable name, array index, ...)
@@ -15,7 +12,7 @@ struct Lookup<'a> {
 }
 
 impl<'a> Lookup<'a> {
-    fn new(root: &'a Value) -> Lookup<'a> {
+    pub fn new(root: &'a Value) -> Lookup<'a> {
         Lookup {
             root,
             stack: vec![root],
@@ -31,7 +28,7 @@ impl<'a> Lookup<'a> {
     ///
     /// * `identifier_value` - Next identifier component to lookup
     /// * `position` - Initial position for relative lookup
-    fn update_with_identifier_value(
+    pub fn update_with_identifier_value(
         &mut self,
         identifier_value: &IdentifierValue,
         position: Option<&Identifier>,
@@ -120,7 +117,7 @@ impl<'a> Lookup<'a> {
     /// * `root` - Variable values (whole data structure)
     /// * `identifier` - Identifier to lookup value for
     /// * `position` - Initial position for relative identifiers
-    fn lookup_identifier(root: &'a Value, identifier: &Identifier, position: Option<&Identifier>) -> Result<&'a Value> {
+    pub fn lookup_identifier(root: &'a Value, identifier: &Identifier, position: Option<&Identifier>) -> Result<&'a Value> {
         let mut lookup = Lookup::new(root);
 
         if identifier.is_relative() {
@@ -144,79 +141,5 @@ impl<'a> Lookup<'a> {
             .stack
             .last()
             .ok_or_else(|| "lookup_identifier: unable to lookup identifier, empty stack")?)
-    }
-}
-
-/// Internal context structure
-///
-/// It's in a separate structure because these data are mutable and
-/// the whole structure should be behind `Arc` & `Mutex`.
-///
-/// Not sure if it's a good idea yet, because the whole project is in
-/// early stage, evolving pretty quickly, ...
-#[derive(Default)]
-struct Internal {
-    cached_now: Option<DateTime<Utc>>,
-}
-
-impl Internal {
-    /// Generate current date time or return cached one
-    ///
-    /// Subsequent calls to this function return same date time.
-    fn cached_now(&mut self) -> DateTime<Utc> {
-        if let Some(x) = self.cached_now {
-            return x;
-        }
-
-        let x = Utc::now();
-        self.cached_now = Some(x);
-        x
-    }
-}
-
-/// Evaluation context
-pub struct Context {
-    /// Variable values, whole JSON
-    data: Value,
-    /// Internal data structure
-    internal: Arc<Mutex<Internal>>,
-}
-
-impl Context {
-    pub fn new(data: Value) -> Context {
-        Context {
-            data,
-            internal: Arc::new(Mutex::new(Internal::default())),
-        }
-    }
-}
-
-impl Context {
-    /// Current date time
-    ///
-    /// # Warning
-    ///
-    /// The result is cached and subsequent calls return same value! This is used
-    /// by the `now()` function, which must return same value within one context.
-    pub(crate) fn cached_now(&self) -> DateTime<Utc> {
-        self.internal.lock().unwrap().cached_now()
-    }
-}
-
-impl Context {
-    /// Lookup identifier (variable) value
-    ///
-    /// # Arguments
-    ///
-    /// * `identifier` - An identifier to lookup value for
-    /// * `position` - An position for relative identifier lookup (ignored for absolute identifier)
-    pub(crate) fn lookup_identifier(&self, identifier: &Identifier, position: Option<&Identifier>) -> Result<&Value> {
-        Lookup::lookup_identifier(&self.data, identifier, position)
-    }
-}
-
-impl Default for Context {
-    fn default() -> Context {
-        Context::new(Value::Null)
     }
 }

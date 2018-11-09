@@ -3,7 +3,7 @@ use std::collections::HashMap;
 use chrono::{DateTime, NaiveDateTime, Utc};
 use serde_json::Value;
 
-use crate::engine::context::Context;
+use crate::context::Context;
 use crate::error::Result;
 
 fn format_timestamp(filter: &str, value: &Value, args: &HashMap<String, Value>, default: &str) -> Result<Value> {
@@ -41,7 +41,7 @@ mod tests {
 
     use serde_json::json;
 
-    use crate::engine::context::Context;
+    use crate::context::Context;
 
     use super::{date, datetime, format_timestamp, time};
 

@@ -1,7 +1,6 @@
 use serde_json::json;
 
-use balena_temen::engine::context::Context;
-use balena_temen::engine::Engine;
+use balena_temen::{Context, Engine};
 use balena_temen::parser::ast::*;
 
 macro_rules! test_eval_eq {

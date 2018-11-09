@@ -13,9 +13,7 @@ use crate::{
 };
 use crate::utils::RelativeEq;
 
-use self::context::Context;
-
-pub mod context;
+use crate::context::Context;
 
 pub struct EngineBuilder {
     functions: HashMap<String, FunctionFn>,

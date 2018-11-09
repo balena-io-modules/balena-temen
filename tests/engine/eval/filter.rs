@@ -1,9 +1,8 @@
 use std::collections::HashMap;
 
-use serde_json::{json, Value};
+use serde_json::json;
 
-use balena_temen::engine::{Engine, EngineBuilder};
-use balena_temen::engine::context::Context;
+use balena_temen::{Context, Engine, EngineBuilder, Value};
 
 macro_rules! test_eval_eq {
     ($e:expr, $r:expr) => {{

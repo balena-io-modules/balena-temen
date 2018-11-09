@@ -9,9 +9,16 @@
 
 pub use serde_json::Value;
 
+pub use crate::{
+    context::Context,
+    engine::{Engine, EngineBuilder},
+};
+
 pub(crate) mod builtin;
 
-pub mod engine;
+mod context;
+mod engine;
 pub mod error;
+mod lookup;
 pub mod parser;
 mod utils;
