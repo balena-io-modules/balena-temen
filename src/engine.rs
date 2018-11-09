@@ -11,9 +11,8 @@ use crate::{
     parser::ast::*,
     utils::validate_f64,
 };
-use crate::utils::RelativeEq;
-
 use crate::context::Context;
+use crate::utils::RelativeEq;
 
 pub struct EngineBuilder {
     functions: HashMap<String, FunctionFn>,
