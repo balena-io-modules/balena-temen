@@ -12,13 +12,15 @@ pub use serde_json::Value;
 pub use crate::{
     context::Context,
     engine::{Engine, EngineBuilder},
+    lookup::Lookup,
 };
 
 pub(crate) mod builtin;
 
+pub mod ast;
 mod context;
 mod engine;
 pub mod error;
 mod lookup;
-pub mod parser;
+mod parser;
 mod utils;

@@ -3,7 +3,7 @@
 //! # Example
 //!
 //! ```rust
-//! use balena_temen::parser::ast::*;
+//! use balena_temen::ast::*;
 //!
 //! let parsed: Expression = "1 + 2".parse().unwrap();
 //! let manual = Expression::new(
@@ -185,6 +185,12 @@ impl Identifier {
     /// Check if an identifier is absolute
     pub fn is_absolute(&self) -> bool {
         !self.is_relative()
+    }
+}
+
+impl Default for Identifier {
+    fn default() -> Identifier {
+        Identifier::new(vec![])
     }
 }
 

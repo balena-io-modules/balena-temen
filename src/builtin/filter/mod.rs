@@ -17,4 +17,4 @@ mod slugify;
 mod trim;
 mod upper;
 
-pub type FilterFn = fn(&Value, &HashMap<String, Value>, &Context) -> Result<Value>;
+pub type FilterFn = fn(input: &Value, args: &HashMap<String, Value>, context: &mut Context) -> Result<Value>;

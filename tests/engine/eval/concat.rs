@@ -1,14 +1,5 @@
 use serde_json::json;
-
-use balena_temen::{Context, Engine};
-
-macro_rules! test_eval_eq {
-    ($e:expr, $r:expr) => {{
-        let engine = Engine::default();
-        let context = Context::default();
-        assert_eq!(engine.eval(&$e.parse().unwrap(), &context, None).unwrap(), $r);
-    }};
-}
+use testutils::test_eval_eq;
 
 #[test]
 fn multiple_strings() {

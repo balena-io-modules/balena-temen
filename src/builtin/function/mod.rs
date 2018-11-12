@@ -11,4 +11,4 @@ pub(crate) use self::uuidv4::uuidv4;
 mod now;
 mod uuidv4;
 
-pub type FunctionFn = fn(&HashMap<String, Value>, &Context) -> Result<Value>;
+pub type FunctionFn = fn(args: &HashMap<String, Value>, context: &mut Context) -> Result<Value>;

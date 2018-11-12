@@ -1,30 +1,11 @@
-use std::collections::HashMap;
-
-use balena_temen::{error::Error, parser::ast::*};
-
-macro_rules! test_parse_eq {
-    ($e:expr, $r:expr) => {{
-        assert_eq!(($e.parse() as Result<Expression, Error>).unwrap(), $r);
-    }};
-}
-
-macro_rules! fn_args_map(
-    { $($key:expr => $value:expr),+ } => {
-        {
-            let mut m = ::std::collections::HashMap::new();
-            $(
-                m.insert($key.to_string(), Expression::new($value));
-            )+
-            m
-        }
-     };
-);
+use balena_temen::ast::*;
+use testutils::{fn_args_map, test_parse_eq};
 
 #[test]
 fn without_arguments() {
     test_parse_eq!(
         "uuid()",
-        Expression::new(ExpressionValue::FunctionCall(FunctionCall::new("uuid", HashMap::new())))
+        Expression::new(ExpressionValue::FunctionCall(FunctionCall::new("uuid", fn_args_map!())))
     );
 }
 

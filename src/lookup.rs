@@ -1,19 +1,53 @@
 use serde_json::Value;
 
+use crate::ast::*;
 use crate::error::{bail, Result};
-use crate::parser::ast::*;
+
+/// Lookup identifier
+pub trait Lookup {
+    /// Lookup identifier (variable) value
+    ///
+    /// # Arguments
+    ///
+    /// * `identifier` - An identifier (variable) to lookup
+    /// * `position` - An initial position for relative lookups
+    fn lookup_identifier(&self, identifier: &Identifier, position: &Identifier) -> Result<&Value>;
+}
+
+impl Lookup for Value {
+    fn lookup_identifier(&self, identifier: &Identifier, position: &Identifier) -> Result<&Value> {
+        let mut lookup = LookupStack::new(self);
+
+        if identifier.is_relative() {
+            // Update stack with initial position
+            for position_value in position.values.iter() {
+                lookup.update_with_identifier_value(position_value, position)?;
+            }
+        }
+
+        // Update stack with either relative / absolute identifier, stack is prepared for both
+        for identifier_value in identifier.values.iter() {
+            lookup.update_with_identifier_value(identifier_value, position)?;
+        }
+
+        Ok(lookup
+            .stack
+            .last()
+            .ok_or_else(|| "lookup_identifier: unable to lookup identifier, empty stack")?)
+    }
+}
 
 /// Provide a way to lookup an identifier (variable) value
-pub struct Lookup<'a> {
+pub struct LookupStack<'a> {
     /// Whole structure (JSON) with variable values
     root: &'a Value,
     /// Stack of values for every identifier component (variable name, array index, ...)
     stack: Vec<&'a Value>,
 }
 
-impl<'a> Lookup<'a> {
-    pub fn new(root: &'a Value) -> Lookup<'a> {
-        Lookup {
+impl<'a> LookupStack<'a> {
+    pub fn new(root: &'a Value) -> LookupStack<'a> {
+        LookupStack {
             root,
             stack: vec![root],
         }
@@ -31,7 +65,7 @@ impl<'a> Lookup<'a> {
     pub fn update_with_identifier_value(
         &mut self,
         identifier_value: &IdentifierValue,
-        position: Option<&Identifier>,
+        position: &Identifier,
     ) -> Result<()> {
         let last_value = self
             .stack
@@ -87,7 +121,7 @@ impl<'a> Lookup<'a> {
                 //
                 // We have to create new Lookup structure and lookup this identifier
                 // from scratch to avoid existing stack modifications
-                match Lookup::lookup_identifier(self.root, identifier, position)? {
+                match self.root.lookup_identifier(identifier, position)? {
                     // If we were able to lookup the value, treat it as an String or Number index
                     Value::String(ref x) => {
                         self.update_with_identifier_value(&IdentifierValue::StringIndex(x.to_string()), position)?
@@ -105,41 +139,5 @@ impl<'a> Lookup<'a> {
         };
 
         Ok(())
-    }
-
-    /// Lookup identifier value
-    ///
-    /// `position` is required for relative identifier values only (`This`, `Super`).
-    /// This argument is ignored if an identifier is absolute.
-    ///
-    /// # Arguments
-    ///
-    /// * `root` - Variable values (whole data structure)
-    /// * `identifier` - Identifier to lookup value for
-    /// * `position` - Initial position for relative identifiers
-    pub fn lookup_identifier(root: &'a Value, identifier: &Identifier, position: Option<&Identifier>) -> Result<&'a Value> {
-        let mut lookup = Lookup::new(root);
-
-        if identifier.is_relative() {
-            // In case of relative identifier we have to update stack to the
-            // initial position to be able to lookup relative identifier
-            let position =
-                position.ok_or_else(|| "lookup_identifier: unable to lookup relative identifier without position")?;
-
-            // Update stack with initial position
-            for position_value in position.values.iter() {
-                lookup.update_with_identifier_value(position_value, Some(&position))?;
-            }
-        }
-
-        // Update stack with either relative / absolute identifier, stack is prepared for both
-        for identifier_value in identifier.values.iter() {
-            lookup.update_with_identifier_value(identifier_value, position)?;
-        }
-
-        Ok(lookup
-            .stack
-            .last()
-            .ok_or_else(|| "lookup_identifier: unable to lookup identifier, empty stack")?)
     }
 }

@@ -27,7 +27,7 @@ fn now_with_cached(cached: DateTime<Utc>, args: &HashMap<String, Value>) -> Resu
     }
 }
 
-pub(crate) fn now(args: &HashMap<String, Value>, context: &Context) -> Result<Value> {
+pub(crate) fn now(args: &HashMap<String, Value>, context: &mut Context) -> Result<Value> {
     now_with_cached(context.cached_now(), args)
 }
 
@@ -44,22 +44,22 @@ mod tests {
 
     #[test]
     fn subsequent_call_must_return_same_value() {
-        let ctx = Context::default();
+        let mut ctx = Context::default();
         let args = HashMap::<String, Value>::new();
 
-        assert_eq!(now(&args, &ctx).unwrap(), now(&args, &ctx).unwrap());
+        assert_eq!(now(&args, &mut ctx).unwrap(), now(&args, &mut ctx).unwrap());
     }
 
     #[test]
     fn default_argument_values() {
-        let ctx = Context::default();
+        let mut ctx = Context::default();
         let empty_args = HashMap::<String, Value>::new();
 
         let mut args = HashMap::new();
         args.insert("utc".to_string(), json!(false));
         args.insert("timestamp".to_string(), json!(false));
 
-        assert_eq!(now(&empty_args, &ctx).unwrap(), now(&args, &ctx).unwrap());
+        assert_eq!(now(&empty_args, &mut ctx).unwrap(), now(&args, &mut ctx).unwrap());
     }
 
     #[test]
@@ -107,19 +107,19 @@ mod tests {
 
     #[test]
     fn fail_on_invalid_utc_argument_type() {
-        let ctx = Context::default();
+        let mut ctx = Context::default();
         let mut args = HashMap::new();
         args.insert("utc".to_string(), json!(1));
 
-        assert!(now(&args, &ctx).is_err());
+        assert!(now(&args, &mut ctx).is_err());
     }
 
     #[test]
     fn fail_on_invalid_timestamp_argument_type() {
-        let ctx = Context::default();
+        let mut ctx = Context::default();
         let mut args = HashMap::new();
         args.insert("timestamp".to_string(), json!("some-string"));
 
-        assert!(now(&args, &ctx).is_err());
+        assert!(now(&args, &mut ctx).is_err());
     }
 }

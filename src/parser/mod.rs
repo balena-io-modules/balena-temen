@@ -9,12 +9,10 @@ use pest::{
 use pest_derive::Parser;
 
 use crate::{
+    ast::*,
     error::{bail, Result},
-    parser::ast::*,
     utils::validate_f64,
 };
-
-pub mod ast;
 
 lazy_static! {
     static ref MATH_CLIMBER: PrecClimber<Rule> = PrecClimber::new(vec![
