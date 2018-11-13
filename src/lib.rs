@@ -7,6 +7,14 @@
 //! * evaluate an expression as a boolean (logical expressions)
 //! * register custom functions and filters
 //!
+//! # Versioning
+//!
+//! This crate is being actively developed and it does NOT follow [Semantic Versioning] yet.
+//! It will follow semantic versioning when it reaches version 1.0.
+//!
+//! MINOR version changes denotes incompatible API changes and PATCH version changes denotes
+//! both new functionality in a backwards-compatible manner and backwards-compatible bug fixes.
+//!
 //! # Examples
 //!
 //! ## Expression parsing
@@ -104,6 +112,7 @@
 //! [ast]: ast/index.html
 //! [`EngineBuilder::function`]: struct.EngineBuilder.html#method.function
 //! [`EngineBuilder::filter`]: struct.EngineBuilder.html#method.filter
+//! [Semantic Versioning]: https://semver.org/
 #![allow(clippy::possible_missing_comma)]
 
 pub use serde_json::Value;
