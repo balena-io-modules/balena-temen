@@ -242,6 +242,7 @@ impl From<EngineBuilder> for Engine {
 pub struct Engine {
     functions: HashMap<String, FunctionFn>,
     filters: HashMap<String, FilterFn>,
+    #[allow(dead_code)]
     eval_keyword: String,
 }
 
@@ -385,6 +386,7 @@ impl Engine {
         self.eval_expression_as_bool(&expression, position, data, context)
     }
 
+    #[allow(dead_code)]
     pub(crate) fn eval_keyword(&self) -> &str {
         &self.eval_keyword
     }
