@@ -8,13 +8,17 @@ use crate::{
         filter::{self, FilterFn},
         function::{self, FunctionFn},
     },
+    context::Context,
     error::{bail, Result},
     lookup::Lookup,
-    utils::validate_f64,
+    utils::{RelativeEq, validate_f64}
 };
-use crate::context::Context;
-use crate::utils::RelativeEq;
 
+/// A custom engine builder
+///
+/// Allows to build an [`Engine`] with custom filters, functions or the evaluation keyword.
+///
+/// [`Engine`]: struct.Engine.html
 pub struct EngineBuilder {
     functions: HashMap<String, FunctionFn>,
     filters: HashMap<String, FilterFn>,
@@ -22,6 +26,9 @@ pub struct EngineBuilder {
 }
 
 impl Default for EngineBuilder {
+    /// Creates new [`EngineBuilder`] with default filters, functions and the evaluation keyword
+    ///
+    /// [`EngineBuilder`]: struct.EngineBuilder.html
     fn default() -> EngineBuilder {
         EngineBuilder::new()
             .filter("upper", filter::upper)
@@ -37,6 +44,11 @@ impl Default for EngineBuilder {
 }
 
 impl EngineBuilder {
+    /// Creates new, empty, [`EngineBuilder`]
+    ///
+    /// No filters and functions are registered.
+    ///
+    /// [`EngineBuilder`]: struct.EngineBuilder.html
     fn new() -> EngineBuilder {
         EngineBuilder {
             functions: HashMap::new(),
@@ -45,32 +57,74 @@ impl EngineBuilder {
         }
     }
 
-    /// Register custom evaluation keyword
-    ///
-    /// Default evaluation keyword is `eval`.
-    ///
-    /// # Arguments
-    ///
-    /// * `keyword` - An evaluation keyword
-    pub fn eval_keyword<S>(self, keyword: S) -> EngineBuilder
-    where
-        S: Into<String>,
-    {
-        EngineBuilder {
-            functions: self.functions,
-            filters: self.filters,
-            eval_keyword: Some(keyword.into()),
-        }
-    }
-
-    /// Register custom filter
+    /// Registers custom filter
     ///
     /// If a filter with the name already exists, it will be overwritten.
     ///
+    /// Visit [`FilterFn`] to learn more about filters.
+    ///
     /// # Arguments
     ///
-    /// * `name` - Filter name
-    /// * `filter` - Filter function
+    /// * `name` - Custom filter name
+    /// * `filter` - Custom filter function
+    ///
+    /// # Examples
+    ///
+    /// ```rust
+    /// use balena_temen::{
+    ///   ast::Identifier,
+    ///   Engine, EngineBuilder, Context, Value,
+    ///   error::Result
+    /// };
+    /// use serde_json::json;
+    /// use std::collections::HashMap;
+    ///
+    /// fn text_filter(input: &Value, args: &HashMap<String, Value>, _: &mut Context) -> Result<Value> {
+    ///     let input = input.as_str()
+    ///         .ok_or_else(|| "`text` filter accepts string only")?;
+    ///
+    ///     let trim = args.get("trim")
+    ///         .unwrap_or_else(|| &Value::Bool(false))
+    ///         .as_bool()
+    ///         .ok_or_else(|| "`trim` argument must be a bool")?;
+    ///
+    ///     let upper = args.get("upper")
+    ///         .unwrap_or_else(|| &Value::Bool(false))
+    ///         .as_bool()
+    ///         .ok_or_else(|| "`upper` argument must be a bool")?;
+    ///
+    ///     let result = match (trim, upper) {
+    ///         (false, false) => input.to_string(),
+    ///         (true, false) => input.trim().to_string(),
+    ///         (false, true) => input.to_uppercase(),
+    ///         (true, true) => input.trim().to_uppercase(),
+    ///     };
+    ///
+    ///     Ok(Value::String(result))
+    /// };
+    ///
+    /// let engine: Engine = EngineBuilder::default()
+    ///     .filter("text", text_filter)
+    ///     .into();
+    /// let mut ctx = Context::default();
+    /// let position = Identifier::default();
+    /// let data = Value::Null;
+    ///
+    /// assert_eq!(
+    ///     engine.eval("` abc ` | text", &position, &data, &mut ctx).unwrap(),
+    ///     json!(" abc ")
+    /// );
+    /// assert_eq!(
+    ///     engine.eval("` abc ` | text(trim=true)", &position, &data, &mut ctx).unwrap(),
+    ///     json!("abc")
+    /// );
+    /// assert_eq!(
+    ///     engine.eval("` abc ` | text(trim=true, upper=true)", &position, &data, &mut ctx).unwrap(),
+    ///     json!("ABC")
+    /// );
+    /// ```
+    ///
+    /// [`FilterFn`]: type.FilterFn.html
     pub fn filter<S>(self, name: S, filter: FilterFn) -> EngineBuilder
     where
         S: Into<String>,
@@ -84,14 +138,60 @@ impl EngineBuilder {
         }
     }
 
-    /// Register custom function
+    /// Registers custom function
     ///
     /// If a function with the name already exists, it will be overwritten.
     ///
+    /// Visit [`FunctionFn`] to learn more about functions.
+    ///
     /// # Arguments
     ///
-    /// * `name` - Function name
-    /// * `function` - Function
+    /// * `name` - Custom function name
+    /// * `function` - Custom function function
+    ///
+    /// # Examples
+    ///
+    /// ```rust
+    /// use balena_temen::{
+    ///   ast::Identifier,
+    ///   Engine, EngineBuilder, Context, Value,
+    ///   error::Result
+    /// };
+    /// use serde_json::json;
+    /// use std::collections::HashMap;
+    ///
+    /// fn echo_function(args: &HashMap<String, Value>, _: &mut Context) -> Result<Value> {
+    ///     let value = match args.get("value") {
+    ///         Some(x) => {
+    ///             x.as_str().ok_or_else(|| "`value` argument must be a string")?
+    ///         },
+    ///         None => "echo"
+    ///     };
+    ///
+    ///     Ok(Value::String(value.to_string()))
+    /// };
+    ///
+    /// let engine: Engine = EngineBuilder::default()
+    ///     .function("echo", echo_function)
+    ///     .into();
+    /// let mut ctx = Context::default();
+    /// let position = Identifier::default();
+    /// let data = Value::Null;
+    ///
+    /// assert_eq!(
+    ///     engine.eval("echo()", &position, &data, &mut ctx).unwrap(),
+    ///     json!("echo")
+    /// );
+    /// assert_eq!(
+    ///     engine.eval("echo(value=`Hallo`)", &position, &data, &mut ctx).unwrap(),
+    ///     json!("Hallo")
+    /// );
+    /// assert!(
+    ///     engine.eval("echo(value=1)", &position, &data, &mut ctx).is_err()
+    /// );
+    /// ```
+    ///
+    /// [`FunctionFn`]: type.FunctionFn.html
     pub fn function<S>(self, name: S, function: FunctionFn) -> EngineBuilder
     where
         S: Into<String>,
@@ -104,6 +204,28 @@ impl EngineBuilder {
             eval_keyword: self.eval_keyword,
         }
     }
+
+    /// Registers custom evaluation keyword
+    ///
+    /// Defaults to `$$eval` if no keyword is registered.
+    ///
+    /// # Arguments
+    ///
+    /// * `keyword` - An evaluation keyword
+    ///
+    /// # Examples
+    ///
+    // TODO Add example
+    pub fn eval_keyword<S>(self, keyword: S) -> EngineBuilder
+    where
+        S: Into<String>,
+    {
+        EngineBuilder {
+            functions: self.functions,
+            filters: self.filters,
+            eval_keyword: Some(keyword.into()),
+        }
+    }
 }
 
 impl From<EngineBuilder> for Engine {
@@ -111,11 +233,12 @@ impl From<EngineBuilder> for Engine {
         Engine {
             functions: builder.functions,
             filters: builder.filters,
-            eval_keyword: builder.eval_keyword.unwrap_or_else(|| "eval".into()),
+            eval_keyword: builder.eval_keyword.unwrap_or_else(|| "$$eval".into()),
         }
     }
 }
 
+/// An expression evaluation engine
 pub struct Engine {
     functions: HashMap<String, FunctionFn>,
     filters: HashMap<String, FilterFn>,
@@ -123,13 +246,146 @@ pub struct Engine {
 }
 
 impl Default for Engine {
+    /// Creates new [`Engine`] with default set of functions, filters and the evaluation keyword.
+    ///
+    /// [`Engine`]: struct.Engine.html
     fn default() -> Engine {
         EngineBuilder::default().into()
     }
 }
 
 impl Engine {
-    pub fn eval_keyword(&self) -> &str {
+    /// Evaluates an expression
+    ///
+    /// Result can be any valid JSON value.
+    ///
+    /// # Arguments
+    ///
+    /// * `expression` - An expression to evaluate
+    /// * `position` - An initial position for relative identifiers
+    /// * `data` - A JSON with variable values
+    /// * `context` - An evaluation context
+    ///
+    /// # Examples
+    ///
+    /// ```rust
+    /// use balena_temen::{
+    ///   ast::Identifier,
+    ///   Engine, Context, Value
+    /// };
+    /// use serde_json::json;
+    ///
+    /// let engine = Engine::default();       // Default functions, filters
+    /// let mut ctx = Context::default();     // Default context
+    /// let position = Identifier::default(); // Evaluate from the root
+    /// let data = json!({
+    ///   "numbers": {
+    ///     "one": 1,
+    ///     "two": 2
+    ///   },
+    ///   "names": [
+    ///     "zero",
+    ///     "one",
+    ///     "two"
+    ///   ]
+    /// });
+    ///
+    /// // Math expression
+    ///
+    /// assert_eq!(
+    ///     engine.eval("2 + 3", &position, &data, &mut ctx).unwrap(),
+    ///     json!(5)
+    /// );
+    ///
+    /// // Filters
+    ///
+    /// assert_eq!(
+    ///     engine.eval("`Balena is great!` | slugify", &position, &data, &mut ctx).unwrap(),
+    ///     json!("balena-is-great")
+    /// );
+    ///
+    /// // Variables
+    ///
+    /// assert_eq!(
+    ///     engine.eval("numbers.one + numbers.two", &position, &data, &mut ctx).unwrap(),
+    ///     json!(3)
+    /// );
+    /// assert_eq!(
+    ///     engine.eval("numbers[`one`] * numbers[`two`]", &position, &data, &mut ctx).unwrap(),
+    ///     json!(2)
+    /// );
+    ///
+    /// // Indirect / nested variables
+    ///
+    /// assert_eq!(
+    ///     engine.eval("numbers[names[1]] + numbers[names[2]]", &position, &data, &mut ctx).unwrap(),
+    ///     json!(3)
+    /// );
+    /// assert_eq!(
+    ///     engine.eval("numbers[names.1] + numbers[names.2]", &position, &data, &mut ctx).unwrap(),
+    ///     json!(3)
+    /// );
+    /// ```
+    pub fn eval(&self, expression: &str, position: &Identifier, data: &Value, context: &mut Context) -> Result<Value> {
+        let expression = expression.parse()?;
+        self.eval_expression(&expression, position, data, context)
+    }
+
+    /// Evaluates an expression as a boolean
+    ///
+    /// Result must evaluate to a boolean value otherwise it fails. Numbers, strings, ... do not
+    /// evaluate to a boolean like in other languages.
+    ///
+    /// # Arguments
+    ///
+    /// * `expression` - An expression to evaluate
+    /// * `position` - An initial position for relative identifiers
+    /// * `data` - A JSON with variable values
+    /// * `context` - An evaluation context
+    ///
+    /// # Examples
+    ///
+    /// ```rust
+    /// use balena_temen::{
+    ///   ast::Identifier,
+    ///   Engine, Context, Value
+    /// };
+    /// use serde_json::json;
+    ///
+    /// let engine = Engine::default();       // Default functions, filters
+    /// let mut ctx = Context::default();     // Default context
+    /// let position = Identifier::default(); // Evaluate from the root
+    /// let data = Value::Null;               // No data (variables)
+    ///
+    /// assert_eq!(
+    ///     engine.eval_as_bool("2 == 2 + 3", &position, &data, &mut ctx).unwrap(),
+    ///     json!(false)
+    /// );
+    ///
+    /// // An expression MUST evaluate to a boolean otherwise the evaluation fails
+    ///
+    /// assert!(
+    ///     engine.eval_as_bool("1", &position, &data, &mut ctx).is_err()
+    /// );
+    ///
+    /// // Invalid syntax leads to a failure too
+    ///
+    /// assert!(
+    ///     engine.eval_as_bool("true ==", &position, &data, &mut ctx).is_err()
+    /// );
+    /// ```
+    pub fn eval_as_bool(
+        &self,
+        expression: &str,
+        position: &Identifier,
+        data: &Value,
+        context: &mut Context,
+    ) -> Result<bool> {
+        let expression = expression.parse()?;
+        self.eval_expression_as_bool(&expression, position, data, context)
+    }
+
+    pub(crate) fn eval_keyword(&self) -> &str {
         &self.eval_keyword
     }
 
@@ -318,11 +574,6 @@ impl Engine {
         bail!("unable to evaluate expression as a number: {:?}", expression)
     }
 
-    pub fn eval(&self, expression: &str, position: &Identifier, data: &Value, context: &mut Context) -> Result<Value> {
-        let expression = expression.parse()?;
-        self.eval_expression(&expression, position, data, context)
-    }
-
     fn eval_expression(
         &self,
         expression: &Expression,
@@ -395,7 +646,7 @@ impl Engine {
             ExpressionValue::String(_) => bail!("string can't be evaluated as bool"),
             ExpressionValue::Identifier(x) => match data.lookup_identifier(x, position)? {
                 Value::Bool(x) => *x,
-                _ => bail!("identifier does not evaluated to a boolean"),
+                _ => bail!("identifier does not evaluate to a boolean"),
             },
             ExpressionValue::Math(_) => bail!("math expression can't be evaluated as bool"),
             ExpressionValue::Logical(LogicalExpression {
@@ -475,16 +726,5 @@ impl Engine {
         }
 
         Ok(value)
-    }
-
-    pub fn eval_as_bool(
-        &self,
-        expression: &str,
-        position: &Identifier,
-        data: &Value,
-        context: &mut Context,
-    ) -> Result<bool> {
-        let expression = expression.parse()?;
-        self.eval_expression_as_bool(&expression, position, data, context)
     }
 }

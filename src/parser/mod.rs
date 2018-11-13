@@ -165,7 +165,7 @@ fn parse_logical_value(pair: Pair<Rule>) -> Result<Expression> {
 
     let exp = expression.ok_or_else(|| "parse_logical_value: invalid grammar, unable to create expression")?;
     if negated {
-        Ok(exp.negate())
+        Ok(exp.into_negated())
     } else {
         Ok(exp)
     }

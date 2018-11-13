@@ -1,3 +1,4 @@
+//! Error chain
 use error_chain::*;
 pub(crate) use error_chain::bail;
 
