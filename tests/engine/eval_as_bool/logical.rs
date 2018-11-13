@@ -1,4 +1,4 @@
-use testutils::{test_eval_as_bool_eq, test_eval_as_bool_err};
+use crate::{test_eval_as_bool_eq, test_eval_as_bool_err};
 
 #[test]
 fn logical_and() {

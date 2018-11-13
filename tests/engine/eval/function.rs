@@ -1,7 +1,7 @@
 use std::collections::HashMap;
 
 use serde_json::json;
-use testutils::{test_eval_eq, test_eval_err, test_eval_ok};
+use crate::{test_eval_eq, test_eval_err, test_eval_ok};
 
 use balena_temen::{Context, Engine, EngineBuilder, Value};
 

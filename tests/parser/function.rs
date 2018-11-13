@@ -1,5 +1,5 @@
 use balena_temen::ast::*;
-use testutils::{fn_args_map, test_parse_eq};
+use crate::{fn_args_map, test_parse_eq};
 
 #[test]
 fn without_arguments() {

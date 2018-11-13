@@ -1,5 +1,5 @@
 use balena_temen::{error::Error, parser::ast::*};
-use testutils::test_parse_eq;
+use crate::test_parse_eq;
 
 #[test]
 fn single_filter() {

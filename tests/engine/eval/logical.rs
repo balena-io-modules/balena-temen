@@ -1,5 +1,5 @@
 use serde_json::json;
-use testutils::test_eval_eq;
+use crate::test_eval_eq;
 
 #[test]
 fn equal() {

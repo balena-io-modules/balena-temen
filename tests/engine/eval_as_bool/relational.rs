@@ -1,4 +1,4 @@
-use testutils::test_eval_as_bool_eq;
+use crate::test_eval_as_bool_eq;
 
 #[test]
 fn equal() {

@@ -1,5 +1,5 @@
 use balena_temen::ast::*;
-use testutils::{test_parse_eq, test_parse_err};
+use crate::{test_parse_eq, test_parse_err};
 
 #[test]
 fn operator() {
