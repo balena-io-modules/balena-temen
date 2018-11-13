@@ -18,4 +18,4 @@ slug = "0.1"
 uuid = { version = "0.7", features = ["v4"] }
 
 [dev-dependencies]
-testutils = { path = "testutils" }
+testutils = { version = "0.0.1", path = "testutils" }
