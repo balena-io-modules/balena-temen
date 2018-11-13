@@ -1,4 +1,4 @@
-//! [balena] templating engine
+//! [balena] **tem**plating **en**gine
 //!
 //! A crate that provides facilities to:
 //!
