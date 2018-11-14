@@ -1,9 +1,11 @@
-//! Expression Abstract Syntax Tree.
+//! An expression Abstract Syntax Tree
 //!
-//! # Example
+//! [The Elegant Parser] is used to parse an expression. Full [grammar].
+//!
+//! # Examples
 //!
 //! ```rust
-//! use balena_temen::parser::ast::*;
+//! use balena_temen::ast::*;
 //!
 //! let parsed: Expression = "1 + 2".parse().unwrap();
 //! let manual = Expression::new(
@@ -16,57 +18,64 @@
 //!     )
 //! );
 //! assert_eq!(parsed, manual);
+//! ```
+//!
+//! [The Elegant Parser]: https://github.com/pest-parser/pest
+//! [grammar]: https://github.com/balena-io-modules/balena-temen/blob/master/src/parser/grammar.pest
 use std::{collections::HashMap, str::FromStr};
 
-use crate::{error::Error, parser::parse};
+use crate::{
+    error::{bail, Error},
+    parser::parse
+};
 
-/// Mathematical operator
+/// Math operator
 #[derive(Copy, Clone, Debug, PartialEq)]
 pub enum MathOperator {
-    /// +
+    /// `+`
     Addition,
-    /// -
+    /// `-`
     Subtraction,
-    /// *
+    /// `*`
     Multiplication,
-    /// /
+    /// `/`
     Division,
-    /// %
+    /// `%`
     Modulo,
 }
 
 /// Logical operator
 #[derive(Copy, Clone, Debug, PartialEq)]
 pub enum LogicalOperator {
-    /// ==
+    /// `==`
     Equal,
-    /// !=
+    /// `!=`
     NotEqual,
-    /// >
+    /// `>`
     GreaterThan,
-    /// >=
+    /// `>=`
     GreaterThanOrEqual,
-    /// <
+    /// `<`
     LowerThan,
-    /// <=
+    /// `<=`
     LowerThanOrEqual,
-    /// and
+    /// `and`
     And,
-    /// or
+    /// `or`
     Or,
 }
 
-/// Function call
+/// A function call
 #[derive(Clone, Debug, PartialEq)]
 pub struct FunctionCall {
-    /// Function name
+    /// A function name
     pub name: String,
-    /// Function arguments (kwargs style, see Python)
+    /// A function arguments (kwargs style, see Python)
     pub args: HashMap<String, Expression>,
 }
 
 impl FunctionCall {
-    /// Create new function call
+    /// Creates new function call
     ///
     /// # Arguments
     ///
@@ -83,25 +92,25 @@ impl FunctionCall {
     }
 }
 
-/// Mathematical expression
+/// Math expression
 #[derive(Clone, Debug, PartialEq)]
 pub struct MathExpression {
-    /// Left side
+    /// A left-hand side
     pub lhs: Box<Expression>,
-    /// Right side
+    /// A right-hand side
     pub rhs: Box<Expression>,
-    /// Operator
+    /// An operator
     pub operator: MathOperator,
 }
 
 impl MathExpression {
-    /// Create new mathematical expression
+    /// Creates new mathematical expression
     ///
     /// # Arguments
     ///
-    /// * `lhs` - Left side
-    /// * `rhs` - Right side
-    /// * `operator` - Operator
+    /// * `lhs` - A left-hand side
+    /// * `rhs` - A right-hand side
+    /// * `operator` - An operator
     pub fn new(lhs: Expression, rhs: Expression, operator: MathOperator) -> MathExpression {
         MathExpression {
             lhs: Box::new(lhs),
@@ -114,22 +123,22 @@ impl MathExpression {
 /// Logical expression
 #[derive(Clone, Debug, PartialEq)]
 pub struct LogicalExpression {
-    /// Left side
+    /// A left-hand side
     pub lhs: Box<Expression>,
-    /// Right side
+    /// A right-hand side
     pub rhs: Box<Expression>,
-    /// Operator
+    /// An operator
     pub operator: LogicalOperator,
 }
 
 impl LogicalExpression {
-    /// Create new logical expression
+    /// Creates new logical expression
     ///
     /// # Arguments
     ///
-    /// * `lhs` - Left side
-    /// * `rhs` - Right side
-    /// * `operator` - Operator
+    /// * `lhs` - A left-hand side
+    /// * `rhs` - A right-hand side
+    /// * `operator` - An operator
     pub fn new(lhs: Expression, rhs: Expression, operator: LogicalOperator) -> LogicalExpression {
         LogicalExpression {
             lhs: Box::new(lhs),
@@ -142,12 +151,12 @@ impl LogicalExpression {
 /// String concatenation
 #[derive(Clone, Debug, PartialEq)]
 pub struct StringConcat {
-    /// Values to concatenate
+    /// List of values to concatenate
     pub values: Vec<ExpressionValue>,
 }
 
 impl StringConcat {
-    /// Create new concatenation
+    /// Creates new concatenation expression
     ///
     /// # Arguments
     ///
@@ -157,23 +166,61 @@ impl StringConcat {
     }
 }
 
-/// Identifier
+/// An identifier
+///
+/// # Examples
+///
+/// ```text
+/// networks[0].name
+///   |      │   |
+///   |      |   └ IdentifierValue::Name("name")
+///   |      |
+///   |      └ IdentifierValue::IntegerIndex(0)
+///   |
+///   └ IdentifierValue::Name("networks")
+/// ```
+///
+/// ```text
+/// persons[boss.id]["name"]
+///   |      │         |
+///   |      |         └ IdentifierValue::StringIndex("name")
+///   |      |
+///   |      └ IdentifierValue::IdentifierIndex(boss.id)
+///   |                                          |   |
+///   |                                          |   └ IdentifierValue::Name("id")
+///   |                                          |
+///   |                                          └ IdentifierValue::Name("boss")
+///   |
+///   └ IdentifierValue::Name(String)
+/// ```
+///
+/// ```text
+/// this.id
+///   |  |
+///   |  └ IdentifierValue::Name("id")
+///   |
+///   └ IdentifierValue::This
+/// ```
 #[derive(Clone, Debug, PartialEq)]
 pub struct Identifier {
+    /// List of identifier values (components)
     pub values: Vec<IdentifierValue>,
 }
 
 impl Identifier {
-    /// Create new identifier
+    /// Creates new identifier
     ///
     /// # Arguments
     ///
-    /// * `values` - List of identifier values
+    /// * `values` - List of identifier values (components)
     pub fn new(values: Vec<IdentifierValue>) -> Identifier {
         Identifier { values }
     }
 
     /// Check if an identifier is relative
+    ///
+    /// An identifier is considered as a relative one if it starts with `this` or `super`
+    /// keyword.
     pub fn is_relative(&self) -> bool {
         if let Some(first) = self.values.first() {
             first == &IdentifierValue::This || first == &IdentifierValue::Super
@@ -183,70 +230,82 @@ impl Identifier {
     }
 
     /// Check if an identifier is absolute
+    ///
+    /// An identifier is considered as an absolute one if it does not start with `this`
+    /// or `super` keyword.
     pub fn is_absolute(&self) -> bool {
         !self.is_relative()
     }
 }
 
-/// Identifier value
+impl Default for Identifier {
+    /// Creates new, empty, identifier
+    ///
+    /// This identifier can be used to refer to the root.
+    fn default() -> Identifier {
+        Identifier::new(vec![])
+    }
+}
+
+/// An identifier value (component)
 #[derive(Clone, Debug, PartialEq)]
 pub enum IdentifierValue {
-    /// Name (variable/property name)
+    /// A name (variable/property name)
     Name(String),
-    /// Integer index (arrays)
+    /// An integer index (arrays)
     IntegerIndex(isize),
-    /// String index (dictionaries)
+    /// A string index (dictionaries)
     StringIndex(String),
-    /// Indirect index (value of another identifier)
+    /// An indirect index (value of another identifier)
     IdentifierIndex(Identifier),
-    /// Points to current object
+    /// Current object
     This,
-    /// Points to parent object
+    /// Parent object
     Super,
 }
 
-/// Expression value
+/// An expression value
 #[derive(Clone, Debug, PartialEq)]
 pub enum ExpressionValue {
-    /// Integer
+    /// An integer
     Integer(i64),
-    /// Floating point
+    /// A floating point
     Float(f64),
-    /// Boolean
+    /// A boolean
     Boolean(bool),
-    /// String
+    /// A string
     String(String),
-    /// Identifier (variable name, array index, ...)
+    /// An identifier (variable name, array index, ...)
     Identifier(Identifier),
-    /// Mathematical expression
+    /// A mathematical expression
     Math(MathExpression),
-    /// Logical expression
+    /// A logical expression
     Logical(LogicalExpression),
-    /// Function call
+    /// A function call
     FunctionCall(FunctionCall),
     /// String concatenation
     StringConcat(StringConcat),
 }
 
-/// Expression
+/// An expression
 #[derive(Clone, Debug, PartialEq)]
 pub struct Expression {
-    /// Expression value
+    /// An expression value
     pub value: ExpressionValue,
     /// Is expression negated?
     pub negated: bool,
-    /// Filters to apply
+    /// List of filters to apply
     pub filters: Vec<FunctionCall>,
 }
 
 impl Expression {
-    /// Create new expression
+    /// Creates new expression
     ///
     /// Expression is not negated and no filters are applied.
     ///
     /// # Arguments
     ///
-    /// * `value` - Expression value
+    /// * `value` - An expression value
     pub fn new(value: ExpressionValue) -> Expression {
         Expression {
             value,
@@ -255,13 +314,13 @@ impl Expression {
         }
     }
 
-    /// Create new negated expression
+    /// Creates new negated expression
     ///
     /// Expression is negated and no filters are applied.
     ///
     /// # Arguments
     ///
-    /// * `value` - Expression value
+    /// * `value` - An expression value
     pub fn new_negated(value: ExpressionValue) -> Expression {
         Expression {
             value,
@@ -270,13 +329,13 @@ impl Expression {
         }
     }
 
-    /// Create new expression
+    /// Creates new expression
     ///
     /// Expression is not negated and filters are applied.
     ///
     /// # Arguments
     ///
-    /// * `value` - Expression value
+    /// * `value` - An expression value
     /// * `filters` - List of filters to apply
     pub fn new_with_filters(value: ExpressionValue, filters: Vec<FunctionCall>) -> Expression {
         Expression {
@@ -286,8 +345,8 @@ impl Expression {
         }
     }
 
-    /// Negate expression (`self` is consumed)
-    pub fn negate(self) -> Expression {
+    /// Converts self into negated expression
+    pub fn into_negated(self) -> Expression {
         Expression {
             value: self.value,
             negated: !self.negated,
@@ -295,11 +354,21 @@ impl Expression {
         }
     }
 
-    /// Get identifier from an expression value
+    /// Returns identifier from an expression value
     pub fn identifier(&self) -> Option<&Identifier> {
         match &self.value {
             ExpressionValue::Identifier(ref identifier) => Some(identifier),
             _ => None,
+        }
+    }
+
+    /// Converts self into [`Identifier`]
+    ///
+    /// [`Identifier`]: struct.Identifier.html
+    pub fn into_identifier(self) -> Result<Identifier, Error> {
+        match self.value {
+            ExpressionValue::Identifier(identifier) => Ok(identifier),
+            _ => bail!("expression is not an identifier"),
         }
     }
 }
@@ -307,7 +376,7 @@ impl Expression {
 impl FromStr for Expression {
     type Err = Error;
 
-    fn from_str(s: &str) -> Result<Self, Self::Err> {
+    fn from_str(s: &str) -> Result<Expression, Self::Err> {
         parse(s)
     }
 }

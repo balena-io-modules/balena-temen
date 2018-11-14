@@ -1,17 +1,9 @@
 use std::collections::HashMap;
 
-use serde_json::{json, Value};
+use serde_json::json;
+use crate::{test_eval_eq, test_eval_err};
 
-use balena_temen::engine::{Engine, EngineBuilder};
-use balena_temen::engine::context::Context;
-
-macro_rules! test_eval_eq {
-    ($e:expr, $r:expr) => {{
-        let engine = Engine::default();
-        let context = Context::default();
-        assert_eq!(engine.eval(&$e.parse().unwrap(), &context, None).unwrap(), $r);
-    }};
-}
+use balena_temen::{Context, Engine, EngineBuilder, Value};
 
 #[test]
 fn default_filters_are_registered() {
@@ -33,34 +25,21 @@ fn filter_chain() {
 
 #[test]
 fn fail_on_unknown_filter() {
-    let engine = Engine::default();
-    let context = Context::default();
-
-    assert!(engine
-        .eval(
-            &"1 | filterdoesnotexistoratleastitshouldnot".parse().unwrap(),
-            &context,
-            None
-        )
-        .is_err());
+    test_eval_err!("1 | filterdoesnotexistoratleastitshouldnot");
 }
 
 #[test]
 fn custom_filter() {
-    let cf = |value: &Value, _: &HashMap<String, Value>, _: &Context| {
-        if value.is_string() {
-            Ok(Value::String(value.as_str().unwrap().replace("a", "b")))
+    let cf = |input: &Value, _: &HashMap<String, Value>, _: &mut Context| {
+        if input.is_string() {
+            Ok(Value::String(input.as_str().unwrap().replace("a", "b")))
         } else {
             Err("no string, no fun".into())
         }
     };
 
     let engine: Engine = EngineBuilder::default().filter("atob", cf).into();
-    let ctx = Context::default();
 
-    assert_eq!(
-        engine.eval(&"`abc` | atob".parse().unwrap(), &ctx, None).unwrap(),
-        json!("bbc")
-    );
-    assert!(engine.eval(&"true | atob".parse().unwrap(), &ctx, None).is_err());
+    test_eval_eq!(engine, "`abc` | atob", json!("bbc"));
+    test_eval_err!(engine, "true | atob");
 }

@@ -3,14 +3,14 @@ use std::collections::HashMap;
 use serde_json::Value;
 use slug;
 
-use crate::engine::context::Context;
+use crate::context::Context;
 use crate::error::Result;
 
-pub(crate) fn slugify(value: &Value, _args: &HashMap<String, Value>, _context: &Context) -> Result<Value> {
-    let s = value.as_str().ok_or_else(|| "`slugify` filter accepts string only")?;
+pub(crate) fn slugify(input: &Value, _args: &HashMap<String, Value>, _context: &mut Context) -> Result<Value> {
+    let s = input.as_str().ok_or_else(|| "`slugify` filter accepts string only")?;
 
     if s.is_empty() {
-        return Ok(value.clone());
+        return Ok(input.clone());
     }
 
     let result = slug::slugify(s);
@@ -32,48 +32,48 @@ mod tests {
     #[test]
     fn result_is_trimmed() {
         let args = HashMap::new();
-        let ctx = Context::default();
+        let mut ctx = Context::default();
 
-        assert_eq!(slugify(&json!("abc"), &args, &ctx).unwrap(), json!("abc"));
-        assert_eq!(slugify(&json!("abc--def"), &args, &ctx).unwrap(), json!("abc-def"));
+        assert_eq!(slugify(&json!("abc"), &args, &mut ctx).unwrap(), json!("abc"));
+        assert_eq!(slugify(&json!("abc--def"), &args, &mut ctx).unwrap(), json!("abc-def"));
         assert_eq!(
-            slugify(&json!("ěščřžýáíé"), &args, &ctx).unwrap(),
+            slugify(&json!("ěščřžýáíé"), &args, &mut ctx).unwrap(),
             json!("escrzyaie")
         );
         assert_eq!(
-            slugify(&json!("Robert & Cyryl"), &args, &ctx).unwrap(),
+            slugify(&json!("Robert & Cyryl"), &args, &mut ctx).unwrap(),
             json!("robert-cyryl")
         );
         assert_eq!(
-            slugify(&json!("some white\tspace here"), &args, &ctx).unwrap(),
+            slugify(&json!("some white\tspace here"), &args, &mut ctx).unwrap(),
             json!("some-white-space-here")
         );
         assert_eq!(
-            slugify(&json!("what about !@#$%^&*()"), &args, &ctx).unwrap(),
+            slugify(&json!("what about !@#$%^&*()"), &args, &mut ctx).unwrap(),
             json!("what-about")
         );
-        assert_eq!(slugify(&json!("-abc"), &args, &ctx).unwrap(), json!("abc"));
-        assert_eq!(slugify(&json!("-abc-"), &args, &ctx).unwrap(), json!("abc"));
-        assert_eq!(slugify(&json!("abc-"), &args, &ctx).unwrap(), json!("abc"));
+        assert_eq!(slugify(&json!("-abc"), &args, &mut ctx).unwrap(), json!("abc"));
+        assert_eq!(slugify(&json!("-abc-"), &args, &mut ctx).unwrap(), json!("abc"));
+        assert_eq!(slugify(&json!("abc-"), &args, &mut ctx).unwrap(), json!("abc"));
     }
 
     #[test]
     fn fail_on_invalid_input() {
         let args = HashMap::new();
-        let ctx = Context::default();
+        let mut ctx = Context::default();
 
-        assert!(slugify(&json!("-"), &args, &ctx).is_err());
+        assert!(slugify(&json!("-"), &args, &mut ctx).is_err());
     }
 
     #[test]
     fn fail_on_invalid_input_type() {
         let args = HashMap::new();
-        let ctx = Context::default();
+        let mut ctx = Context::default();
 
-        assert!(slugify(&json!(1), &args, &ctx).is_err());
-        assert!(slugify(&json!(1.0), &args, &ctx).is_err());
-        assert!(slugify(&json!(true), &args, &ctx).is_err());
-        assert!(slugify(&json!(["a", "b"]), &args, &ctx).is_err());
-        assert!(slugify(&json!({"a": "b"}), &args, &ctx).is_err());
+        assert!(slugify(&json!(1), &args, &mut ctx).is_err());
+        assert!(slugify(&json!(1.0), &args, &mut ctx).is_err());
+        assert!(slugify(&json!(true), &args, &mut ctx).is_err());
+        assert!(slugify(&json!(["a", "b"]), &args, &mut ctx).is_err());
+        assert!(slugify(&json!({"a": "b"}), &args, &mut ctx).is_err());
     }
 }

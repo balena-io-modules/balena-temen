@@ -1,16 +1,5 @@
-use balena_temen::{error::Error, parser::ast::*};
-
-macro_rules! test_parse_eq {
-    ($e:expr, $r:expr) => {{
-        assert_eq!(($e.parse() as Result<Expression, Error>).unwrap(), $r);
-    }};
-}
-
-macro_rules! test_parse_err {
-    ($e:expr) => {{
-        assert!(($e.parse() as Result<Expression, Error>).is_err());
-    }};
-}
+use balena_temen::ast::*;
+use crate::{test_parse_eq, test_parse_err};
 
 #[test]
 fn min_length() {

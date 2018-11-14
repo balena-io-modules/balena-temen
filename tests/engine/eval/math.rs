@@ -1,23 +1,5 @@
 use serde_json::json;
-
-use balena_temen::engine::context::Context;
-use balena_temen::engine::Engine;
-
-macro_rules! test_eval_eq {
-    ($e:expr, $r:expr) => {{
-        let engine = Engine::default();
-        let context = Context::default();
-        assert_eq!(engine.eval(&$e.parse().unwrap(), &context, None).unwrap(), $r);
-    }};
-}
-
-macro_rules! test_eval_err {
-    ($e:expr) => {{
-        let engine = Engine::default();
-        let context = Context::default();
-        assert!(engine.eval(&$e.parse().unwrap(), &context, None).is_err());
-    }};
-}
+use crate::{test_eval_eq, test_eval_err};
 
 // TODO Add better comparison of numbers, especially floats
 
@@ -71,22 +53,22 @@ fn division_result_as_float() {
 fn integer_operation_boundaries() {
     // If engine can't do i64 math, values are converted to f64
     test_eval_eq!(
-        format!("{} + {}", std::i64::MAX, std::i64::MAX),
+        &format!("{} + {}", std::i64::MAX, std::i64::MAX),
         json!(std::i64::MAX as f64 + std::i64::MAX as f64)
     );
     test_eval_eq!(
-        format!("{} - {}", std::i64::MIN, std::i64::MAX),
+        &format!("{} - {}", std::i64::MIN, std::i64::MAX),
         json!(std::i64::MIN as f64 - std::i64::MAX as f64)
     );
     test_eval_eq!(
-        format!("{} * {}", std::i64::MAX, std::i64::MAX),
+        &format!("{} * {}", std::i64::MAX, std::i64::MAX),
         json!(std::i64::MAX as f64 * std::i64::MAX as f64)
     );
 }
 
 #[test]
 fn fail_on_float_underflow_overflow_infinity() {
-    test_eval_err!(format!("{:.1} + {:.1}", std::f64::MAX, std::f64::MAX));
-    test_eval_err!(format!("{:.1} - {:.1}", std::f64::MIN, std::f64::MAX));
-    test_eval_err!(format!("{:.1} * {:.1}", std::f64::MAX, std::f64::MAX));
+    test_eval_err!(&format!("{:.1} + {:.1}", std::f64::MAX, std::f64::MAX));
+    test_eval_err!(&format!("{:.1} - {:.1}", std::f64::MIN, std::f64::MAX));
+    test_eval_err!(&format!("{:.1} * {:.1}", std::f64::MAX, std::f64::MAX));
 }

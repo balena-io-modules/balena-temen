@@ -1,15 +1,5 @@
 use serde_json::json;
-
-use balena_temen::engine::context::Context;
-use balena_temen::engine::Engine;
-
-macro_rules! test_eval_eq {
-    ($e:expr, $r:expr) => {{
-        let engine = Engine::default();
-        let context = Context::default();
-        assert_eq!(engine.eval(&$e.parse().unwrap(), &context, None).unwrap(), $r);
-    }};
-}
+use crate::test_eval_eq;
 
 #[test]
 fn equal() {

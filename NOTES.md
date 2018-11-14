@@ -5,7 +5,10 @@
 * Rename `date-time` filter to `datetime`
 * Add missing `upper` filter
 
-Mapping:
+### Reserved keywords
 
-* Replace `.` with `this`
-* Replace `..` with `super`
+Following keywords MUST NOT be used as property names:
+
+* `this`
+* `super`
+* `eval`

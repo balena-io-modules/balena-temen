@@ -1,10 +1,5 @@
 use balena_temen::{error::Error, parser::ast::*};
-
-macro_rules! test_parse_eq {
-    ($e:expr, $r:expr) => {{
-        assert_eq!(($e.parse() as Result<Expression, Error>).unwrap(), $r);
-    }};
-}
+use crate::test_parse_eq;
 
 #[test]
 fn single_filter() {

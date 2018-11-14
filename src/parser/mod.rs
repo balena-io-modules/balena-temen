@@ -9,12 +9,10 @@ use pest::{
 use pest_derive::Parser;
 
 use crate::{
+    ast::*,
     error::{bail, Result},
-    parser::ast::*,
     utils::validate_f64,
 };
-
-pub mod ast;
 
 lazy_static! {
     static ref MATH_CLIMBER: PrecClimber<Rule> = PrecClimber::new(vec![
@@ -167,7 +165,7 @@ fn parse_logical_value(pair: Pair<Rule>) -> Result<Expression> {
 
     let exp = expression.ok_or_else(|| "parse_logical_value: invalid grammar, unable to create expression")?;
     if negated {
-        Ok(exp.negate())
+        Ok(exp.into_negated())
     } else {
         Ok(exp)
     }

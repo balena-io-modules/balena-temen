@@ -3,11 +3,11 @@ use std::collections::HashMap;
 use chrono::{DateTime, NaiveDateTime, Utc};
 use serde_json::Value;
 
-use crate::engine::context::Context;
+use crate::context::Context;
 use crate::error::Result;
 
-fn format_timestamp(filter: &str, value: &Value, args: &HashMap<String, Value>, default: &str) -> Result<Value> {
-    let ts = value
+fn format_timestamp(filter: &str, input: &Value, args: &HashMap<String, Value>, default: &str) -> Result<Value> {
+    let ts = input
         .as_i64()
         .ok_or_else(|| format!("`{}` accepts integer only", filter))?;
 
@@ -23,16 +23,16 @@ fn format_timestamp(filter: &str, value: &Value, args: &HashMap<String, Value>, 
     Ok(Value::String(dt.format(format).to_string()))
 }
 
-pub(crate) fn time(value: &Value, args: &HashMap<String, Value>, _context: &Context) -> Result<Value> {
-    format_timestamp("time", value, args, "%H:%M:%S")
+pub(crate) fn time(input: &Value, args: &HashMap<String, Value>, _context: &mut Context) -> Result<Value> {
+    format_timestamp("time", input, args, "%H:%M:%S")
 }
 
-pub(crate) fn date(value: &Value, args: &HashMap<String, Value>, _context: &Context) -> Result<Value> {
-    format_timestamp("date", value, args, "%Y-%m-%d")
+pub(crate) fn date(input: &Value, args: &HashMap<String, Value>, _context: &mut Context) -> Result<Value> {
+    format_timestamp("date", input, args, "%Y-%m-%d")
 }
 
-pub(crate) fn datetime(value: &Value, args: &HashMap<String, Value>, _context: &Context) -> Result<Value> {
-    format_timestamp("datetime", value, args, "%Y-%m-%dT%H:%M:%S%:z")
+pub(crate) fn datetime(input: &Value, args: &HashMap<String, Value>, _context: &mut Context) -> Result<Value> {
+    format_timestamp("datetime", input, args, "%Y-%m-%dT%H:%M:%S%:z")
 }
 
 #[cfg(test)]
@@ -41,33 +41,33 @@ mod tests {
 
     use serde_json::json;
 
-    use crate::engine::context::Context;
+    use crate::context::Context;
 
     use super::{date, datetime, format_timestamp, time};
 
     #[test]
     fn time_default_format() {
         let args = HashMap::new();
-        let ctx = Context::default();
+        let mut ctx = Context::default();
 
-        assert_eq!(time(&json!(1541485381), &args, &ctx).unwrap(), json!("06:23:01"));
+        assert_eq!(time(&json!(1541485381), &args, &mut ctx).unwrap(), json!("06:23:01"));
     }
 
     #[test]
     fn date_default_format() {
         let args = HashMap::new();
-        let ctx = Context::default();
+        let mut ctx = Context::default();
 
-        assert_eq!(date(&json!(1541485381), &args, &ctx).unwrap(), json!("2018-11-06"));
+        assert_eq!(date(&json!(1541485381), &args, &mut ctx).unwrap(), json!("2018-11-06"));
     }
 
     #[test]
     fn datetime_default_format() {
         let args = HashMap::new();
-        let ctx = Context::default();
+        let mut ctx = Context::default();
 
         assert_eq!(
-            datetime(&json!(1541485381), &args, &ctx).unwrap(),
+            datetime(&json!(1541485381), &args, &mut ctx).unwrap(),
             json!("2018-11-06T06:23:01+00:00")
         );
     }

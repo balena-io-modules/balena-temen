@@ -1,26 +1,43 @@
 use serde_json::json;
 
-use balena_temen::engine::context::Context;
-use balena_temen::engine::Engine;
-use balena_temen::parser::ast::*;
+#[macro_export]
+macro_rules! test_lookup_eq {
+    ($expression:expr, $data:expr, $position:expr, $result:expr) => {{
+        let engine = balena_temen::Engine::default();
+        let mut context = balena_temen::Context::default();
+        let position: balena_temen::ast::Expression = $position.parse().unwrap();
 
-macro_rules! test_eval_eq {
-    ($e:expr, $c:ident, $r:expr) => {{
-        let engine = Engine::default();
-        assert_eq!(engine.eval(&$e.parse().unwrap(), &$c, None).unwrap(), $r);
+        assert_eq!(
+            engine
+                .eval($expression, &position.identifier().unwrap(), &$data, &mut context)
+                .unwrap(),
+            $result
+        );
+    }};
+    ($expression:expr, $data:expr, $result:expr) => {{
+        test_lookup_eq!($expression, $data, "this", $result);
     }};
 }
 
-macro_rules! test_eval_err {
-    ($e:expr, $c:ident) => {{
-        let engine = Engine::default();
-        assert!(engine.eval(&$e.parse().unwrap(), &$c, None).is_err());
+#[macro_export]
+macro_rules! test_lookup_err {
+    ($expression:expr, $data:expr, $position:expr) => {{
+        let engine = balena_temen::Engine::default();
+        let mut context = balena_temen::Context::default();
+        let position: balena_temen::ast::Expression = $position.parse().unwrap();
+
+        assert!(engine
+            .eval($expression, &position.identifier().unwrap(), &$data, &mut context)
+            .is_err());
+    }};
+    ($expression:expr, $data:expr) => {{
+        test_lookup_err!($expression, $data, "this");
     }};
 }
 
 #[test]
 fn simple_identifier() {
-    let ctx = Context::new(json!({
+    let data = json!({
         "string": "hallo",
         "integer": 10,
         "float": 3.2,
@@ -28,20 +45,20 @@ fn simple_identifier() {
         "array": ["a", "b"],
         "object": {"a": "b"},
         "null": null,
-    }));
+    });
 
-    test_eval_eq!("string", ctx, json!("hallo"));
-    test_eval_eq!("integer", ctx, json!(10));
-    test_eval_eq!("float", ctx, json!(3.2));
-    test_eval_eq!("boolean", ctx, json!(true));
-    test_eval_eq!("array", ctx, json!(["a", "b"]));
-    test_eval_eq!("object", ctx, json!({"a": "b"}));
-    test_eval_eq!("null", ctx, json!(null));
+    test_lookup_eq!("string", data, json!("hallo"));
+    test_lookup_eq!("integer", data, json!(10));
+    test_lookup_eq!("float", data, json!(3.2));
+    test_lookup_eq!("boolean", data, json!(true));
+    test_lookup_eq!("array", data, json!(["a", "b"]));
+    test_lookup_eq!("object", data, json!({"a": "b"}));
+    test_lookup_eq!("null", data, json!(null));
 }
 
 #[test]
 fn fail_on_unknown_identifier() {
-    let ctx = Context::new(json!({
+    let data = json!({
         "string": "hallo",
         "integer": 10,
         "float": 3.2,
@@ -49,14 +66,14 @@ fn fail_on_unknown_identifier() {
         "array": ["a", "b"],
         "object": {"a": "b"},
         "null": null,
-    }));
+    });
 
-    test_eval_err!("na", ctx);
+    test_lookup_err!("na", data);
 }
 
 #[test]
 fn dotted_identifier() {
-    let ctx = Context::new(json!({
+    let data = json!({
         "root": {
             "another": {
                 "string": "hallo",
@@ -68,20 +85,20 @@ fn dotted_identifier() {
                 "null": null,
             }
         }
-    }));
+    });
 
-    test_eval_eq!("root.another.string", ctx, json!("hallo"));
-    test_eval_eq!("root.another.integer", ctx, json!(10));
-    test_eval_eq!("root.another.float", ctx, json!(3.2));
-    test_eval_eq!("root.another.boolean", ctx, json!(true));
-    test_eval_eq!("root.another.array", ctx, json!(["a", "b"]));
-    test_eval_eq!("root.another.object", ctx, json!({"a": "b"}));
-    test_eval_eq!("root.another.null", ctx, json!(null));
+    test_lookup_eq!("root.another.string", data, json!("hallo"));
+    test_lookup_eq!("root.another.integer", data, json!(10));
+    test_lookup_eq!("root.another.float", data, json!(3.2));
+    test_lookup_eq!("root.another.boolean", data, json!(true));
+    test_lookup_eq!("root.another.array", data, json!(["a", "b"]));
+    test_lookup_eq!("root.another.object", data, json!({"a": "b"}));
+    test_lookup_eq!("root.another.null", data, json!(null));
 }
 
 #[test]
 fn fail_on_unknown_dotted_identifier() {
-    let ctx = Context::new(json!({
+    let data = json!({
         "root": {
             "another": {
                 "string": "hallo",
@@ -93,16 +110,16 @@ fn fail_on_unknown_dotted_identifier() {
                 "null": null,
             }
         }
-    }));
+    });
 
-    test_eval_err!("root.another.na", ctx);
-    test_eval_err!("root.na", ctx);
-    test_eval_err!("na", ctx);
+    test_lookup_err!("root.another.na", data);
+    test_lookup_err!("root.na", data);
+    test_lookup_err!("na", data);
 }
 
 #[test]
 fn dotted_identifier_integer_index() {
-    let ctx = Context::new(json!({
+    let data = json!({
         "root": [
             "hallo",
             10,
@@ -111,20 +128,20 @@ fn dotted_identifier_integer_index() {
             ["a", "b"],
             {"a": "b"},
             null
-        ]}));
+        ]});
 
-    test_eval_eq!("root.0", ctx, json!("hallo"));
-    test_eval_eq!("root.1", ctx, json!(10));
-    test_eval_eq!("root.2", ctx, json!(3.2));
-    test_eval_eq!("root.3", ctx, json!(true));
-    test_eval_eq!("root.4", ctx, json!(["a", "b"]));
-    test_eval_eq!("root.5", ctx, json!({"a": "b"}));
-    test_eval_eq!("root.6", ctx, json!(null));
+    test_lookup_eq!("root.0", data, json!("hallo"));
+    test_lookup_eq!("root.1", data, json!(10));
+    test_lookup_eq!("root.2", data, json!(3.2));
+    test_lookup_eq!("root.3", data, json!(true));
+    test_lookup_eq!("root.4", data, json!(["a", "b"]));
+    test_lookup_eq!("root.5", data, json!({"a": "b"}));
+    test_lookup_eq!("root.6", data, json!(null));
 }
 
 #[test]
 fn fail_on_dotted_identifier_integer_index_out_of_bounds() {
-    let ctx = Context::new(json!({
+    let data = json!({
         "root": [
             "hallo",
             10,
@@ -133,14 +150,14 @@ fn fail_on_dotted_identifier_integer_index_out_of_bounds() {
             ["a", "b"],
             {"a": "b"},
             null
-        ]}));
+        ]});
 
-    test_eval_err!("root.7", ctx);
+    test_lookup_err!("root.7", data);
 }
 
 #[test]
 fn dotted_identifier_integer_index_mixed() {
-    let ctx = Context::new(json!({
+    let data = json!({
         "people": [
             {
                 "name": "Robert"
@@ -148,17 +165,17 @@ fn dotted_identifier_integer_index_mixed() {
             {
                 "name": "Cyryl"
             }
-        ]}));
+        ]});
 
-    test_eval_eq!("people.0[`name`]", ctx, json!("Robert"));
-    test_eval_eq!("people.0.name", ctx, json!("Robert"));
-    test_eval_eq!("people.1[`name`]", ctx, json!("Cyryl"));
-    test_eval_eq!("people.1.name", ctx, json!("Cyryl"));
+    test_lookup_eq!("people.0[`name`]", data, json!("Robert"));
+    test_lookup_eq!("people.0.name", data, json!("Robert"));
+    test_lookup_eq!("people.1[`name`]", data, json!("Cyryl"));
+    test_lookup_eq!("people.1.name", data, json!("Cyryl"));
 }
 
 #[test]
 fn square_bracket_string() {
-    let ctx = Context::new(json!({
+    let data = json!({
         "root": {
             "another": {
                 "string": "hallo",
@@ -170,20 +187,20 @@ fn square_bracket_string() {
                 "null": null,
             }
         }
-    }));
+    });
 
-    test_eval_eq!("root[`another`][`string`]", ctx, json!("hallo"));
-    test_eval_eq!("root[`another`][`integer`]", ctx, json!(10));
-    test_eval_eq!("root[`another`][`float`]", ctx, json!(3.2));
-    test_eval_eq!("root[`another`][`boolean`]", ctx, json!(true));
-    test_eval_eq!("root[`another`][`array`]", ctx, json!(["a", "b"]));
-    test_eval_eq!("root[`another`][`object`]", ctx, json!({"a": "b"}));
-    test_eval_eq!("root[`another`][`null`]", ctx, json!(null));
+    test_lookup_eq!("root[`another`][`string`]", data, json!("hallo"));
+    test_lookup_eq!("root[`another`][`integer`]", data, json!(10));
+    test_lookup_eq!("root[`another`][`float`]", data, json!(3.2));
+    test_lookup_eq!("root[`another`][`boolean`]", data, json!(true));
+    test_lookup_eq!("root[`another`][`array`]", data, json!(["a", "b"]));
+    test_lookup_eq!("root[`another`][`object`]", data, json!({"a": "b"}));
+    test_lookup_eq!("root[`another`][`null`]", data, json!(null));
 }
 
 #[test]
 fn fail_on_square_bracket_string_invalid_index() {
-    let ctx = Context::new(json!({
+    let data = json!({
         "root": {
             "another": {
                 "string": "hallo",
@@ -195,15 +212,15 @@ fn fail_on_square_bracket_string_invalid_index() {
                 "null": null,
             }
         }
-    }));
+    });
 
-    test_eval_err!("root[`another`][`dummy`]", ctx);
-    test_eval_err!("root[`dummy`]", ctx);
+    test_lookup_err!("root[`another`][`dummy`]", data);
+    test_lookup_err!("root[`dummy`]", data);
 }
 
 #[test]
 fn square_bracket_integer() {
-    let ctx = Context::new(json!({
+    let data = json!({
         "root": [
             "hallo",
             10,
@@ -212,20 +229,20 @@ fn square_bracket_integer() {
             ["a", "b"],
             {"a": "b"},
             null
-        ]}));
+        ]});
 
-    test_eval_eq!("root[0]", ctx, json!("hallo"));
-    test_eval_eq!("root[1]", ctx, json!(10));
-    test_eval_eq!("root[2]", ctx, json!(3.2));
-    test_eval_eq!("root[3]", ctx, json!(true));
-    test_eval_eq!("root[4]", ctx, json!(["a", "b"]));
-    test_eval_eq!("root[5]", ctx, json!({"a": "b"}));
-    test_eval_eq!("root[6]", ctx, json!(null));
+    test_lookup_eq!("root[0]", data, json!("hallo"));
+    test_lookup_eq!("root[1]", data, json!(10));
+    test_lookup_eq!("root[2]", data, json!(3.2));
+    test_lookup_eq!("root[3]", data, json!(true));
+    test_lookup_eq!("root[4]", data, json!(["a", "b"]));
+    test_lookup_eq!("root[5]", data, json!({"a": "b"}));
+    test_lookup_eq!("root[6]", data, json!(null));
 }
 
 #[test]
 fn fail_on_square_bracket_integer_out_of_bounds() {
-    let ctx = Context::new(json!({
+    let data = json!({
         "root": [
             "hallo",
             10,
@@ -234,14 +251,14 @@ fn fail_on_square_bracket_integer_out_of_bounds() {
             ["a", "b"],
             {"a": "b"},
             null
-        ]}));
+        ]});
 
-    test_eval_err!("root[7]", ctx);
+    test_lookup_err!("root[7]", data);
 }
 
 #[test]
 fn square_bracket_negative_integer() {
-    let ctx = Context::new(json!({
+    let data = json!({
         "root": [
             "hallo",
             10,
@@ -250,20 +267,20 @@ fn square_bracket_negative_integer() {
             ["a", "b"],
             {"a": "b"},
             null
-        ]}));
+        ]});
 
-    test_eval_eq!("root[-7]", ctx, json!("hallo"));
-    test_eval_eq!("root[-6]", ctx, json!(10));
-    test_eval_eq!("root[-5]", ctx, json!(3.2));
-    test_eval_eq!("root[-4]", ctx, json!(true));
-    test_eval_eq!("root[-3]", ctx, json!(["a", "b"]));
-    test_eval_eq!("root[-2]", ctx, json!({"a": "b"}));
-    test_eval_eq!("root[-1]", ctx, json!(null));
+    test_lookup_eq!("root[-7]", data, json!("hallo"));
+    test_lookup_eq!("root[-6]", data, json!(10));
+    test_lookup_eq!("root[-5]", data, json!(3.2));
+    test_lookup_eq!("root[-4]", data, json!(true));
+    test_lookup_eq!("root[-3]", data, json!(["a", "b"]));
+    test_lookup_eq!("root[-2]", data, json!({"a": "b"}));
+    test_lookup_eq!("root[-1]", data, json!(null));
 }
 
 #[test]
 fn fail_on_square_bracket_negative_integer_out_of_bounds() {
-    let ctx = Context::new(json!({
+    let data = json!({
         "root": [
             "hallo",
             10,
@@ -272,14 +289,14 @@ fn fail_on_square_bracket_negative_integer_out_of_bounds() {
             ["a", "b"],
             {"a": "b"},
             null
-        ]}));
+        ]});
 
-    test_eval_err!("root[-8]", ctx);
+    test_lookup_err!("root[-8]", data);
 }
 
 #[test]
 fn square_bracket_mixed() {
-    let ctx = Context::new(json!({
+    let data = json!({
         "people": [
             {
                 "name": "Robert"
@@ -287,17 +304,17 @@ fn square_bracket_mixed() {
             {
                 "name": "Cyryl"
             }
-        ]}));
+        ]});
 
-    test_eval_eq!("people[0][`name`]", ctx, json!("Robert"));
-    test_eval_eq!("people[0].name", ctx, json!("Robert"));
-    test_eval_eq!("people[1][`name`]", ctx, json!("Cyryl"));
-    test_eval_eq!("people[1].name", ctx, json!("Cyryl"));
+    test_lookup_eq!("people[0][`name`]", data, json!("Robert"));
+    test_lookup_eq!("people[0].name", data, json!("Robert"));
+    test_lookup_eq!("people[1][`name`]", data, json!("Cyryl"));
+    test_lookup_eq!("people[1].name", data, json!("Cyryl"));
 }
 
 #[test]
 fn square_bracket_indirect() {
-    let ctx = Context::new(json!({
+    let data = json!({
         "first": 0,
         "second": 1,
         "boolean": true,
@@ -311,17 +328,17 @@ fn square_bracket_indirect() {
             {
                 "name": "Cyryl"
             }
-        ]}));
+        ]});
 
-    test_eval_eq!("people[first][`name`]", ctx, json!("Robert"));
-    test_eval_eq!("people[first].name", ctx, json!("Robert"));
-    test_eval_eq!("people[second][`name`]", ctx, json!("Cyryl"));
-    test_eval_eq!("people[second].name", ctx, json!("Cyryl"));
+    test_lookup_eq!("people[first][`name`]", data, json!("Robert"));
+    test_lookup_eq!("people[first].name", data, json!("Robert"));
+    test_lookup_eq!("people[second][`name`]", data, json!("Cyryl"));
+    test_lookup_eq!("people[second].name", data, json!("Cyryl"));
 }
 
 #[test]
 fn fail_on_square_bracket_indirect_invalid_type() {
-    let ctx = Context::new(json!({
+    let data = json!({
         "first": 0,
         "second": 1,
         "boolean": true,
@@ -335,17 +352,17 @@ fn fail_on_square_bracket_indirect_invalid_type() {
             {
                 "name": "Cyryl"
             }
-        ]}));
+        ]});
 
-    test_eval_err!("people[boolean].name", ctx);
-    test_eval_err!("people[array].name", ctx);
-    test_eval_err!("people[object].name", ctx);
-    test_eval_err!("people[null].name", ctx);
+    test_lookup_err!("people[boolean].name", data);
+    test_lookup_err!("people[array].name", data);
+    test_lookup_err!("people[object].name", data);
+    test_lookup_err!("people[null].name", data);
 }
 
 #[test]
 fn square_bracket_multiple_indirect() {
-    let ctx = Context::new(json!({
+    let data = json!({
         "country": "Czech Republic",
         "city": "Hradec Kralove",
         "data": {
@@ -358,14 +375,14 @@ fn square_bracket_multiple_indirect() {
                     }
                 }
             }
-        }}));
+        }});
 
-    test_eval_eq!("data.country[country].city[city]['rust-developers']", ctx, json!(1));
+    test_lookup_eq!("data.country[country].city[city]['rust-developers']", data, json!(1));
 }
 
 #[test]
 fn square_bracket_nested_indirect() {
-    let ctx = Context::new(json!({
+    let data = json!({
         "name": "czech",
         "country": {
             "czech": "Czech Republic"
@@ -376,23 +393,9 @@ fn square_bracket_nested_indirect() {
                     "rust-developers": 2
                 }
             }
-        }}));
+        }});
 
-    test_eval_eq!("data.country[country[name]]['rust-developers']", ctx, json!(2));
-}
-
-macro_rules! test_relative_eval_eq {
-    ($e:expr, $d:expr, $p:expr, $r:expr) => {{
-        let expression: Expression = $p.parse().unwrap();
-        let engine = Engine::default();
-        let context = Context::new($d);
-        assert_eq!(
-            engine
-                .eval(&$e.parse().unwrap(), &context, Some(expression.identifier().unwrap()))
-                .unwrap(),
-            $r
-        );
-    }};
+    test_lookup_eq!("data.country[country[name]]['rust-developers']", data, json!(2));
 }
 
 #[test]
@@ -405,22 +408,22 @@ fn relative_lookup() {
             "Cyryl"
         ]});
 
-    test_relative_eval_eq!("this", data.clone(), "first", json!(0));
-    test_relative_eval_eq!("this.this.this", data.clone(), "first", json!(0));
-    test_relative_eval_eq!("this == this.this", data.clone(), "first", json!(true));
+    test_lookup_eq!("this", data.clone(), "first", json!(0));
+    test_lookup_eq!("this.this.this", data.clone(), "first", json!(0));
+    test_lookup_eq!("this == this.this", data.clone(), "first", json!(true));
 
-    test_relative_eval_eq!("this.super", data.clone(), "names[0]", json!(["Robert", "Cyryl"]));
-    test_relative_eval_eq!("super", data.clone(), "names[0]", json!(["Robert", "Cyryl"]));
-    test_relative_eval_eq!("super == this.super", data.clone(), "names[0]", json!(true));
-    test_relative_eval_eq!("this.super.super", data.clone(), "names[0]", data.clone());
+    test_lookup_eq!("this.super", data.clone(), "names[0]", json!(["Robert", "Cyryl"]));
+    test_lookup_eq!("super", data.clone(), "names[0]", json!(["Robert", "Cyryl"]));
+    test_lookup_eq!("super == this.super", data.clone(), "names[0]", json!(true));
+    test_lookup_eq!("this.super.super", data.clone(), "names[0]", data.clone());
 
-    test_relative_eval_eq!("this[0]", data.clone(), "names", json!("Robert"));
-    test_relative_eval_eq!("this[1]", data.clone(), "names", json!("Cyryl"));
-    test_relative_eval_eq!("this[first]", data.clone(), "names", json!("Robert"));
-    test_relative_eval_eq!("this[second]", data.clone(), "names", json!("Cyryl"));
+    test_lookup_eq!("this[0]", data.clone(), "names", json!("Robert"));
+    test_lookup_eq!("this[1]", data.clone(), "names", json!("Cyryl"));
+    test_lookup_eq!("this[first]", data.clone(), "names", json!("Robert"));
+    test_lookup_eq!("this[second]", data.clone(), "names", json!("Cyryl"));
 
-    test_relative_eval_eq!("names[this]", data.clone(), "first", json!("Robert"));
-    test_relative_eval_eq!("names[this]", data.clone(), "second", json!("Cyryl"));
+    test_lookup_eq!("names[this]", data.clone(), "first", json!("Robert"));
+    test_lookup_eq!("names[this]", data.clone(), "second", json!("Cyryl"));
 
-    test_relative_eval_eq!("this == names[second]", data.clone(), "names[1]", json!(true));
+    test_lookup_eq!("this == names[second]", data.clone(), "names[1]", json!(true));
 }
