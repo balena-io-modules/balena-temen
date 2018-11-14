@@ -1,4 +1,16 @@
 - commits:
+    - subject: Add crate documentation
+      hash: 894610e92bff3462677029f286ae62ca458233b0
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Robert Vojta <robert@balena.io>
+        signed-off-by: Robert Vojta <robert@balena.io>
+      author: Robert Vojta
+  version: 0.0.8
+  date: 2018-11-14T10:03:17.395Z
+- commits:
     - subject: Refactoring of tests
       hash: cb67e2ae3af8e7aa95593a23c34368007907387f
       body: ''
