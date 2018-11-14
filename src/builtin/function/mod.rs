@@ -32,6 +32,9 @@ mod uuidv4;
 /// * `random` - function name
 /// * `args` - map contains `max` key with the `Value::Number(1024)` value
 ///
+/// Visit [`function`] method documentation to see how to register custom function
+/// and how it should look like.
+///
 /// [`Engine`]: struct.Engine.html
 /// [`function`]: struct.EngineBuilder.html#method.function
 pub type FunctionFn = fn(args: &HashMap<String, Value>, context: &mut Context) -> Result<Value>;
