@@ -17,38 +17,17 @@
 //!
 //! # Examples
 //!
-//! ## Expression parsing
+//! ## High level
 //!
-//! ```rust
-//! use balena_temen::ast::*;
+//! Helpers are not implemented yet. You can track the implementation progress
+//! [here](https://github.com/balena-io-modules/balena-temen/issues/20).
 //!
-//! let parsed: Expression = "1 + 2 == 3".parse().unwrap();
+//! ## Low level
 //!
-//! let lhs = Expression::new(
-//!     ExpressionValue::Math(
-//!         MathExpression::new(
-//!             Expression::new(ExpressionValue::Integer(1)),
-//!             Expression::new(ExpressionValue::Integer(2)),
-//!             MathOperator::Addition
-//!         )
-//!     )
-//! );
-//! let rhs = Expression::new(
-//!     ExpressionValue::Integer(3)
-//! );
-//! let manual = Expression::new(
-//!     ExpressionValue::Logical(
-//!         LogicalExpression::new(
-//!             lhs, rhs, LogicalOperator::Equal
-//!         )
-//!     )
-//! );
-//! assert_eq!(parsed, manual);
-//! ```
+//! You should not use this functionality directly unless you need some really
+//! specific stuff.
 //!
-//! Visit [ast] module documentation for more info.
-//!
-//! ## Expression evaluation
+//! ### Expression evaluation
 //!
 //! ```rust
 //! use balena_temen::{
@@ -73,7 +52,7 @@
 //! );
 //! ```
 //!
-//! ## Logical expression evaluation
+//! ### Logical expression evaluation
 //!
 //! ```rust
 //! use balena_temen::{
@@ -103,10 +82,46 @@
 //! );
 //! ```
 //!
-//! ## Custom functions and filters
+//! ### Custom functions and filters
 //!
 //! Visit [`EngineBuilder::function`] and [`EngineBuilder::filter`] methods
 //! documentation for examples.
+//!
+//! ### Expression parsing
+//!
+//! ```rust
+//! use balena_temen::ast::*;
+//!
+//! // Parse expression automatically
+//! let parsed: Expression = "1 + 2 == 3".parse().unwrap();
+//!
+//! // Construct expression manually
+//! let lhs = Expression::new(
+//!     ExpressionValue::Math(
+//!         MathExpression::new(
+//!             Expression::new(ExpressionValue::Integer(1)),
+//!             Expression::new(ExpressionValue::Integer(2)),
+//!             MathOperator::Addition
+//!         )
+//!     )
+//! );
+//! let rhs = Expression::new(
+//!     ExpressionValue::Integer(3)
+//! );
+//! let full_expression = Expression::new(
+//!     ExpressionValue::Logical(
+//!         LogicalExpression::new(
+//!             lhs, rhs, LogicalOperator::Equal
+//!         )
+//!     )
+//! );
+//!
+//! // Compare and check that the expression was parsed correctly
+//! assert_eq!(parsed, full_expression);
+//! ```
+//!
+//! Visit [ast] module documentation for more info.
+
 //!
 //! [balena]: https://www.balena.io
 //! [ast]: ast/index.html
