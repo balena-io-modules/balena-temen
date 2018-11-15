@@ -1,4 +1,16 @@
 - commits:
+    - subject: Internal optimisation
+      hash: 74a71b35ec807c9ebed2ebe166eae43474b7e44b
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Robert Vojta <robert@balena.io>
+        signed-off-by: Robert Vojta <robert@balena.io>
+      author: Robert Vojta
+  version: 0.0.9
+  date: 2018-11-14T13:55:54.454Z
+- commits:
     - subject: Add crate documentation
       hash: 894610e92bff3462677029f286ae62ca458233b0
       body: ''
