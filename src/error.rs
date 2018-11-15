@@ -72,13 +72,13 @@ impl fmt::Display for Error {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         writeln!(f, "temen: {}", self.inner.message)?;
         if !self.inner.context.is_empty() {
-            writeln!(f, "└ context:")?;
+            writeln!(f, " └ context:")?;
             let last_index = self.inner.context().len() - 1;
             for (idx, (k, v)) in self.inner.context().iter().enumerate() {
                 if idx == last_index {
-                    writeln!(f, "   └ {} = {}", k, v)?;
+                    writeln!(f, "    └ {} = {}", k, v)?;
                 } else {
-                    writeln!(f, "   ├ {} = {}", k, v)?;
+                    writeln!(f, "    ├ {} = {}", k, v)?;
                 }
             }
         }
