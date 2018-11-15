@@ -1,3 +1,5 @@
+use std::borrow::Cow;
+
 use serde_json::Value;
 
 use crate::ast::*;
@@ -11,11 +13,11 @@ pub trait Lookup {
     ///
     /// * `identifier` - An identifier (variable) to lookup
     /// * `position` - An initial position for relative lookups
-    fn lookup_identifier(&self, identifier: &Identifier, position: &Identifier) -> Result<&Value>;
+    fn lookup_identifier<'a>(&'a self, identifier: &Identifier, position: &Identifier) -> Result<Cow<'a, Value>>;
 }
 
 impl Lookup for Value {
-    fn lookup_identifier(&self, identifier: &Identifier, position: &Identifier) -> Result<&Value> {
+    fn lookup_identifier<'a>(&'a self, identifier: &Identifier, position: &Identifier) -> Result<Cow<'a, Value>> {
         let mut lookup = LookupStack::new(self);
 
         if identifier.is_relative() {
@@ -30,10 +32,13 @@ impl Lookup for Value {
             lookup.update_with_identifier_value(identifier_value, position)?;
         }
 
-        Ok(lookup
-            .stack
-            .last()
-            .ok_or_else(|| "lookup_identifier: unable to lookup identifier, empty stack")?)
+        let result = Cow::Borrowed(
+            lookup
+                .stack
+                .pop()
+                .ok_or_else(|| "lookup_identifier: unable to lookup identifier, empty stack")?,
+        );
+        Ok(result)
     }
 }
 
@@ -121,7 +126,7 @@ impl<'a> LookupStack<'a> {
                 //
                 // We have to create new Lookup structure and lookup this identifier
                 // from scratch to avoid existing stack modifications
-                match self.root.lookup_identifier(identifier, position)? {
+                match self.root.lookup_identifier(identifier, position)?.as_ref() {
                     // If we were able to lookup the value, treat it as an String or Number index
                     Value::String(ref x) => {
                         self.update_with_identifier_value(&IdentifierValue::StringIndex(x.to_string()), position)?

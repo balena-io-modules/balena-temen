@@ -1,3 +1,4 @@
+use std::borrow::Cow;
 use std::collections::HashMap;
 
 use serde_json::{Number, Value};
@@ -329,7 +330,7 @@ impl Engine {
     /// ```
     pub fn eval(&self, expression: &str, position: &Identifier, data: &Value, context: &mut Context) -> Result<Value> {
         let expression = expression.parse()?;
-        self.eval_expression(&expression, position, data, context)
+        Ok(self.eval_expression(&expression, position, data, context)?.into_owned())
     }
 
     /// Evaluates an expression as a boolean
@@ -475,42 +476,45 @@ impl Engine {
         let mut result = HashMap::new();
 
         for (k, v) in args.iter() {
-            result.insert(k.to_string(), self.eval_expression(v, position, data, context)?);
+            result.insert(
+                k.to_string(),
+                self.eval_expression(v, position, data, context)?.into_owned(),
+            );
         }
 
         Ok(result)
     }
 
-    fn eval_function(
+    fn eval_function<'a>(
         &self,
         name: &str,
-        args: &HashMap<String, Expression>,
+        args: &'a HashMap<String, Expression>,
         position: &Identifier,
         data: &Value,
         context: &mut Context,
-    ) -> Result<Value> {
+    ) -> Result<Cow<'a, Value>> {
         let args = self.eval_args(args, position, data, context)?;
 
         if let Some(f) = self.functions.get(name) {
-            f(&args, context)
+            Ok(Cow::Owned(f(&args, context)?))
         } else {
             bail!("function `{}` not found", name);
         }
     }
 
-    fn eval_filter(
+    fn eval_filter<'a>(
         &self,
         name: &str,
         input: &Value,
-        args: &HashMap<String, Expression>,
+        args: &'a HashMap<String, Expression>,
         position: &Identifier,
         data: &Value,
         context: &mut Context,
-    ) -> Result<Value> {
+    ) -> Result<Cow<'a, Value>> {
         let args = self.eval_args(args, position, data, context)?;
 
         if let Some(f) = self.filters.get(name) {
-            f(input, &args, context)
+            Ok(Cow::Owned(f(input, &args, context)?))
         } else {
             bail!("filter `{}` not found", name);
         }
@@ -526,10 +530,18 @@ impl Engine {
         let number = match value {
             ExpressionValue::Integer(x) => Number::from(*x),
             ExpressionValue::Float(x) => Number::from_f64(*x).unwrap(),
-            ExpressionValue::Identifier(x) => match data.lookup_identifier(x, position)? {
-                Value::Number(ref x) => x.clone(),
-                _ => bail!("identifier does not evaluate to a number"),
-            },
+            ExpressionValue::Identifier(x) => {
+                let value = &*data.lookup_identifier(x, position)?;
+                if value.is_i64() {
+                    Number::from(value.as_i64().unwrap())
+                } else if value.is_u64() {
+                    Number::from(value.as_u64().unwrap())
+                } else if value.is_f64() {
+                    Number::from_f64(value.as_f64().unwrap()).unwrap()
+                } else {
+                    bail!("identifier does not evaluate to a number");
+                }
+            }
             ExpressionValue::Math(MathExpression {
                 ref lhs,
                 ref rhs,
@@ -540,9 +552,16 @@ impl Engine {
                 self.eval_math(&lhs, &rhs, *operator)?
             }
             ExpressionValue::FunctionCall(FunctionCall { ref name, ref args }) => {
-                match self.eval_function(name, args, position, data, context)? {
-                    Value::Number(x) => x,
-                    _ => bail!("result of `{}` is not a number", name),
+                let value = &*self.eval_function(name, args, position, data, context)?;
+
+                if value.is_i64() {
+                    Number::from(value.as_i64().unwrap())
+                } else if value.is_u64() {
+                    Number::from(value.as_u64().unwrap())
+                } else if value.is_f64() {
+                    Number::from_f64(value.as_f64().unwrap()).unwrap()
+                } else {
+                    bail!("result of `{}` is not a number", name);
                 }
             }
             ExpressionValue::Boolean(_) => bail!("unable to evaluate boolean as a number"),
@@ -569,30 +588,40 @@ impl Engine {
 
         // In case of filters, just evaluate the expression as a generic one
         // and check if the result is a Number
-        if let Value::Number(number) = self.eval_expression(expression, position, data, context)? {
-            return Ok(number);
+        let value = self.eval_expression(expression, position, data, context)?;
+        if value.is_i64() {
+            Ok(Number::from(value.as_i64().unwrap()))
+        } else if value.is_u64() {
+            Ok(Number::from(value.as_u64().unwrap()))
+        } else if value.is_f64() {
+            Ok(Number::from_f64(value.as_f64().unwrap()).unwrap())
+        } else {
+            bail!("unable to evaluate expression as a number: {:?}", expression)
         }
-
-        bail!("unable to evaluate expression as a number: {:?}", expression)
     }
 
-    fn eval_expression(
+    fn eval_expression<'a>(
         &self,
-        expression: &Expression,
+        expression: &'a Expression,
         position: &Identifier,
-        data: &Value,
+        data: &'a Value,
         context: &mut Context,
-    ) -> Result<Value> {
+    ) -> Result<Cow<'a, Value>> {
         let mut result = match expression.value {
-            ExpressionValue::Integer(x) => Value::Number(Number::from(x)),
-            ExpressionValue::Float(x) => Value::Number(Number::from_f64(x).unwrap()),
-            ExpressionValue::Boolean(x) => Value::Bool(x),
-            ExpressionValue::String(ref x) => Value::String(x.to_string()),
+            ExpressionValue::Integer(x) => Cow::Owned(Value::Number(Number::from(x))),
+            ExpressionValue::Float(x) => Cow::Owned(Value::Number(Number::from_f64(x).unwrap())),
+            ExpressionValue::Boolean(x) => Cow::Owned(Value::Bool(x)),
+            ExpressionValue::String(ref x) => Cow::Owned(Value::String(x.to_string())),
             ExpressionValue::Identifier(ref x) => data.lookup_identifier(x, position)?.clone(),
-            ExpressionValue::Math(_) => Value::Number(self.eval_as_number(expression, position, data, context)?),
-            ExpressionValue::Logical(_) => {
-                Value::Bool(self.eval_value_as_bool(&expression.value, position, data, context)?)
+            ExpressionValue::Math(_) => {
+                Cow::Owned(Value::Number(self.eval_as_number(expression, position, data, context)?))
             }
+            ExpressionValue::Logical(_) => Cow::Owned(Value::Bool(self.eval_value_as_bool(
+                &expression.value,
+                position,
+                data,
+                context,
+            )?)),
             ExpressionValue::FunctionCall(FunctionCall { ref name, ref args }) => {
                 self.eval_function(name, args, position, data, context)?
             }
@@ -604,7 +633,7 @@ impl Engine {
                         ExpressionValue::String(ref x) => result.push_str(x),
                         ExpressionValue::Integer(x) => result.push_str(&format!("{}", x)),
                         ExpressionValue::Float(x) => result.push_str(&format!("{}", x)),
-                        ExpressionValue::Identifier(ref x) => match data.lookup_identifier(x, position)? {
+                        ExpressionValue::Identifier(ref x) => match *data.lookup_identifier(x, position)? {
                             Value::String(ref x) => result.push_str(x),
                             Value::Number(ref x) => result.push_str(&format!("{}", x)),
                             _ => bail!(
@@ -615,7 +644,7 @@ impl Engine {
                     };
                 }
 
-                Value::String(result)
+                Cow::Owned(Value::String(result))
             }
         };
 
@@ -624,8 +653,8 @@ impl Engine {
         }
 
         if expression.negated {
-            if let Value::Bool(x) = result {
-                result = Value::Bool(!x);
+            if let Value::Bool(x) = *result {
+                result = Cow::Owned(Value::Bool(!x));
             } else {
                 bail!("unable to negate non bool value");
             }
@@ -646,10 +675,14 @@ impl Engine {
             ExpressionValue::Float(_) => bail!("float can't be evaluated as bool"),
             ExpressionValue::Boolean(x) => *x,
             ExpressionValue::String(_) => bail!("string can't be evaluated as bool"),
-            ExpressionValue::Identifier(x) => match data.lookup_identifier(x, position)? {
-                Value::Bool(x) => *x,
-                _ => bail!("identifier does not evaluate to a boolean"),
-            },
+            ExpressionValue::Identifier(x) => {
+                let value = data.lookup_identifier(x, position)?;
+                if let Value::Bool(value) = value.as_ref() {
+                    *value
+                } else {
+                    bail!("identifier does not evaluate to a boolean");
+                }
+            }
             ExpressionValue::Math(_) => bail!("math expression can't be evaluated as bool"),
             ExpressionValue::Logical(LogicalExpression {
                 ref lhs,
@@ -669,7 +702,7 @@ impl Engine {
                     let lhs = self.eval_expression(lhs, position, data, context)?;
                     let rhs = self.eval_expression(rhs, position, data, context)?;
 
-                    match (&lhs, &rhs) {
+                    match (lhs.as_ref(), rhs.as_ref()) {
                         (Value::Number(ref lhs), Value::Number(ref rhs)) => {
                             if operator == &LogicalOperator::Equal {
                                 lhs.relative_eq(rhs)
@@ -703,9 +736,11 @@ impl Engine {
                 }
             },
             ExpressionValue::FunctionCall(FunctionCall { ref name, ref args }) => {
-                match self.eval_function(name, args, position, data, context)? {
-                    Value::Bool(x) => x,
-                    _ => bail!("unable to evaluate `{}` function result as bool", name),
+                let value = self.eval_function(name, args, position, data, context)?;
+                if let Value::Bool(value) = value.as_ref() {
+                    *value
+                } else {
+                    bail!("unable to evaluate `{}` function result as bool", name);
                 }
             }
             ExpressionValue::StringConcat(_) => bail!("string concatenation can't be evaluated as bool"),
