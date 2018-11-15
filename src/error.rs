@@ -1,4 +1,37 @@
 //! Error handling
+//!
+//! A module allowing us to create more detailed, context aware, errors.
+//!
+//! # Examples
+//!
+//! Invalid UTC argument type:
+//!
+//! ```rust
+//! use balena_temen::{
+//!     ast::Identifier,
+//!     Engine, Context, Value,
+//!     error::*
+//! };
+//! use std::collections::HashMap;
+//!
+//! let engine: Engine = Engine::default();
+//! let mut ctx = Context::default();
+//! let position = Identifier::default();
+//! let data = Value::Null;
+//!
+//! eprintln!("{}", engine.eval("now(utc=`yes`)", &position, &data, &mut ctx).err().unwrap());
+//! ```
+//!
+//! Printed error:
+//!
+//! ```text
+//! temen: invalid argument type
+//!  └ context:
+//!     ├ function = now
+//!     ├ argument name = utc
+//!     ├ argument value = "yes"
+//!     └ expected = boolean
+//! ```
 use std::borrow::Cow;
 use std::error;
 use std::fmt;
