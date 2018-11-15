@@ -1,9 +1,10 @@
 use std::collections::HashMap;
 
 use serde_json::json;
-use crate::{test_eval_eq, test_eval_err, test_eval_ok};
 
 use balena_temen::{Context, Engine, EngineBuilder, Value};
+
+use crate::{test_eval_eq, test_eval_err, test_eval_ok};
 
 #[test]
 fn default_functions_are_registered() {
