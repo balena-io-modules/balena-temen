@@ -2,7 +2,7 @@
 use approx::Relative;
 use serde_json::Number;
 
-use crate::error::{bail, Result};
+use crate::error::*;
 
 /// Check that the float is not infinite or NaN
 ///
@@ -14,11 +14,11 @@ use crate::error::{bail, Result};
 /// * `number` - A number to check
 pub fn validate_f64(number: f64) -> Result<f64> {
     if number.is_nan() {
-        bail!("parse_f64: NaN not supported");
+        return Err(Error::with_message("NaN f64 not supported"));
     }
 
     if number.is_infinite() {
-        bail!("parse_f64: infinite not supported");
+        return Err(Error::with_message("infinite f64 not supported"));
     }
 
     Ok(number)

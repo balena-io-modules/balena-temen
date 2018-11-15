@@ -15,7 +15,6 @@ travis-ci = { repository = "balena-io-modules/balena-temen", branch = "master" }
 [dependencies]
 approx = "0.3"
 chrono = "0.4"
-error-chain = "0.12"
 lazy_static = "1"
 pest = "2"
 pest_derive = "2"

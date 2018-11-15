@@ -4,10 +4,15 @@ use serde_json::Value;
 use slug;
 
 use crate::context::Context;
-use crate::error::Result;
+use crate::error::*;
 
 pub(crate) fn slugify(input: &Value, _args: &HashMap<String, Value>, _context: &mut Context) -> Result<Value> {
-    let s = input.as_str().ok_or_else(|| "`slugify` filter accepts string only")?;
+    let s = input.as_str().ok_or_else(|| {
+        Error::with_message("invalid input type")
+            .context("filter", "slugify")
+            .context("expected", "string")
+            .context("input", input.to_string())
+    })?;
 
     if s.is_empty() {
         return Ok(input.clone());
@@ -15,7 +20,9 @@ pub(crate) fn slugify(input: &Value, _args: &HashMap<String, Value>, _context: &
 
     let result = slug::slugify(s);
     if result.is_empty() {
-        return Err(format!("unable to slugify `{}`", s).into());
+        return Err(Error::with_message("empty result, unable to slugify input")
+            .context("filter", "slugify")
+            .context("input", input.to_string()));
     }
 
     Ok(Value::String(result))

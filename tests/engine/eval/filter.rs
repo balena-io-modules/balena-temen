@@ -1,9 +1,10 @@
 use std::collections::HashMap;
 
 use serde_json::json;
-use crate::{test_eval_eq, test_eval_err};
 
-use balena_temen::{Context, Engine, EngineBuilder, Value};
+use balena_temen::{Context, Engine, EngineBuilder, error::*, Value};
+
+use crate::{test_eval_eq, test_eval_err};
 
 #[test]
 fn default_filters_are_registered() {
@@ -34,7 +35,7 @@ fn custom_filter() {
         if input.is_string() {
             Ok(Value::String(input.as_str().unwrap().replace("a", "b")))
         } else {
-            Err("no string, no fun".into())
+            Err(Error::with_message("no string, no fun"))
         }
     };
 
