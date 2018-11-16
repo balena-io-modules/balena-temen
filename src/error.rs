@@ -34,14 +34,14 @@
 //! temen: unable to evaluate as a number
 //!  ├ frame[0]
 //!  |  └ context:
-//!  |     ├ value = some value
-//!  |     └ expected = number
+//!  |     ├ value: some value
+//!  |     └ expected: number
 //!  ├ frame[1]: eval_math
 //!  |  └ context:
-//!  |     └ rhs = `23`
+//!  |     └ rhs: `23`
 //!  └ frame[2]: eval
 //!     └ context:
-//!        └ expression = 1 = `23`
+//!        └ expression: 1 = `23`
 //! ```
 use std::borrow::Cow;
 use std::error;
@@ -235,9 +235,9 @@ impl fmt::Display for Error {
                 let last_index = frame.context().len() - 1;
                 for (idx, (k, v)) in frame.context().iter().enumerate() {
                     if idx == last_index {
-                        writeln!(f, "{}    └ {} = {}", context_indent, k, v)?;
+                        writeln!(f, "{}    └ {}: {}", context_indent, k, v)?;
                     } else {
-                        writeln!(f, "{}    ├ {} = {}", context_indent, k, v)?;
+                        writeln!(f, "{}    ├ {}: {}", context_indent, k, v)?;
                     }
                 }
             }
