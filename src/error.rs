@@ -18,7 +18,7 @@
 //! fn eval_math() -> Result<()> {
 //!     Ok(eval_as_number()
 //!         .frame_with(|| "eval_math".into())
-//!         .context_with(|| ("rhs".into(), "`23`".into()))?)
+//!         .context_with(|| ("rhs".to_string(), "`23`".to_string()))?)
 //! }
 //!
 //! fn eval() -> Result<()> {
