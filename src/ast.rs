@@ -219,8 +219,8 @@ impl Identifier {
 
     /// Check if an identifier is canonical
     ///
-    /// An identifier is considered as canonical if all relative identifier values
-    /// (`IdentifierValue::This`, `IdentifierValue::Super`) are not present.
+    /// An identifier is considered as canonical if none relative identifier values
+    /// (`IdentifierValue::This`, `IdentifierValue::Super`) are present.
     ///
     /// It affects (checks) nested identifiers as well.
     ///
