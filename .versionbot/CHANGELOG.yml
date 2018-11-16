@@ -1,4 +1,16 @@
 - commits:
+    - subject: Simplify identifier values
+      hash: c2e0d21dff3ae792917671b1e09c7c03a0989252
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Robert Vojta <robert@balena.io>
+        signed-off-by: Robert Vojta <robert@balena.io>
+      author: Robert Vojta
+  version: 0.0.11
+  date: 2018-11-16T10:43:51.459Z
+- commits:
     - subject: Replace error-chain
       hash: 266efaa1e4efd7ceb269753d83fa8fb1ed11c5f3
       body: ''
