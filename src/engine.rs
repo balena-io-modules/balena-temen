@@ -560,14 +560,11 @@ impl Engine {
             ExpressionValue::Float(x) => Number::from_f64(*x).unwrap(),
             ExpressionValue::Identifier(x) => {
                 let value = &*data.lookup_identifier(x, position)?;
-                if value.is_i64() {
-                    Number::from(value.as_i64().unwrap())
-                } else if value.is_u64() {
-                    Number::from(value.as_u64().unwrap())
-                } else if value.is_f64() {
-                    Number::from_f64(value.as_f64().unwrap()).unwrap()
-                } else {
-                    return Err(unable_to_evaluate_as_a_number_error().context("value", format!("{:?}", value)));
+                match value {
+                    Value::Number(num) => num.clone(),
+                    _ => {
+                        return Err(unable_to_evaluate_as_a_number_error().context("value", format!("{:?}", value)));
+                    }
                 }
             }
             ExpressionValue::Math(MathExpression {
@@ -581,23 +578,19 @@ impl Engine {
             }
             ExpressionValue::FunctionCall(FunctionCall { ref name, ref args }) => {
                 let value = &*self.eval_function(name, args, position, data, context)?;
+                match value {
+                    Value::Number(num) => num.clone(),
+                    _ => {
+                        let mut error = unable_to_evaluate_as_a_number_error()
+                            .context("value", format!("{:?}", value))
+                            .context("function", name.to_string());
 
-                if value.is_i64() {
-                    Number::from(value.as_i64().unwrap())
-                } else if value.is_u64() {
-                    Number::from(value.as_u64().unwrap())
-                } else if value.is_f64() {
-                    Number::from_f64(value.as_f64().unwrap()).unwrap()
-                } else {
-                    let mut error = unable_to_evaluate_as_a_number_error()
-                        .context("value", format!("{:?}", value))
-                        .context("function", name.to_string());
+                        for (k, v) in args {
+                            error = error.context(format!("argument[{}]", k), format!("{:?}", v));
+                        }
 
-                    for (k, v) in args {
-                        error = error.context(format!("argument[{}]", k), format!("{:?}", v));
+                        return Err(error);
                     }
-
-                    return Err(error);
                 }
             }
             ExpressionValue::Boolean(_) => {
@@ -632,17 +625,12 @@ impl Engine {
 
         // In case of filters, just evaluate the expression as a generic one
         // and check if the result is a Number
-        let value = self.eval_expression(expression, position, data, context)?;
-        if value.is_i64() {
-            Ok(Number::from(value.as_i64().unwrap()))
-        } else if value.is_u64() {
-            Ok(Number::from(value.as_u64().unwrap()))
-        } else if value.is_f64() {
-            Ok(Number::from_f64(value.as_f64().unwrap()).unwrap())
-        } else {
-            return Err(unable_to_evaluate_as_a_number_error()
+        let value = &*self.eval_expression(expression, position, data, context)?;
+        match value {
+            Value::Number(num) => Ok(num.clone()),
+            _ => Err(unable_to_evaluate_as_a_number_error()
                 .context("expression", format!("{:?}", expression))
-                .context("reason", "result is not a number"));
+                .context("reason", "result is not a number")),
         }
     }
 
