@@ -352,6 +352,77 @@ impl Identifier {
 
         Ok(Identifier::new(result))
     }
+
+    /// Appends `IdentifierValue::Name` to the identifier
+    ///
+    /// # Arguments
+    ///
+    /// * `name` - A name (object field, string index)
+    ///
+    /// # Examples
+    ///
+    /// ```rust
+    /// use balena_temen::ast::*;
+    ///
+    /// let identifier = Identifier::default()
+    ///     .name("wifi")
+    ///     .name("ssid");
+    ///
+    /// let parsed = "wifi.ssid".parse().unwrap();
+    ///
+    /// assert_eq!(identifier, parsed);
+    /// ```
+    pub fn name<S>(mut self, name: S) -> Identifier
+    where
+        S: Into<String>,
+    {
+        self.values.push(IdentifierValue::Name(name.into()));
+        self
+    }
+
+    /// Appends `IdentifierValue::Index` to the identifier
+    ///
+    /// # Arguments
+    ///
+    /// * `index` - An array index
+    ///
+    /// ```rust
+    /// use balena_temen::ast::*;
+    ///
+    /// let identifier = Identifier::default()
+    ///     .name("networks")
+    ///     .index(0);
+    ///
+    /// let parsed = "networks[0]".parse().unwrap();
+    ///
+    /// assert_eq!(identifier, parsed);
+    /// ```
+    pub fn index(mut self, index: isize) -> Identifier {
+        self.values.push(IdentifierValue::Index(index));
+        self
+    }
+
+    /// Appends `IdentifierValue::Identifier` to the identifier
+    ///
+    /// # Arguments
+    ///
+    /// * `identifier` - An identifier index
+    ///
+    /// ```rust
+    /// use balena_temen::ast::*;
+    ///
+    /// let identifier = Identifier::default()
+    ///     .name("wifi")
+    ///     .identifier(Identifier::default().name("first_wifi_id"));
+    ///
+    /// let parsed = "wifi[first_wifi_id]".parse().unwrap();
+    ///
+    /// assert_eq!(identifier, parsed);
+    /// ```
+    pub fn identifier(mut self, identifier: Identifier) -> Identifier {
+        self.values.push(IdentifierValue::Identifier(identifier));
+        self
+    }
 }
 
 impl Default for Identifier {
