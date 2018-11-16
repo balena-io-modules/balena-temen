@@ -1,4 +1,16 @@
 - commits:
+    - subject: Replace error-chain
+      hash: 266efaa1e4efd7ceb269753d83fa8fb1ed11c5f3
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Robert Vojta <robert@balena.io>
+        signed-off-by: Robert Vojta <robert@balena.io>
+      author: Robert Vojta
+  version: 0.0.10
+  date: 2018-11-16T09:22:17.250Z
+- commits:
     - subject: Internal optimisation
       hash: 74a71b35ec807c9ebed2ebe166eae43474b7e44b
       body: ''
