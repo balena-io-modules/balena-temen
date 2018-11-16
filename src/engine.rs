@@ -10,7 +10,7 @@ use crate::{
         function::{self, FunctionFn},
     },
     context::Context,
-    error::{bail, Result},
+    error::*,
     lookup::Lookup,
     utils::{RelativeEq, validate_f64}
 };
@@ -73,26 +73,42 @@ impl EngineBuilder {
     ///
     /// ```rust
     /// use balena_temen::{
-    ///   ast::Identifier,
-    ///   Engine, EngineBuilder, Context, Value,
-    ///   error::Result
+    ///     ast::Identifier,
+    ///     Engine, EngineBuilder, Context, Value,
+    ///     error::*
     /// };
     /// use serde_json::json;
     /// use std::collections::HashMap;
     ///
     /// fn text_filter(input: &Value, args: &HashMap<String, Value>, _: &mut Context) -> Result<Value> {
     ///     let input = input.as_str()
-    ///         .ok_or_else(|| "`text` filter accepts string only")?;
+    ///         .ok_or_else(|| {
+    ///             Error::with_message("invalid input type")
+    ///                 .context("expected", "string")
+    ///                 .context("value", input.to_string())
+    ///     })?;
     ///
     ///     let trim = args.get("trim")
-    ///         .unwrap_or_else(|| &Value::Bool(false))
+    ///         .unwrap_or_else(|| &Value::Bool(false));
+    ///     let trim = trim
     ///         .as_bool()
-    ///         .ok_or_else(|| "`trim` argument must be a bool")?;
+    ///         .ok_or_else(|| {
+    ///             Error::with_message("invalid argument type")
+    ///                 .context("argument", "trim")
+    ///                 .context("expected", "boolean")
+    ///                 .context("value", trim.to_string())
+    ///         })?;
     ///
     ///     let upper = args.get("upper")
-    ///         .unwrap_or_else(|| &Value::Bool(false))
+    ///         .unwrap_or_else(|| &Value::Bool(false));
+    ///     let upper = upper
     ///         .as_bool()
-    ///         .ok_or_else(|| "`upper` argument must be a bool")?;
+    ///         .ok_or_else(|| {
+    ///             Error::with_message("invalid argument type")
+    ///                 .context("argument", "upper")
+    ///                 .context("expected", "boolean")
+    ///                 .context("value", trim.to_string())
+    ///         })?;
     ///
     ///     let result = match (trim, upper) {
     ///         (false, false) => input.to_string(),
@@ -154,9 +170,9 @@ impl EngineBuilder {
     ///
     /// ```rust
     /// use balena_temen::{
-    ///   ast::Identifier,
-    ///   Engine, EngineBuilder, Context, Value,
-    ///   error::Result
+    ///     ast::Identifier,
+    ///     Engine, EngineBuilder, Context, Value,
+    ///     error::*
     /// };
     /// use serde_json::json;
     /// use std::collections::HashMap;
@@ -164,7 +180,11 @@ impl EngineBuilder {
     /// fn echo_function(args: &HashMap<String, Value>, _: &mut Context) -> Result<Value> {
     ///     let value = match args.get("value") {
     ///         Some(x) => {
-    ///             x.as_str().ok_or_else(|| "`value` argument must be a string")?
+    ///             x.as_str().ok_or_else(|| {
+    ///                 Error::with_message("invalid argument type")
+    ///                     .context("expect", "string")
+    ///                     .context("value", x.to_string())
+    ///             })?
     ///         },
     ///         None => "echo"
     ///     };
@@ -256,6 +276,14 @@ impl Default for Engine {
     }
 }
 
+fn unable_to_evaluate_as_a_number_error() -> Error {
+    Error::with_message("unable to evaluate as a number").context("expected", "number")
+}
+
+fn unable_to_evaluate_as_a_bool_error() -> Error {
+    Error::with_message("unable to evaluate as a bool").context("expected", "bool")
+}
+
 impl Engine {
     /// Evaluates an expression
     ///
@@ -272,8 +300,8 @@ impl Engine {
     ///
     /// ```rust
     /// use balena_temen::{
-    ///   ast::Identifier,
-    ///   Engine, Context, Value
+    ///     ast::Identifier,
+    ///     Engine, Context, Value
     /// };
     /// use serde_json::json;
     ///
@@ -349,8 +377,8 @@ impl Engine {
     ///
     /// ```rust
     /// use balena_temen::{
-    ///   ast::Identifier,
-    ///   Engine, Context, Value
+    ///     ast::Identifier,
+    ///     Engine, Context, Value
     /// };
     /// use serde_json::json;
     ///
@@ -498,7 +526,7 @@ impl Engine {
         if let Some(f) = self.functions.get(name) {
             Ok(Cow::Owned(f(&args, context)?))
         } else {
-            bail!("function `{}` not found", name);
+            Err(Error::with_message("function not found").context("function", name.to_string()))
         }
     }
 
@@ -516,7 +544,7 @@ impl Engine {
         if let Some(f) = self.filters.get(name) {
             Ok(Cow::Owned(f(input, &args, context)?))
         } else {
-            bail!("filter `{}` not found", name);
+            Err(Error::with_message("filter not found").context("filter", name.to_string()))
         }
     }
 
@@ -539,7 +567,7 @@ impl Engine {
                 } else if value.is_f64() {
                     Number::from_f64(value.as_f64().unwrap()).unwrap()
                 } else {
-                    bail!("identifier does not evaluate to a number");
+                    return Err(unable_to_evaluate_as_a_number_error().context("value", format!("{:?}", value)));
                 }
             }
             ExpressionValue::Math(MathExpression {
@@ -561,13 +589,29 @@ impl Engine {
                 } else if value.is_f64() {
                     Number::from_f64(value.as_f64().unwrap()).unwrap()
                 } else {
-                    bail!("result of `{}` is not a number", name);
+                    let mut error = unable_to_evaluate_as_a_number_error()
+                        .context("value", format!("{:?}", value))
+                        .context("function", name.to_string());
+
+                    for (k, v) in args {
+                        error = error.context(format!("argument[{}]", k), format!("{:?}", v));
+                    }
+
+                    return Err(error);
                 }
             }
-            ExpressionValue::Boolean(_) => bail!("unable to evaluate boolean as a number"),
-            ExpressionValue::String(_) => bail!("unable to evaluate string as a number"),
-            ExpressionValue::Logical(_) => bail!("unable to evaluate logical expression as a number"),
-            ExpressionValue::StringConcat(_) => bail!("unable to evaluate string concatenation as a number"),
+            ExpressionValue::Boolean(_) => {
+                return Err(unable_to_evaluate_as_a_number_error().context("value", format!("{:?}", value)))
+            }
+            ExpressionValue::String(_) => {
+                return Err(unable_to_evaluate_as_a_number_error().context("value", format!("{:?}", value)))
+            }
+            ExpressionValue::Logical(_) => {
+                return Err(unable_to_evaluate_as_a_number_error().context("value", format!("{:?}", value)))
+            }
+            ExpressionValue::StringConcat(_) => {
+                return Err(unable_to_evaluate_as_a_number_error().context("value", format!("{:?}", value)))
+            }
         };
 
         Ok(number)
@@ -596,7 +640,9 @@ impl Engine {
         } else if value.is_f64() {
             Ok(Number::from_f64(value.as_f64().unwrap()).unwrap())
         } else {
-            bail!("unable to evaluate expression as a number: {:?}", expression)
+            return Err(unable_to_evaluate_as_a_number_error()
+                .context("expression", format!("{:?}", expression))
+                .context("reason", "result is not a number"));
         }
     }
 
@@ -636,11 +682,13 @@ impl Engine {
                         ExpressionValue::Identifier(ref x) => match *data.lookup_identifier(x, position)? {
                             Value::String(ref x) => result.push_str(x),
                             Value::Number(ref x) => result.push_str(&format!("{}", x)),
-                            _ => bail!(
-                                "unable to concatenate string (identifier does not evaluated to a number / string)"
-                            ),
+                            _ => {
+                                return Err(Error::with_message("unable to concatenate string")
+                                    .context("expected", "number")
+                                    .context("value", format!("{:?}", x)))
+                            }
                         },
-                        _ => bail!("unable to concatenate string (string, number or identifiers supported only)"),
+                        _ => unreachable!("invalid grammar"),
                     };
                 }
 
@@ -656,7 +704,10 @@ impl Engine {
             if let Value::Bool(x) = *result {
                 result = Cow::Owned(Value::Bool(!x));
             } else {
-                bail!("unable to negate non bool value");
+                return Err(Error::with_message("unable to negate expression")
+                    .context("expected", "bool")
+                    .context("value", result.to_string())
+                    .context("expression", format!("{:?}", expression)));
             }
         }
 
@@ -671,19 +722,24 @@ impl Engine {
         context: &mut Context,
     ) -> Result<bool> {
         let result = match value {
-            ExpressionValue::Integer(_) => bail!("integer can't be evaluated as bool"),
-            ExpressionValue::Float(_) => bail!("float can't be evaluated as bool"),
+            ExpressionValue::Integer(_)
+            | ExpressionValue::Float(_)
+            | ExpressionValue::String(_)
+            | ExpressionValue::Math(_)
+            | ExpressionValue::StringConcat(_) => {
+                return Err(unable_to_evaluate_as_a_bool_error().context("value", format!("{:?}", value)))
+            }
             ExpressionValue::Boolean(x) => *x,
-            ExpressionValue::String(_) => bail!("string can't be evaluated as bool"),
-            ExpressionValue::Identifier(x) => {
-                let value = data.lookup_identifier(x, position)?;
+            ExpressionValue::Identifier(identifier) => {
+                let value = data.lookup_identifier(identifier, position)?;
                 if let Value::Bool(value) = value.as_ref() {
                     *value
                 } else {
-                    bail!("identifier does not evaluate to a boolean");
+                    return Err(unable_to_evaluate_as_a_bool_error()
+                        .context("value", value.to_string())
+                        .context("identifier", format!("{:?}", identifier)));
                 }
             }
-            ExpressionValue::Math(_) => bail!("math expression can't be evaluated as bool"),
             ExpressionValue::Logical(LogicalExpression {
                 ref lhs,
                 ref rhs,
@@ -731,7 +787,7 @@ impl Engine {
                         LogicalOperator::GreaterThanOrEqual => lhs >= rhs,
                         LogicalOperator::LowerThan => lhs < rhs,
                         LogicalOperator::LowerThanOrEqual => lhs <= rhs,
-                        _ => bail!("grammar error?"),
+                        _ => unreachable!("invalid grammar"),
                     }
                 }
             },
@@ -740,10 +796,19 @@ impl Engine {
                 if let Value::Bool(value) = value.as_ref() {
                     *value
                 } else {
-                    bail!("unable to evaluate `{}` function result as bool", name);
+                    return Err({
+                        let mut error = unable_to_evaluate_as_a_bool_error()
+                            .context("value", format!("{:?}", value))
+                            .context("function", name.to_string());
+
+                        for (k, v) in args {
+                            error = error.context(format!("argument[{}]", k), format!("{:?}", v));
+                        }
+
+                        error
+                    });
                 }
             }
-            ExpressionValue::StringConcat(_) => bail!("string concatenation can't be evaluated as bool"),
         };
 
         Ok(result)

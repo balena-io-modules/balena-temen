@@ -4,17 +4,29 @@ use chrono::{DateTime, NaiveDateTime, Utc};
 use serde_json::Value;
 
 use crate::context::Context;
-use crate::error::Result;
+use crate::error::*;
 
-fn format_timestamp(filter: &str, input: &Value, args: &HashMap<String, Value>, default: &str) -> Result<Value> {
-    let ts = input
-        .as_i64()
-        .ok_or_else(|| format!("`{}` accepts integer only", filter))?;
+fn format_timestamp(
+    filter: &'static str,
+    input: &Value,
+    args: &HashMap<String, Value>,
+    default: &str,
+) -> Result<Value> {
+    let ts = input.as_i64().ok_or_else(|| {
+        Error::with_message("invalid input type")
+            .context("filter", filter)
+            .context("expected", "i64")
+            .context("input", input.to_string())
+    })?;
 
     let format = match args.get("format") {
-        Some(x) => x
-            .as_str()
-            .ok_or_else(|| format!("`{}` format must be a string", filter))?,
+        Some(x) => x.as_str().ok_or_else(|| {
+            Error::with_message("invalid argument type")
+                .context("filter", filter)
+                .context("argument name", "format")
+                .context("argument value", x.to_string())
+                .context("expected", "string")
+        })?,
         None => default,
     };
 

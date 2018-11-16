@@ -4,20 +4,28 @@ use chrono::{DateTime, Local, Utc};
 use serde_json::{Number, Value};
 
 use crate::context::Context;
-use crate::error::Result;
+use crate::error::*;
 
 fn now_with_cached(cached: DateTime<Utc>, args: &HashMap<String, Value>) -> Result<Value> {
-    let timestamp = args
-        .get("timestamp")
-        .unwrap_or_else(|| &Value::Bool(false))
-        .as_bool()
-        .ok_or_else(|| "timestamp must be a boolean value")?;
+    let timestamp = args.get("timestamp").unwrap_or_else(|| &Value::Bool(false));
 
-    let utc = args
-        .get("utc")
-        .unwrap_or_else(|| &Value::Bool(false))
-        .as_bool()
-        .ok_or_else(|| "utc must be a boolean value")?;
+    let timestamp = timestamp.as_bool().ok_or_else(|| {
+        Error::with_message("invalid argument type")
+            .context("function", "now")
+            .context("argument name", "timestamp")
+            .context("argument value", timestamp.to_string())
+            .context("expected", "boolean")
+    })?;
+
+    let utc = args.get("utc").unwrap_or_else(|| &Value::Bool(false));
+
+    let utc = utc.as_bool().ok_or_else(|| {
+        Error::with_message("invalid argument type")
+            .context("function", "now")
+            .context("argument name", "utc")
+            .context("argument value", utc.to_string())
+            .context("expected", "boolean")
+    })?;
 
     match (utc, timestamp) {
         (true, true) => Ok(Value::Number(Number::from(cached.timestamp()))),

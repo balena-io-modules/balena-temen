@@ -25,7 +25,7 @@
 use std::{collections::HashMap, str::FromStr};
 
 use crate::{
-    error::{bail, Error},
+    error::*,
     parser::parse
 };
 
@@ -365,10 +365,11 @@ impl Expression {
     /// Converts self into [`Identifier`]
     ///
     /// [`Identifier`]: struct.Identifier.html
-    pub fn into_identifier(self) -> Result<Identifier, Error> {
+    pub fn into_identifier(self) -> Result<Identifier> {
         match self.value {
             ExpressionValue::Identifier(identifier) => Ok(identifier),
-            _ => bail!("expression is not an identifier"),
+            _ => Err(Error::with_message("expression does not contain an identifier")
+                .context("expression", format!("{:?}", self))),
         }
     }
 }
@@ -376,7 +377,7 @@ impl Expression {
 impl FromStr for Expression {
     type Err = Error;
 
-    fn from_str(s: &str) -> Result<Expression, Self::Err> {
+    fn from_str(s: &str) -> Result<Expression> {
         parse(s)
     }
 }

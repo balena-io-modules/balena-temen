@@ -3,16 +3,17 @@ use std::collections::HashMap;
 use serde_json::Value;
 
 use crate::context::Context;
-use crate::error::Result;
+use crate::error::*;
 
 pub(crate) fn trim(input: &Value, _args: &HashMap<String, Value>, _context: &mut Context) -> Result<Value> {
-    Ok(Value::String(
-        input
-            .as_str()
-            .ok_or_else(|| "`trim` filter accepts string only")?
-            .trim()
-            .to_string(),
-    ))
+    let s = input.as_str().ok_or_else(|| {
+        Error::with_message("invalid input type")
+            .context("filter", "trim")
+            .context("expected", "string")
+            .context("input", input.to_string())
+    })?;
+
+    Ok(Value::String(s.trim().to_string()))
 }
 
 #[cfg(test)]

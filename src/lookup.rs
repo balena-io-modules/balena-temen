@@ -3,7 +3,7 @@ use std::borrow::Cow;
 use serde_json::Value;
 
 use crate::ast::*;
-use crate::error::{bail, Result};
+use crate::error::*;
 
 /// Lookup identifier
 pub trait Lookup {
@@ -32,12 +32,9 @@ impl Lookup for Value {
             lookup.update_with_identifier_value(identifier_value, position)?;
         }
 
-        let result = Cow::Borrowed(
-            lookup
-                .stack
-                .pop()
-                .ok_or_else(|| "lookup_identifier: unable to lookup identifier, empty stack")?,
-        );
+        let result = Cow::Borrowed(lookup.stack.pop().ok_or_else(|| {
+            Error::with_message("unable to lookup identifier").context("reason", "empty stack = invalid identifier")
+        })?);
         Ok(result)
     }
 }
@@ -72,20 +69,27 @@ impl<'a> LookupStack<'a> {
         identifier_value: &IdentifierValue,
         position: &Identifier,
     ) -> Result<()> {
-        let last_value = self
-            .stack
-            .last()
-            .ok_or_else(|| "update_with_identifier_value: invalid identifier")?;
+        let last_value = self.stack.last().ok_or_else(|| {
+            Error::with_message("unable to lookup identifier").context("reason", "empty stack = invalid identifier")
+        })?;
 
         match identifier_value {
             IdentifierValue::Name(ref name) | IdentifierValue::StringIndex(ref name) => {
                 // Name (networks) and StringIndex (["networks"]) equals
                 let new_value = last_value
                     .as_object()
-                    .ok_or_else(|| "update_with_identifier_value: not an object".to_string())
+                    .ok_or_else(|| {
+                        Error::with_message("unable to lookup identifier")
+                            .context("reason", "parent value is not an object")
+                            .context("name", name.to_string())
+                    })
                     .and_then(|x| {
-                        x.get(name)
-                            .ok_or_else(|| format!("update_with_identifier_value: key `{}` does not exist", name))
+                        x.get(name).ok_or_else(|| {
+                            Error::with_message("unable to lookup identifier")
+                                .context("reason", "field does not exist")
+                                .context("name", name.to_string())
+                                .context("object", format!("{:?}", x))
+                        })
                     })?;
                 self.stack.push(new_value);
             }
@@ -94,15 +98,20 @@ impl<'a> LookupStack<'a> {
             }
             IdentifierValue::Super => {
                 // Pop the last stack value, `super` refers to parent
-                self.stack
-                    .pop()
-                    .ok_or_else(|| "update_with_identifier_value: invalid `super` usage, no parent object")?;
+                self.stack.pop().ok_or_else(|| {
+                    Error::with_message("unable to lookup identifier")
+                        .context("reason", "super must not be used in the root")
+                })?;
             }
             IdentifierValue::IntegerIndex(idx) => {
                 // Array index
                 let new_value = last_value
                     .as_array()
-                    .ok_or_else(|| "update_with_identifier_value: not an array")
+                    .ok_or_else(|| {
+                        Error::with_message("unable to lookup identifier")
+                            .context("reason", "parent value is not an array")
+                            .context("index", format!("{}", idx))
+                    })
                     .and_then(|x| {
                         let mut index = *idx;
 
@@ -112,11 +121,17 @@ impl<'a> LookupStack<'a> {
                         }
 
                         if index < 0 {
-                            bail!("update_with_identifier_value: index out of bounds")
+                            return Err(Error::with_message("unable to lookup identifier")
+                                .context("reason", "invalid index")
+                                .context("index", format!("{}", index)));
                         }
 
-                        x.get(index as usize)
-                            .ok_or_else(|| "update_with_identifier_value: index out of bounds")
+                        x.get(index as usize).ok_or_else(|| {
+                            Error::with_message("unable to lookup identifier")
+                                .context("reason", "index out of bounds")
+                                .context("index", format!("{}", index))
+                                .context("array", format!("{:?}", x))
+                        })
                     })?;
                 self.stack.push(new_value);
             }
@@ -132,13 +147,20 @@ impl<'a> LookupStack<'a> {
                         self.update_with_identifier_value(&IdentifierValue::StringIndex(x.to_string()), position)?
                     }
                     Value::Number(ref x) => {
-                        let idx = x
-                            .as_i64()
-                            .ok_or_else(|| "update_with_identifier_value: invalid integer index")?;
+                        let idx = x.as_i64().ok_or_else(|| {
+                            Error::with_message("unable to lookup identifier")
+                                .context("reason", "invalid index")
+                                .context("index", format!("{:?}", x))
+                        })?;
 
                         self.update_with_identifier_value(&IdentifierValue::IntegerIndex(idx as isize), position)?;
                     }
-                    _ => bail!("update_with_identifier_value: result of indirect lookup is not a number / string"),
+                    _ => {
+                        return Err(Error::with_message("unable to lookup identifier")
+                            .context("reason", "identifier does not point to an integer / string")
+                            .context("identifier", format!("{:?}", identifier))
+                            .context("position", format!("{:?}", position)))
+                    }
                 };
             }
         };
