@@ -271,14 +271,14 @@ fn parse_dotted_square_bracket_identifier_value(pair: Pair<Rule>) -> Result<Iden
                 "super" => IdentifierValue::Super,
                 _ => IdentifierValue::Name(p.as_str().to_string()),
             },
-            Rule::string => IdentifierValue::StringIndex(remove_string_quotes(p.as_str())?),
-            Rule::integer | Rule::positive_integer => IdentifierValue::IntegerIndex(
+            Rule::string => IdentifierValue::Name(remove_string_quotes(p.as_str())?),
+            Rule::integer | Rule::positive_integer => IdentifierValue::Index(
                 p.as_str()
                     .parse()
                     .map_err(|_| Error::with_message("unable to parse i64").context("value", p.to_string()))?,
             ),
             Rule::dotted_square_bracket_identifier => {
-                IdentifierValue::IdentifierIndex(parse_dotted_square_bracket_identifier_value(p)?)
+                IdentifierValue::Identifier(parse_dotted_square_bracket_identifier_value(p)?)
             }
             _ => unreachable!("invalid grammar"),
         };

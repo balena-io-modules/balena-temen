@@ -79,7 +79,7 @@ fn integer_index() {
         "networks[0].wifi",
         Expression::new(ExpressionValue::Identifier(Identifier::new(vec![
             IdentifierValue::Name("networks".to_string()),
-            IdentifierValue::IntegerIndex(0),
+            IdentifierValue::Index(0),
             IdentifierValue::Name("wifi".to_string())
         ])))
     );
@@ -91,7 +91,7 @@ fn string_index() {
         "people[`123-456-789`].first",
         Expression::new(ExpressionValue::Identifier(Identifier::new(vec![
             IdentifierValue::Name("people".to_string()),
-            IdentifierValue::StringIndex("123-456-789".to_string()),
+            IdentifierValue::Name("123-456-789".to_string()),
             IdentifierValue::Name("first".to_string())
         ])))
     );
@@ -103,9 +103,9 @@ fn indirect_index() {
         "people[people[0].id].first",
         Expression::new(ExpressionValue::Identifier(Identifier::new(vec![
             IdentifierValue::Name("people".to_string()),
-            IdentifierValue::IdentifierIndex(Identifier::new(vec![
+            IdentifierValue::Identifier(Identifier::new(vec![
                 IdentifierValue::Name("people".to_string()),
-                IdentifierValue::IntegerIndex(0),
+                IdentifierValue::Index(0),
                 IdentifierValue::Name("id".to_string()),
             ])),
             IdentifierValue::Name("first".to_string())
@@ -153,7 +153,7 @@ fn super_reserved_keyword() {
         "networks[0].super",
         Expression::new(ExpressionValue::Identifier(Identifier::new(vec![
             IdentifierValue::Name("networks".to_string()),
-            IdentifierValue::IntegerIndex(0),
+            IdentifierValue::Index(0),
             IdentifierValue::Super
         ])))
     );
