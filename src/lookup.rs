@@ -74,8 +74,7 @@ impl<'a> LookupStack<'a> {
         })?;
 
         match identifier_value {
-            IdentifierValue::Name(ref name) | IdentifierValue::StringIndex(ref name) => {
-                // Name (networks) and StringIndex (["networks"]) equals
+            IdentifierValue::Name(ref name) => {
                 let new_value = last_value
                     .as_object()
                     .ok_or_else(|| {
@@ -103,7 +102,7 @@ impl<'a> LookupStack<'a> {
                         .context("reason", "super must not be used in the root")
                 })?;
             }
-            IdentifierValue::IntegerIndex(idx) => {
+            IdentifierValue::Index(idx) => {
                 // Array index
                 let new_value = last_value
                     .as_array()
@@ -135,16 +134,16 @@ impl<'a> LookupStack<'a> {
                     })?;
                 self.stack.push(new_value);
             }
-            IdentifierValue::IdentifierIndex(ref identifier) => {
-                // IdentifierIndex is like indirect lookup, identifier within identifier
-                // people[boss.id].name - boss.id = IdentifierIndex
+            IdentifierValue::Identifier(ref identifier) => {
+                // Identifier is like indirect lookup, identifier within identifier
+                // people[boss.id].name - boss.id = Identifier to lookup
                 //
                 // We have to create new Lookup structure and lookup this identifier
                 // from scratch to avoid existing stack modifications
                 match self.root.lookup_identifier(identifier, position)?.as_ref() {
                     // If we were able to lookup the value, treat it as an String or Number index
                     Value::String(ref x) => {
-                        self.update_with_identifier_value(&IdentifierValue::StringIndex(x.to_string()), position)?
+                        self.update_with_identifier_value(&IdentifierValue::Name(x.to_string()), position)?
                     }
                     Value::Number(ref x) => {
                         let idx = x.as_i64().ok_or_else(|| {
@@ -153,7 +152,7 @@ impl<'a> LookupStack<'a> {
                                 .context("index", format!("{:?}", x))
                         })?;
 
-                        self.update_with_identifier_value(&IdentifierValue::IntegerIndex(idx as isize), position)?;
+                        self.update_with_identifier_value(&IdentifierValue::Index(idx as isize), position)?;
                     }
                     _ => {
                         return Err(Error::with_message("unable to lookup identifier")

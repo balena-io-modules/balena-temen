@@ -175,7 +175,7 @@ impl StringConcat {
 ///   |      │   |
 ///   |      |   └ IdentifierValue::Name("name")
 ///   |      |
-///   |      └ IdentifierValue::IntegerIndex(0)
+///   |      └ IdentifierValue::Index(0)
 ///   |
 ///   └ IdentifierValue::Name("networks")
 /// ```
@@ -183,15 +183,15 @@ impl StringConcat {
 /// ```text
 /// persons[boss.id]["name"]
 ///   |      │         |
-///   |      |         └ IdentifierValue::StringIndex("name")
+///   |      |         └ IdentifierValue::Name("name")
 ///   |      |
-///   |      └ IdentifierValue::IdentifierIndex(boss.id)
-///   |                                          |   |
-///   |                                          |   └ IdentifierValue::Name("id")
-///   |                                          |
-///   |                                          └ IdentifierValue::Name("boss")
+///   |      └ IdentifierValue::Identifier(boss.id)
+///   |                                     |   |
+///   |                                     |   └ IdentifierValue::Name("id")
+///   |                                     |
+///   |                                     └ IdentifierValue::Name("boss")
 ///   |
-///   └ IdentifierValue::Name(String)
+///   └ IdentifierValue::Name("persons")
 /// ```
 ///
 /// ```text
@@ -250,14 +250,12 @@ impl Default for Identifier {
 /// An identifier value (component)
 #[derive(Clone, Debug, PartialEq)]
 pub enum IdentifierValue {
-    /// A name (variable/property name)
+    /// A string index (dictionaries)
     Name(String),
     /// An integer index (arrays)
-    IntegerIndex(isize),
-    /// A string index (dictionaries)
-    StringIndex(String),
+    Index(isize),
     /// An indirect index (value of another identifier)
-    IdentifierIndex(Identifier),
+    Identifier(Identifier),
     /// Current object
     This,
     /// Parent object
