@@ -71,6 +71,9 @@ impl<T> ResultExt<T> for Result<T> {
 
 /// Error type
 pub struct Error {
+    // Box is not really required here, but we'd like to keep
+    // Result as small as possible. Inner can be very huge
+    // sometimes.
     inner: Box<Inner>,
 }
 
