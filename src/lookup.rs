@@ -20,15 +20,9 @@ impl Lookup for Value {
     fn lookup_identifier<'a>(&'a self, identifier: &Identifier, position: &Identifier) -> Result<Cow<'a, Value>> {
         let mut lookup = LookupStack::new(self);
 
-        if identifier.is_relative() {
-            // Update stack with initial position
-            for position_value in position.values.iter() {
-                lookup.update_with_identifier_value(position_value, position)?;
-            }
-        }
+        let canonical = identifier.canonicalize(position)?;
 
-        // Update stack with either relative / absolute identifier, stack is prepared for both
-        for identifier_value in identifier.values.iter() {
+        for identifier_value in canonical.values.iter() {
             lookup.update_with_identifier_value(identifier_value, position)?;
         }
 

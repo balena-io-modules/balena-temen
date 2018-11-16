@@ -217,24 +217,140 @@ impl Identifier {
         Identifier { values }
     }
 
-    /// Check if an identifier is relative
+    /// Check if an identifier is canonical
     ///
-    /// An identifier is considered as a relative one if it starts with `this` or `super`
-    /// keyword.
-    pub fn is_relative(&self) -> bool {
+    /// An identifier is considered as canonical if all relative identifier values
+    /// (`IdentifierValue::This`, `IdentifierValue::Super`) are not present.
+    ///
+    /// It affects (checks) nested identifiers as well.
+    ///
+    /// # Examples
+    ///
+    /// Canonical identifiers.
+    ///
+    /// ```rust
+    /// use balena_temen::ast::*;
+    ///
+    /// let identifier: Identifier = "names.wifi".parse().unwrap();
+    /// assert!(identifier.is_canonical());
+    ///
+    /// let identifier: Identifier = "names.wifi[first].id".parse().unwrap();
+    /// assert!(identifier.is_canonical());
+    /// ```
+    ///
+    /// Not canonical identifiers.
+    ///
+    /// ```rust
+    /// use balena_temen::ast::*;
+    ///
+    /// let identifier: Identifier = "names.this".parse().unwrap();
+    /// assert!(!identifier.is_canonical());
+    ///
+    /// let identifier: Identifier = "names[this.index]".parse().unwrap();
+    /// assert!(!identifier.is_canonical());
+    /// ```
+    pub fn is_canonical(&self) -> bool {
+        for v in &self.values {
+            match v {
+                IdentifierValue::This | IdentifierValue::Super => return false,
+                IdentifierValue::Identifier(ref identifier) => {
+                    if !identifier.is_canonical() {
+                        return false;
+                    }
+                }
+                _ => {}
+            };
+        }
+
+        true
+    }
+
+    fn is_relative(&self) -> bool {
         if let Some(first) = self.values.first() {
-            first == &IdentifierValue::This || first == &IdentifierValue::Super
+            match first {
+                IdentifierValue::This | IdentifierValue::Super => true,
+                _ => false,
+            }
         } else {
             false
         }
     }
 
-    /// Check if an identifier is absolute
+    /// Returns the canonical, absolute, identifier with all intermediate
+    /// components normalized and nested identifiers canonicalized.
     ///
-    /// An identifier is considered as an absolute one if it does not start with `this`
-    /// or `super` keyword.
-    pub fn is_absolute(&self) -> bool {
-        !self.is_relative()
+    /// Nested identifiers (`IdentifierValue::Identifier`) are canonicalized
+    /// too.
+    ///
+    /// # Arguments
+    ///
+    /// * `position` - An identifier position
+    ///
+    /// # Examples
+    ///
+    /// ```rust
+    /// use balena_temen::ast::*;
+    ///
+    /// let identifier: Identifier = "names".parse().unwrap();
+    /// assert_eq!(identifier.canonicalize(&Identifier::default()).unwrap(), identifier);
+    ///
+    /// let identifier: Identifier = "names.this.id.this.super".parse().unwrap();
+    /// let canonicalized: Identifier = "names".parse().unwrap();
+    /// assert_eq!(identifier.canonicalize(&Identifier::default()).unwrap(), canonicalized);
+    ///
+    /// let identifier: Identifier = "super.id".parse().unwrap();
+    /// let position: Identifier = "wifi[`zrzka`].ssid".parse().unwrap();
+    /// let canonicalized: Identifier = "wifi[`zrzka`].id".parse().unwrap();
+    /// assert_eq!(identifier.canonicalize(&position).unwrap(), canonicalized);
+    /// ```
+    pub fn canonicalize(&self, position: &Identifier) -> Result<Identifier> {
+        let position_values = if self.is_relative() {
+            // Identifier is relative, we must have non empty absolute identifier
+            if position.is_relative() {
+                return Err(Error::with_message("unable to canonicalize identifier")
+                    .context("reason", "identifier and position are relative identifiers")
+                    .context("identifier", format!("{:?}", self))
+                    .context("position", format!("{:?}", position)));
+            }
+            if position.values.is_empty() {
+                return Err(Error::with_message("unable to canonicalize identifier")
+                    .context("reason", "identifier is relative and position is empty")
+                    .context("identifier", format!("{:?}", self))
+                    .context("position", format!("{:?}", position)));
+            }
+            Some(position.values.iter())
+        } else {
+            None
+        };
+
+        let values = position_values.into_iter().flatten().chain(self.values.iter());
+
+        let mut result = vec![];
+        for value in values {
+            match value {
+                IdentifierValue::This => {
+                    // This resolves to self, we can remove it
+                }
+                IdentifierValue::Super => {
+                    // Super should resolve to parent, pop the latest identifier
+                    // from result
+                    result.pop().ok_or_else(|| {
+                        Error::with_message("unable to canonicalize identifier")
+                            .context("reason", "`super` can not be resolved")
+                    })?;
+                }
+                IdentifierValue::Identifier(ref identifier) => {
+                    // Canonicalize nested identifiers
+                    result.push(IdentifierValue::Identifier(identifier.canonicalize(position)?));
+                }
+                _ => {
+                    // Rest is just cloned
+                    result.push(value.clone());
+                }
+            }
+        }
+
+        Ok(Identifier::new(result))
     }
 }
 
@@ -377,5 +493,13 @@ impl FromStr for Expression {
 
     fn from_str(s: &str) -> Result<Expression> {
         parse(s)
+    }
+}
+
+impl FromStr for Identifier {
+    type Err = Error;
+
+    fn from_str(s: &str) -> Result<Identifier> {
+        parse(s)?.into_identifier()
     }
 }
