@@ -121,7 +121,6 @@
 //! ```
 //!
 //! Visit [ast] module documentation for more info.
-
 //!
 //! [balena]: https://www.balena.io
 //! [ast]: ast/index.html
