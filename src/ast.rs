@@ -276,6 +276,34 @@ impl Identifier {
         }
     }
 
+    fn initial_position_identifier_values<'a>(
+        &self,
+        position: &'a Identifier,
+    ) -> Result<Option<&'a [IdentifierValue]>> {
+        if self.is_relative() {
+            // Identifier is relative, it must start somewhere
+            if position.is_relative() {
+                // Position must not be relative
+                return Err(Error::with_message("unable to canonicalize identifier")
+                    .context("reason", "identifier and position are relative identifiers")
+                    .context("identifier", format!("{:?}", self))
+                    .context("position", format!("{:?}", position)));
+            }
+
+            if position.values.is_empty() {
+                // Position must not be empty
+                return Err(Error::with_message("unable to canonicalize identifier")
+                    .context("reason", "identifier is relative and position is empty")
+                    .context("identifier", format!("{:?}", self))
+                    .context("position", format!("{:?}", position)));
+            }
+            Ok(Some(&position.values))
+        } else {
+            // Identifier is not relative, no initial position values
+            Ok(None)
+        }
+    }
+
     /// Returns the canonical, absolute, identifier with all intermediate
     /// components normalized and nested identifiers canonicalized.
     ///
@@ -304,26 +332,11 @@ impl Identifier {
     /// assert_eq!(identifier.canonicalize(&position).unwrap(), canonicalized);
     /// ```
     pub fn canonicalize(&self, position: &Identifier) -> Result<Identifier> {
-        let position_values = if self.is_relative() {
-            // Identifier is relative, we must have non empty absolute identifier
-            if position.is_relative() {
-                return Err(Error::with_message("unable to canonicalize identifier")
-                    .context("reason", "identifier and position are relative identifiers")
-                    .context("identifier", format!("{:?}", self))
-                    .context("position", format!("{:?}", position)));
-            }
-            if position.values.is_empty() {
-                return Err(Error::with_message("unable to canonicalize identifier")
-                    .context("reason", "identifier is relative and position is empty")
-                    .context("identifier", format!("{:?}", self))
-                    .context("position", format!("{:?}", position)));
-            }
-            Some(position.values.iter())
-        } else {
-            None
-        };
-
-        let values = position_values.into_iter().flatten().chain(self.values.iter());
+        let values = self
+            .initial_position_identifier_values(position)?
+            .into_iter()
+            .flatten()
+            .chain(self.values.iter());
 
         let mut result = vec![];
         for value in values {
