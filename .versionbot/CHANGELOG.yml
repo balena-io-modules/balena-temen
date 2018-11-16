@@ -1,4 +1,16 @@
 - commits:
+    - subject: Add canonicalize to Identifier
+      hash: 4c4a39b522a07083e3fc16d0cfebd7eca9f692bb
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Robert Vojta <robert@balena.io>
+        signed-off-by: Robert Vojta <robert@balena.io>
+      author: Robert Vojta
+  version: 0.0.12
+  date: 2018-11-16T17:23:54.475Z
+- commits:
     - subject: Simplify identifier values
       hash: c2e0d21dff3ae792917671b1e09c7c03a0989252
       body: ''
