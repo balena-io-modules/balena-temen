@@ -17,22 +17,58 @@
 //!
 //! # Examples
 //!
-//! ## High level
+//! ## Helpers
 //!
-//! Helpers are not implemented yet. You can track the implementation progress
-//! [here](https://github.com/balena-io-modules/balena-temen/issues/20).
+//! ### JSON evaluation
 //!
-//! ## Low level
+//! ```rust
+//! use balena_temen::{eval, Value};
+//! use serde_json::json;
 //!
-//! You should not use this functionality directly unless you need some really
-//! specific stuff.
+//! let data = json!({
+//!     "wifi": {
+//!         "ssid": "Balena Ltd",
+//!         "id": {
+//!             "$$eval": "super.ssid | slugify"
+//!         }
+//!     }
+//! });
+//! let evaluated = json!({
+//!     "wifi": {
+//!         "ssid": "Balena Ltd",
+//!         "id": "balena-ltd"
+//!     }
+//! });
+//! assert_eq!(eval(data).unwrap(), evaluated);
+//! ```
 //!
-//! ### Expression evaluation
+//! ### JSON with custom evaluation keyword
+//!
+//! ```rust
+//! use balena_temen::{Context, Engine, EngineBuilder, eval_with_engine, Value};
+//! use serde_json::json;
+//!
+//! let data = json!({
+//!     "evalMePlease": "3 + 5 * 2"
+//! });
+//! let evaluated = json!(13);
+//!
+//! let mut ctx = Context::default();
+//! let engine: Engine = EngineBuilder::default()
+//!     .eval_keyword("evalMePlease")
+//!     .into();
+//!
+//! assert_eq!(eval_with_engine(data, &engine, &mut ctx).unwrap(), evaluated);
+//! ```
+//!
+//! ## Intermediate
+//!
+//! ### Single expression evaluation
 //!
 //! ```rust
 //! use balena_temen::{
-//!   ast::Identifier,
-//!   Engine, Context, Value
+//!     ast::Identifier,
+//!     Engine, Context, Value
 //! };
 //! use serde_json::json;
 //!
@@ -52,12 +88,12 @@
 //! );
 //! ```
 //!
-//! ### Logical expression evaluation
+//! ### Single logical expression evaluation
 //!
 //! ```rust
 //! use balena_temen::{
-//!   ast::Identifier,
-//!   Engine, Context, Value
+//!     ast::Identifier,
+//!     Engine, Context, Value
 //! };
 //! use serde_json::json;
 //!
@@ -81,6 +117,8 @@
 //!     json!(true)
 //! );
 //! ```
+//!
+//! ## Advanced
 //!
 //! ### Custom functions and filters
 //!
@@ -122,6 +160,26 @@
 //!
 //! Visit [ast] module documentation for more info.
 //!
+//! ### Identifier parsing
+//!
+//! ```rust
+//! use balena_temen::ast::*;
+//!
+//! let s = "wifi.networks[0].ssid";
+//!
+//! // Parse it
+//! let parsed: Identifier = s.parse().unwrap();
+//!
+//! // Create manually
+//! let manual = Identifier::default()
+//!     .name("wifi")
+//!     .name("networks")
+//!     .index(0)
+//!     .name("ssid");
+//!
+//! assert_eq!(parsed, manual);
+//! ```
+//!
 //! [balena]: https://www.balena.io
 //! [ast]: ast/index.html
 //! [`EngineBuilder::function`]: struct.EngineBuilder.html#method.function
@@ -139,7 +197,11 @@ pub use crate::{
     context::Context,
     engine::{
         builder::EngineBuilder,
-        Engine
+        Engine,
+        helper::{
+            eval,
+            eval_with_engine
+        }
     }
 };
 

@@ -18,6 +18,7 @@ use self::builder::EngineBuilder;
 use self::lookup::Lookup;
 
 pub(crate) mod builder;
+pub(crate) mod helper;
 mod lookup;
 
 /// An expression evaluation engine
