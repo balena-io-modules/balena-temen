@@ -269,7 +269,7 @@ Functions can be called without arguments (`uuidv4()`) or with named arguments
 | Filter | Description |
 | --- | --- |
 | [`uuidv4`](#function-uuidv4) | Generates random UUID v4 |
-| [`now`](#filter-now) | Returns the local date time / timestamp |
+| [`now`](#function-now) | Returns the local date time / timestamp |
 
 #### Function uuidv4
 
