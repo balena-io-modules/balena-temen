@@ -320,7 +320,7 @@ impl Engine {
             ExpressionValue::Integer(x) => Number::from(*x),
             ExpressionValue::Float(x) => Number::from_f64(*x).unwrap(),
             ExpressionValue::Identifier(x) => {
-                let value = &*Lookup::lookup_identifier(data, x, position)?;
+                let value = &*Lookup::lookup_identifier(data, x, position, &self.eval_keyword)?;
                 match value {
                     Value::Number(num) => num.clone(),
                     _ => {
@@ -407,7 +407,9 @@ impl Engine {
             ExpressionValue::Float(x) => Cow::Owned(Value::Number(Number::from_f64(x).unwrap())),
             ExpressionValue::Boolean(x) => Cow::Owned(Value::Bool(x)),
             ExpressionValue::String(ref x) => Cow::Owned(Value::String(x.to_string())),
-            ExpressionValue::Identifier(ref x) => Lookup::lookup_identifier(data, x, position)?.clone(),
+            ExpressionValue::Identifier(ref x) => {
+                Lookup::lookup_identifier(data, x, position, &self.eval_keyword)?.to_owned()
+            }
             ExpressionValue::Math(_) => {
                 Cow::Owned(Value::Number(self.eval_as_number(expression, position, data, context)?))
             }
@@ -428,15 +430,17 @@ impl Engine {
                         ExpressionValue::String(ref x) => result.push_str(x),
                         ExpressionValue::Integer(x) => result.push_str(&format!("{}", x)),
                         ExpressionValue::Float(x) => result.push_str(&format!("{}", x)),
-                        ExpressionValue::Identifier(ref x) => match *Lookup::lookup_identifier(data, x, position)? {
-                            Value::String(ref x) => result.push_str(x),
-                            Value::Number(ref x) => result.push_str(&format!("{}", x)),
-                            _ => {
-                                return Err(Error::with_message("unable to concatenate string")
-                                    .context("expected", "number")
-                                    .context("value", format!("{:?}", x)))
+                        ExpressionValue::Identifier(ref x) => {
+                            match *Lookup::lookup_identifier(data, x, position, &self.eval_keyword)? {
+                                Value::String(ref x) => result.push_str(x),
+                                Value::Number(ref x) => result.push_str(&format!("{}", x)),
+                                _ => {
+                                    return Err(Error::with_message("unable to concatenate string")
+                                        .context("expected", "number")
+                                        .context("value", format!("{:?}", x)))
+                                }
                             }
-                        },
+                        }
                         _ => unreachable!("invalid grammar"),
                     };
                 }
@@ -480,7 +484,7 @@ impl Engine {
             }
             ExpressionValue::Boolean(x) => *x,
             ExpressionValue::Identifier(identifier) => {
-                let value = Lookup::lookup_identifier(data, identifier, position)?;
+                let value = Lookup::lookup_identifier(data, identifier, position, &self.eval_keyword)?;
                 if let Value::Bool(value) = value.as_ref() {
                     *value
                 } else {
