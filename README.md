@@ -34,6 +34,11 @@ Anyone should be able to use this crate:
 
 NPM package / browser (Web Assembly) parts are not done yet and are under the construction.
 
+## Documentation
+
+* [API documentation]
+* [Expression language] documentation
+
 ## Usage 
 
 Add as a dependency to your `Cargo.toml`:
@@ -84,3 +89,4 @@ the [license].
 [raise an issue]: https://github.com/balena-io-modules/balena-temen/issues/new
 [API documentation]: https://docs.rs/balena-temen/latest/balena_temen/
 [license]: https://github.com/balena-io-modules/balena-temen/blob/master/LICENSE
+[Expression language]: https://github.com/balena-io-modules/balena-temen/docs/expression.md
