@@ -1,4 +1,25 @@
 - commits:
+    - subject: Add eval & eval_with_engine helper functions
+      hash: 9d88776d3b57c1599002b5fb18f9cc7ad24ce377
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Robert Vojta <robert@balena.io>
+        signed-off-by: Robert Vojta <robert@balena.io>
+      author: Robert Vojta
+    - subject: Move engine related structs to engine module
+      hash: 82feb0e245224a8644e539ba40272b87f7bf6f8b
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Robert Vojta <robert@balena.io>
+        signed-off-by: Robert Vojta <robert@balena.io>
+      author: Robert Vojta
+  version: 0.0.13
+  date: 2018-11-19T14:08:53.877Z
+- commits:
     - subject: Add canonicalize to Identifier
       hash: 4c4a39b522a07083e3fc16d0cfebd7eca9f692bb
       body: ''
