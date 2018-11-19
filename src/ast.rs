@@ -440,6 +440,13 @@ impl Identifier {
         Identifier { values }
     }
 
+    /// Returns `Identifier` with the last identifier value removed
+    pub fn pop(self) -> Result<Identifier> {
+        let mut values = self.values;
+        match values.pop() {
+            Some(_) => Ok(Identifier { values }),
+            None => Err(Error::with_message("unable to pop identifier")),
+        }
     }
 }
 
