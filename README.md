@@ -21,7 +21,7 @@ Provides facilities to:
 
 ## Goal
 
-`balena-temen` crate is one small piece of the [balena] configuration project. This project has
+`balena-temen` crate is one small piece of the [balena.io] configuration project. This project has
 no public / open specification yet, but we're working on it and it will be public once finished.
 
 ## Supported platforms
@@ -37,7 +37,7 @@ NPM package / browser (Web Assembly) parts are not done yet and are under the co
 ## Documentation
 
 * [API documentation]
-* [Expression language] documentation
+* [Expression language documentation]
 
 ## Usage 
 
@@ -72,8 +72,6 @@ let evaluated = json!({
 assert_eq!(eval(data).unwrap(), evaluated);
 ```
 
-You can find more information in the [API documentation].
-
 ## Support
 
 If you're having any problem, please [raise an issue] on GitHub or [contact us], and the [balena.io] team
@@ -81,7 +79,7 @@ will be happy to help.
 
 ## License
 
-WiFi Connect is free software, and may be redistributed under the terms specified in
+`balena-temen` is free software, and may be redistributed under the terms specified in
 the [license].
 
 [balena.io]: https://www.balena.io/
@@ -89,4 +87,4 @@ the [license].
 [raise an issue]: https://github.com/balena-io-modules/balena-temen/issues/new
 [API documentation]: https://docs.rs/balena-temen/latest/balena_temen/
 [license]: https://github.com/balena-io-modules/balena-temen/blob/master/LICENSE
-[Expression language]: https://github.com/balena-io-modules/balena-temen/blob/master/docs/expression.md
+[Expression language documentation]: https://github.com/balena-io-modules/balena-temen/blob/master/docs/expression.md
