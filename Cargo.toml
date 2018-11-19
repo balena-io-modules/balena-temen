@@ -8,6 +8,7 @@ license = "Apache-2.0"
 repository = "https://github.com/balena-io-modules/balena-temen/"
 description = "Templating engine for (not just) JSON"
 categories = ["parsing", "template-engine", "wasm"]
+readme = "README.md"
 
 [badges]
 travis-ci = { repository = "balena-io-modules/balena-temen", branch = "master" }
