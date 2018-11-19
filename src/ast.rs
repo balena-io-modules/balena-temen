@@ -385,12 +385,13 @@ impl Identifier {
     ///
     /// assert_eq!(identifier, parsed);
     /// ```
-    pub fn name<S>(mut self, name: S) -> Identifier
+    pub fn name<S>(self, name: S) -> Identifier
     where
         S: Into<String>,
     {
-        self.values.push(IdentifierValue::Name(name.into()));
-        self
+        let mut values = self.values;
+        values.push(IdentifierValue::Name(name.into()));
+        Identifier { values }
     }
 
     /// Appends `IdentifierValue::Index` to the identifier
@@ -410,9 +411,10 @@ impl Identifier {
     ///
     /// assert_eq!(identifier, parsed);
     /// ```
-    pub fn index(mut self, index: isize) -> Identifier {
-        self.values.push(IdentifierValue::Index(index));
-        self
+    pub fn index(self, index: isize) -> Identifier {
+        let mut values = self.values;
+        values.push(IdentifierValue::Index(index));
+        Identifier { values }
     }
 
     /// Appends `IdentifierValue::Identifier` to the identifier
@@ -432,9 +434,12 @@ impl Identifier {
     ///
     /// assert_eq!(identifier, parsed);
     /// ```
-    pub fn identifier(mut self, identifier: Identifier) -> Identifier {
-        self.values.push(IdentifierValue::Identifier(identifier));
-        self
+    pub fn identifier(self, identifier: Identifier) -> Identifier {
+        let mut values = self.values;
+        values.push(IdentifierValue::Identifier(identifier));
+        Identifier { values }
+    }
+
     }
 }
 
