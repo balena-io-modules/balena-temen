@@ -15,14 +15,11 @@ pub struct Lookup<'a> {
 
 /// Checks that the lookup does not end up with an object containing `eval_keyword`
 fn validate_not_for_evaluation(value: &Value, eval_keyword: &str) -> Result<()> {
-    match value {
-        Value::Object(object) => {
-            if object.contains_key(eval_keyword) {
-                return Err(Error::with_message("unable to lookup identifier"));
-            }
+    if let Value::Object(object) = value {
+        if object.contains_key(eval_keyword) {
+            return Err(Error::with_message("unable to lookup identifier"));
         }
-        _ => {}
-    };
+    }
     Ok(())
 }
 

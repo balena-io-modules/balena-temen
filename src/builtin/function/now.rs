@@ -72,9 +72,9 @@ mod tests {
 
     #[test]
     fn local_rfc3339_as_default() {
-        let dt = DateTime::<Utc>::from_utc(NaiveDateTime::from_timestamp(1541485381, 0), Utc);
+        let dt = DateTime::<Utc>::from_utc(NaiveDateTime::from_timestamp(1_541_485_381, 0), Utc);
         assert_eq!(
-            now_with_cached(dt.clone(), &HashMap::new()).unwrap(),
+            now_with_cached(dt, &HashMap::new()).unwrap(),
             json!(dt.with_timezone(&Local).to_rfc3339())
         );
     }
@@ -84,12 +84,9 @@ mod tests {
         let mut args = HashMap::<String, Value>::new();
         args.insert("utc".to_string(), json!(true));
 
-        let dt = DateTime::<Utc>::from_utc(NaiveDateTime::from_timestamp(1541485381, 0), Utc);
-        assert_eq!(now_with_cached(dt.clone(), &args).unwrap(), json!(dt.to_rfc3339()));
-        assert_eq!(
-            now_with_cached(dt.clone(), &args).unwrap(),
-            json!("2018-11-06T06:23:01+00:00")
-        );
+        let dt = DateTime::<Utc>::from_utc(NaiveDateTime::from_timestamp(1_541_485_381, 0), Utc);
+        assert_eq!(now_with_cached(dt, &args).unwrap(), json!(dt.to_rfc3339()));
+        assert_eq!(now_with_cached(dt, &args).unwrap(), json!("2018-11-06T06:23:01+00:00"));
     }
 
     #[test]
@@ -97,8 +94,8 @@ mod tests {
         let mut args = HashMap::<String, Value>::new();
         args.insert("timestamp".to_string(), json!(true));
 
-        let dt = DateTime::<Utc>::from_utc(NaiveDateTime::from_timestamp(1541485381, 0), Utc);
-        assert_eq!(now_with_cached(dt.clone(), &args).unwrap(), json!(1541485381));
+        let dt = DateTime::<Utc>::from_utc(NaiveDateTime::from_timestamp(1_541_485_381, 0), Utc);
+        assert_eq!(now_with_cached(dt, &args).unwrap(), json!(1_541_485_381));
     }
 
     #[test]
@@ -106,11 +103,11 @@ mod tests {
         let mut args = HashMap::<String, Value>::new();
         args.insert("timestamp".to_string(), json!(true));
 
-        let dt = DateTime::<Utc>::from_utc(NaiveDateTime::from_timestamp(1541485381, 0), Utc);
-        assert_eq!(now_with_cached(dt.clone(), &args).unwrap(), json!(1541485381));
+        let dt = DateTime::<Utc>::from_utc(NaiveDateTime::from_timestamp(1_541_485_381, 0), Utc);
+        assert_eq!(now_with_cached(dt, &args).unwrap(), json!(1_541_485_381));
 
         args.insert("utc".to_string(), json!(true));
-        assert_eq!(now_with_cached(dt.clone(), &args).unwrap(), json!(1541485381));
+        assert_eq!(now_with_cached(dt, &args).unwrap(), json!(1_541_485_381));
     }
 
     #[test]

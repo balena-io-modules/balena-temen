@@ -206,7 +206,7 @@ impl fmt::Display for Error {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         writeln!(f, "temen: {}", self.inner.message)?;
 
-        if self.inner.frames.len() == 0 {
+        if self.inner.frames.is_empty() {
             return Ok(());
         }
 
