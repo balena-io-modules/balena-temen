@@ -137,7 +137,10 @@ pub use crate::{
         function::FunctionFn,
     },
     context::Context,
-    engine::{Engine, EngineBuilder}
+    engine::{
+        builder::EngineBuilder,
+        Engine
+    }
 };
 
 pub(crate) mod builtin;
@@ -146,6 +149,5 @@ pub mod ast;
 mod context;
 mod engine;
 pub mod error;
-mod lookup;
 mod parser;
 mod utils;

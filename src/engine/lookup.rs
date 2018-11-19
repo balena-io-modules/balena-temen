@@ -5,20 +5,35 @@ use serde_json::Value;
 use crate::ast::*;
 use crate::error::*;
 
-/// Lookup identifier
-pub trait Lookup {
+/// Provide a way to lookup an identifier (variable) value
+pub struct Lookup<'a> {
+    /// Whole structure (JSON) with variable values
+    data: &'a Value,
+    /// Stack of values for every identifier component (variable name, array index, ...)
+    stack: Vec<&'a Value>,
+}
+
+impl<'a> Lookup<'a> {
+    pub fn new(data: &'a Value) -> Lookup<'a> {
+        Lookup {
+            data,
+            stack: vec![data],
+        }
+    }
+
     /// Lookup identifier (variable) value
     ///
     /// # Arguments
     ///
+    /// * `data` - Variable values (whole JSON)
     /// * `identifier` - An identifier (variable) to lookup
     /// * `position` - An initial position for relative lookups
-    fn lookup_identifier<'a>(&'a self, identifier: &Identifier, position: &Identifier) -> Result<Cow<'a, Value>>;
-}
-
-impl Lookup for Value {
-    fn lookup_identifier<'a>(&'a self, identifier: &Identifier, position: &Identifier) -> Result<Cow<'a, Value>> {
-        let mut lookup = LookupStack::new(self);
+    pub fn lookup_identifier<'b>(
+        data: &'b Value,
+        identifier: &Identifier,
+        position: &Identifier,
+    ) -> Result<Cow<'b, Value>> {
+        let mut lookup = Lookup::new(data);
 
         let canonical = identifier.canonicalize(position)?;
 
@@ -30,23 +45,6 @@ impl Lookup for Value {
             Error::with_message("unable to lookup identifier").context("reason", "empty stack = invalid identifier")
         })?);
         Ok(result)
-    }
-}
-
-/// Provide a way to lookup an identifier (variable) value
-pub struct LookupStack<'a> {
-    /// Whole structure (JSON) with variable values
-    root: &'a Value,
-    /// Stack of values for every identifier component (variable name, array index, ...)
-    stack: Vec<&'a Value>,
-}
-
-impl<'a> LookupStack<'a> {
-    pub fn new(root: &'a Value) -> LookupStack<'a> {
-        LookupStack {
-            root,
-            stack: vec![root],
-        }
     }
 
     /// Update stack with next identifier value
@@ -134,7 +132,7 @@ impl<'a> LookupStack<'a> {
                 //
                 // We have to create new Lookup structure and lookup this identifier
                 // from scratch to avoid existing stack modifications
-                match self.root.lookup_identifier(identifier, position)?.as_ref() {
+                match Lookup::lookup_identifier(self.data, identifier, position)?.as_ref() {
                     // If we were able to lookup the value, treat it as an String or Number index
                     Value::String(ref x) => {
                         self.update_with_identifier_value(&IdentifierValue::Name(x.to_string()), position)?
