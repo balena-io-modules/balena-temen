@@ -89,4 +89,4 @@ the [license].
 [raise an issue]: https://github.com/balena-io-modules/balena-temen/issues/new
 [API documentation]: https://docs.rs/balena-temen/latest/balena_temen/
 [license]: https://github.com/balena-io-modules/balena-temen/blob/master/LICENSE
-[Expression language]: https://github.com/balena-io-modules/balena-temen/docs/expression.md
+[Expression language]: https://github.com/balena-io-modules/balena-temen/blob/master/docs/expression.md
