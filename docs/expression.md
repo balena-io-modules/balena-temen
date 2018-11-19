@@ -62,8 +62,8 @@ Given the following JSON:
 }
 ```
 
-* `networks.0.ssid` is resolved as `"Balena"` string
-* `networks[0]["ssid"]` is resolved as `"Balena"` string
+* `networks.0.ssid` is evaluated as `"Balena"`
+* `networks[0]["ssid"]` is evaluated as `"Balena"`
 
 All variables are considered as absolute (evaluation starts from the JSON root) unless they
 are prefixed with `this` or `super` keyword. `this` keyword denotes the current object and
@@ -82,12 +82,12 @@ Given the following JSON:
 }
 ```
 
-* `wifi.id` contains `$$eval` with the `super.ssid | slugify` value
-* `super` is resolved as `wifi`
-* `super.ssid` is resolved as `wifi.ssid`
-* `wifi.ssid` is resolved as `"Balena Guest"` string
+* `wifi.id` contains the `$$eval` keyword with the `super.ssid | slugify` value
+* `super` is evaluated as the `wifi` object
+* `super.ssid` is evaluated as the `wifi.ssid` field
+* `wifi.ssid` is evaluated as the `"Balena Guest"` string
 * `| slugify` applies `slugify` filter to the input value
-* the whole expression is resolved as `balena-guest`
+* the whole expression is evaluated as the `"balena-guest"` string
   
 The sample JSON evaluates to:
 
@@ -116,11 +116,11 @@ Square brackets allows you to use variables as well. Given the following JSON:
 }
 ``` 
 
-* `bossCompanyName` contains `$$eval` with the `people[bossId].company` value
-* `bossId` is a variable (no `''`, `""` or back ticks) and is resolved as `"123"` string
+* `bossCompanyName` contains the `$$eval` keyword with the `people[bossId].company` value
+* `bossId` is a variable (no `''`, `""` or back ticks) and is evaluated as the `"123"` string
 * the intermediate expression is `people["123"].company`
-* `people["123"]` is resolved as `{ "company": "Balena" }` object
-* `people["123"].company` is resolved as `"Balena"` string
+* `people["123"]` is evaluated as the `{ "company": "Balena" }` object
+* `people["123"].company` is evaluated as the `"Balena"` string
 
 ## Expressions
 
@@ -180,68 +180,84 @@ Example:
 
 ### Builtin filters
 
-#### lower
+| Filter | Description |
+| --- | --- |
+| [`date`](#filter-date) | Formats a timestamp as a date (`YYYY-MM-DD`) |
+| [`datetime`](#filter-datetime) | Formats a timestamp as a date time (`YYYY-MM-DDTHH:MM:SSZ`) |
+| [`lower`](#filter-lower) | Lower cases a string |
+| [`slugify`](#filter-slugify) |  Transforms a string into a slug |
+| [`time`](#filter-time) | Formats a timestamp as a time (`HH:MM:SS`) |
+| [`trim`](#filter-trim) | Removes leading and trailing whitespaces |
+| [`upper`](#filter-upper) | Upper cases a string |
 
-Lowercase a string.
+#### Filter lower
+
+Lower cases a string.
 
 Example:
 
-* `"HaLlO" | lower` is resolved as `"hallo"` string
+* `"HaLlO" | lower` is resolved as `"hallo"`
 
-#### slugify
+#### Filter slugify
 
 String is transformed into ASCII, lower cased, trimmed, spaces are converted to
 hyphens and all other (not letters, numbers, hyphens) characters removed.
 
 Example:
 
-* `"  Balena Ltd! " | slugify` is resolved as `"balena-ltd"` string
+* `"  Balena Ltd! " | slugify` is resolved as `"balena-ltd"`
 
-#### trim
+#### Filter trim
 
 Leading and trailing whitespace characters are removed.
 
-#### date
+Example:
 
-Parse a timestamp into a date string. Format defaults to `YYYY-MM-DD`.
+* `"  aa   " | trim` is resolved as `"aa"`
 
+#### Filter date
+
+Formats a timestamp into a date string.
+
+Format defaults to `YYYY-MM-DD` and can be changed via the `format` argument.
 Full reference of the format syntax is available in the [chrono documentation].
 
 Example:
 
-* `ts | date`
-* `ts | date(format="%Y-%m-%d %H:%M")`
+* `12345678 | date`
+* `12345678 | date(format="%Y-%m-%d %H:%M")`
 
-#### time
+#### Filter time
 
-Parse a timestamp into a time string. Format defaults to `HH:MM:SS`.
+Formats a timestamp into a time string.
 
+Format defaults to `HH:MM:SS` and can be changed via the `format` argument.
 Full reference of the format syntax is available in the [chrono documentation].
 
 Example:
 
-* `ts | time`
-* `ts | time(format="%Y-%m-%d %H:%M")`
+* `12345678 | time`
+* `12345678 | time(format="%Y-%m-%d %H:%M")`
 
-#### datetime
+#### Filter datetime
 
-Parse a timestamp into a date time string. Format defaults to `YYYY-MM-DDTHH:MM:SSZ`.
+Formats a timestamp into a date time string.
 
+Format defaults to `YYYY-MM-DDTHH:MM:SSZ` and can be changed via the `format` argument.
 Full reference of the format syntax is available in the [chrono documentation].
 
 Example:
 
-* `ts | date-time`
-* `ts | date-time(format="%Y-%m-%d %H:%M")`
+* `12345678 | datetime`
+* `12345678 | datetime(format="%Y-%m-%d %H:%M")`
 
-#### upper
+#### Filter upper
 
-Uppercase a string.
+Upper cases a string.
 
 Example:
 
-* `"HaLlO" | upper` is resolved as `"HALLO"` string
-
+* `"HaLlO" | upper` is resolved as `"HALLO"`
 
 ## Functions
 
@@ -250,15 +266,24 @@ Functions can be called without arguments (`uuidv4()`) or with named arguments
 
 ### Builtin functions
 
-#### uuidv4
+| Filter | Description |
+| --- | --- |
+| [`uuidv4`](#function-uuidv4) | Generates random UUID v4 |
+| [`now`](#filter-now) | Returns the local date time / timestamp |
 
-Generates random UUID v4 in a hexadecimal notation (string).
+#### Function uuidv4
 
-#### now
+Generates random UUID v4 in a hexadecimal, lower case, notation.
 
-Returns the local datetime as a string or the timestamp as an integer.
+Example:
 
-Optional arguments:
+* `uuidv4()`
+
+#### Function now
+
+Returns the local date time as a string (by default) or as a timestamp (integer).
+
+Arguments:
 
 * `timestamp` - whether to return the timestamp (integer) instead of the date time (string)
   * defaults to `false`
