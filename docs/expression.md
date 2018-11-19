@@ -110,13 +110,13 @@ Square brackets allows you to use variables as well. Given the following JSON:
             "company": "Balena"
         }
     },
-    "bossName": {
+    "bossCompanyName": {
         "$$eval": "people[bossId].company"
     }
 }
 ``` 
 
-* `bossName` contains `$$eval` with the `people[bossId].company` value
+* `bossCompanyName` contains `$$eval` with the `people[bossId].company` value
 * `bossId` is a variable (no `''`, `""` or back ticks) and is resolved as `"123"` string
 * the intermediate expression is `people["123"].company`
 * `people["123"]` is resolved as `{ "company": "Balena" }` object
