@@ -77,9 +77,10 @@ will be happy to help.
 ## License
 
 WiFi Connect is free software, and may be redistributed under the terms specified in
-the [license](https://github.com/balena-io/wifi-connect/blob/master/LICENSE).
+the [license].
 
 [balena.io]: https://www.balena.io/
-[contact us]: https://balena.io/community/
+[contact us]: https://forums.balena.io/
 [raise an issue]: https://github.com/balena-io-modules/balena-temen/issues/new
 [API documentation]: https://docs.rs/balena-temen/latest/balena_temen/
+[license]: https://github.com/balena-io-modules/balena-temen/blob/master/LICENSE
