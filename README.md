@@ -1,6 +1,9 @@
 # balena temen
 
 [![Build Status](https://travis-ci.org/balena-io-modules/balena-temen.svg?branch=master)](https://travis-ci.org/balena-io-modules/balena-temen)
+[![Current Release](https://img.shields.io/github/tag/balena-io-modules/balena-temen.svg?style=flat-square)](https://github.com/balena-io-modules/balena-temen/tags)
+[![License](https://img.shields.io/github/license/balena-io-modules/balena-temen.svg?style=flat-square)](https://github.com/balena-io-modules/balena-temen/blob/master/LICENSE)
+[![Issues](https://img.shields.io/github/issues/balena-io-modules/balena-temen.svg?style=flat-square)](https://github.com/balena-io-modules/balena-temen/issues)
 
 A templating engine for JSON.
 
@@ -11,6 +14,10 @@ Provides facilities to:
 * evaluate single expression (result is of any type)
 * evaluate single logical expression (result is a boolean)
 * retrieve [AST](https://en.wikipedia.org/wiki/Abstract_syntax_tree) of any expression / identifier
+
+<div align="center">
+  <sub>an open source :satellite: project by <a href="https://www.balena.io">balena.io</a></sub>
+</div>
 
 ## Goal
 
@@ -62,5 +69,17 @@ assert_eq!(eval(data).unwrap(), evaluated);
 
 You can find more information in the [API documentation].
 
-[balena]: https://www.balena.io/
+## Support
+
+If you're having any problem, please [raise an issue] on GitHub or [contact us], and the [balena.io] team
+will be happy to help.
+
+## License
+
+WiFi Connect is free software, and may be redistributed under the terms specified in
+the [license](https://github.com/balena-io/wifi-connect/blob/master/LICENSE).
+
+[balena.io]: https://www.balena.io/
+[contact us]: https://balena.io/community/
+[raise an issue]: https://github.com/balena-io-modules/balena-temen/issues/new
 [API documentation]: https://docs.rs/balena-temen/latest/balena_temen/
