@@ -9,7 +9,7 @@ cargo fmt -- --check
 if [ ! "$CI" == "true" ]; then
     # When running locally, we have to clean the project, otherwise clippy
     # won't do nothing if the project was already compiled
-    cargo clean
+    cargo clippy --all-targets --all-features -- -D warnings
 fi
 cargo clippy
 
