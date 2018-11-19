@@ -223,11 +223,11 @@ impl fmt::Display for Error {
                 context_indent = " | ";
             }
 
-            write!(f, "{} frame[{}]", frame_indent, frame_idx);
+            write!(f, "{} frame[{}]", frame_indent, frame_idx)?;
             if frame.name.is_some() {
-                writeln!(f, ": {}", frame.name.as_ref().unwrap());
+                writeln!(f, ": {}", frame.name.as_ref().unwrap())?;
             } else {
-                writeln!(f);
+                writeln!(f)?;
             }
 
             if !frame.context.is_empty() {
