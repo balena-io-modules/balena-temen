@@ -1,4 +1,34 @@
 - commits:
+    - subject: Add docs links to README.md
+      hash: 411b1b8c197b6ca3bb89a7c1eaa1efaad2b73edd
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Robert Vojta <robert@balena.io>
+        signed-off-by: Robert Vojta <robert@balena.io>
+      author: Robert Vojta
+    - subject: Add expression language docs
+      hash: d40b2544fc6117bef7bab52d68b8b49e84b95f75
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Robert Vojta <robert@balena.io>
+        signed-off-by: Robert Vojta <robert@balena.io>
+      author: Robert Vojta
+    - subject: Update README
+      hash: 41a50b2b62e9724c0716205af8da047e79a1dc2b
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Robert Vojta <robert@balena.io>
+        signed-off-by: Robert Vojta <robert@balena.io>
+      author: Robert Vojta
+  version: 0.0.14
+  date: 2018-11-19T17:32:57.456Z
+- commits:
     - subject: Add eval & eval_with_engine helper functions
       hash: 9d88776d3b57c1599002b5fb18f9cc7ad24ce377
       body: ''
