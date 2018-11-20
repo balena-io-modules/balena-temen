@@ -59,7 +59,7 @@ fn item_to_eval(value: &Value, position: &Identifier, keyword: &str) -> Result<O
 /// * `value` - A value to traverse
 /// * `position` - Current value position
 /// * `keyword` - An evaluation keyword
-fn items_to_eval(value: &Value, position: Identifier, keyword: &str) -> Result<Option<Vec<Item>>> {
+fn items_to_eval(value: &Value, position: &Identifier, keyword: &str) -> Result<Option<Vec<Item>>> {
     match value {
         Value::Null | Value::String(_) | Value::Number(_) | Value::Bool(_) => {
             // There's nothing to evaluate
@@ -70,16 +70,15 @@ fn items_to_eval(value: &Value, position: Identifier, keyword: &str) -> Result<O
             let mut result = vec![];
 
             for (idx, value) in array.iter().enumerate() {
-                match items_to_eval(value, position.clone().index(idx as isize), keyword)? {
-                    Some(items) => result.extend(items),
-                    None => {}
-                };
+                if let Some(items) = items_to_eval(value, &position.clone().index(idx as isize), keyword)? {
+                    result.extend(items);
+                }
             }
 
-            if result.len() > 0 {
-                Ok(Some(result))
-            } else {
+            if result.is_empty() {
                 Ok(None)
+            } else {
+                Ok(Some(result))
             }
         }
         Value::Object(ref object) => match item_to_eval(value, &position, keyword)? {
@@ -92,16 +91,15 @@ fn items_to_eval(value: &Value, position: Identifier, keyword: &str) -> Result<O
                 let mut result = vec![];
 
                 for (k, v) in object {
-                    match items_to_eval(v, position.clone().name(k.to_string()), keyword)? {
-                        Some(items) => result.extend(items),
-                        None => {}
-                    };
+                    if let Some(items) = items_to_eval(v, &position.clone().name(k.to_string()), keyword)? {
+                        result.extend(items);
+                    }
                 }
 
-                if result.len() > 0 {
-                    Ok(Some(result))
-                } else {
+                if result.is_empty() {
                     Ok(None)
+                } else {
+                    Ok(Some(result))
                 }
             }
         },
@@ -150,7 +148,7 @@ fn replace_value(data: Value, new_value: Value, position: &Identifier) -> Value 
 // We will see what kind of DSLs we will have and if we will need to create
 // dependency tree, detect circular dependencies, analyze if we can evaluate
 // before the actual evaluation, etc.
-fn eval_with_items(data: Value, items: Vec<Item>, engine: &Engine, context: &mut Context) -> Result<Value> {
+fn eval_with_items(data: Value, items: &[Item], engine: &Engine, context: &mut Context) -> Result<Value> {
     let mut fail_counter;
     let mut success_counter;
     let mut data = data;
@@ -159,7 +157,7 @@ fn eval_with_items(data: Value, items: Vec<Item>, engine: &Engine, context: &mut
         fail_counter = 0;
         success_counter = 0;
 
-        for item in &items {
+        for item in items {
             match engine.eval(&item.expression, &item.position, &data, context) {
                 Err(_) => fail_counter += 1,
                 Ok(new_value) => {
@@ -233,9 +231,10 @@ pub fn eval(data: Value) -> Result<Value> {
     let engine = Engine::default();
     let mut context = Context::default();
 
-    match items_to_eval(&data, Identifier::default(), engine.eval_keyword())? {
-        Some(items) => eval_with_items(data, items, &engine, &mut context),
-        None => Ok(data),
+    if let Some(items) = items_to_eval(&data, &Identifier::default(), engine.eval_keyword())? {
+        eval_with_items(data, &items, &engine, &mut context)
+    } else {
+        Ok(data)
     }
 }
 
@@ -268,8 +267,9 @@ pub fn eval(data: Value) -> Result<Value> {
 /// [`eval`]: fn.eval.html
 /// [`Engine`]: struct.Engine.html
 pub fn eval_with_engine(data: Value, engine: &Engine, context: &mut Context) -> Result<Value> {
-    match items_to_eval(&data, Identifier::default(), engine.eval_keyword())? {
-        Some(items) => eval_with_items(data, items, engine, context),
-        None => Ok(data),
+    if let Some(items) = items_to_eval(&data, &Identifier::default(), engine.eval_keyword())? {
+        eval_with_items(data, &items, engine, context)
+    } else {
+        Ok(data)
     }
 }

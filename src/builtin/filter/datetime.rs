@@ -62,7 +62,7 @@ mod tests {
         let args = HashMap::new();
         let mut ctx = Context::default();
 
-        assert_eq!(time(&json!(1541485381), &args, &mut ctx).unwrap(), json!("06:23:01"));
+        assert_eq!(time(&json!(1_541_485_381), &args, &mut ctx).unwrap(), json!("06:23:01"));
     }
 
     #[test]
@@ -70,7 +70,10 @@ mod tests {
         let args = HashMap::new();
         let mut ctx = Context::default();
 
-        assert_eq!(date(&json!(1541485381), &args, &mut ctx).unwrap(), json!("2018-11-06"));
+        assert_eq!(
+            date(&json!(1_541_485_381), &args, &mut ctx).unwrap(),
+            json!("2018-11-06")
+        );
     }
 
     #[test]
@@ -79,7 +82,7 @@ mod tests {
         let mut ctx = Context::default();
 
         assert_eq!(
-            datetime(&json!(1541485381), &args, &mut ctx).unwrap(),
+            datetime(&json!(1_541_485_381), &args, &mut ctx).unwrap(),
             json!("2018-11-06T06:23:01+00:00")
         );
     }
@@ -90,37 +93,37 @@ mod tests {
 
         args.insert("format".to_string(), json!("%Y"));
         assert_eq!(
-            format_timestamp("", &json!(1541485381), &args, "").unwrap(),
+            format_timestamp("", &json!(1_541_485_381), &args, "").unwrap(),
             json!("2018")
         );
 
         args.insert("format".to_string(), json!("%m"));
         assert_eq!(
-            format_timestamp("", &json!(1541485381), &args, "").unwrap(),
+            format_timestamp("", &json!(1_541_485_381), &args, "").unwrap(),
             json!("11")
         );
 
         args.insert("format".to_string(), json!("%d"));
         assert_eq!(
-            format_timestamp("", &json!(1541485381), &args, "").unwrap(),
+            format_timestamp("", &json!(1_541_485_381), &args, "").unwrap(),
             json!("06")
         );
 
         args.insert("format".to_string(), json!("%H"));
         assert_eq!(
-            format_timestamp("", &json!(1541485381), &args, "").unwrap(),
+            format_timestamp("", &json!(1_541_485_381), &args, "").unwrap(),
             json!("06")
         );
 
         args.insert("format".to_string(), json!("%M"));
         assert_eq!(
-            format_timestamp("", &json!(1541485381), &args, "").unwrap(),
+            format_timestamp("", &json!(1_541_485_381), &args, "").unwrap(),
             json!("23")
         );
 
         args.insert("format".to_string(), json!("%S"));
         assert_eq!(
-            format_timestamp("", &json!(1541485381), &args, "").unwrap(),
+            format_timestamp("", &json!(1_541_485_381), &args, "").unwrap(),
             json!("01")
         );
     }
@@ -130,18 +133,18 @@ mod tests {
         let mut args = HashMap::new();
 
         args.insert("format".to_string(), json!(1));
-        assert!(format_timestamp("", &json!(1541485381), &args, "").is_err());
+        assert!(format_timestamp("", &json!(1_541_485_381), &args, "").is_err());
 
         args.insert("format".to_string(), json!(1.2));
-        assert!(format_timestamp("", &json!(1541485381), &args, "").is_err());
+        assert!(format_timestamp("", &json!(1_541_485_381), &args, "").is_err());
 
         args.insert("format".to_string(), json!(true));
-        assert!(format_timestamp("", &json!(1541485381), &args, "").is_err());
+        assert!(format_timestamp("", &json!(1_541_485_381), &args, "").is_err());
 
         args.insert("format".to_string(), json!(["a", "b"]));
-        assert!(format_timestamp("", &json!(1541485381), &args, "").is_err());
+        assert!(format_timestamp("", &json!(1_541_485_381), &args, "").is_err());
 
         args.insert("format".to_string(), json!({"a": "b"}));
-        assert!(format_timestamp("", &json!(1541485381), &args, "").is_err());
+        assert!(format_timestamp("", &json!(1_541_485_381), &args, "").is_err());
     }
 }

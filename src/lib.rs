@@ -7,6 +7,8 @@
 //! * evaluate an expression as a boolean (logical expressions)
 //! * register custom functions and filters
 //!
+//! [Expression language documentation].
+//!
 //! # Versioning
 //!
 //! This crate is being actively developed and it does NOT follow [Semantic Versioning] yet.
@@ -185,6 +187,7 @@
 //! [`EngineBuilder::function`]: struct.EngineBuilder.html#method.function
 //! [`EngineBuilder::filter`]: struct.EngineBuilder.html#method.filter
 //! [Semantic Versioning]: https://semver.org/
+//! [Expression language documentation]: https://github.com/balena-io-modules/balena-temen/blob/master/docs/expression.md
 #![allow(clippy::possible_missing_comma)]
 
 pub use serde_json::Value;
