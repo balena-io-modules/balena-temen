@@ -3,19 +3,14 @@
 set -e
 set -o pipefail
 
-cargo test
+# repo.yml.type = rust-* (rust-crate, rust-crate-wasm)
 cargo fmt -- --check
+cargo clippy --all-targets --all-features -- -D warnings
 
-if [ ! "$CI" == "true" ]; then
-    # When running locally, we have to clean the project, otherwise clippy
-    # won't do nothing if the project was already compiled
-    cargo clippy --all-targets --all-features -- -D warnings
-fi
-cargo clippy
+# repo.yml.type = rust-* (rust-crate, rust-crate-wasm)
+cargo test
 
-if [ ! "$CI" == "true" ]; then
-    # Allow uncommitted changes when running locally
-    CARGO_PACKAGE_FLAGS="--allow-dirty"
-fi
-
-cargo package ${CARGO_PACKAGE_FLAGS}
+# repo.yml.type = rust-* (rust-crate, rust-crate-wasm)
+#
+# Tries to create the package, but not publish it
+cargo package
