@@ -3,15 +3,14 @@
 set -e
 set -o pipefail
 
-# good to have if we cache builds
-cargo clean
-
-# linters
+# repo.yml.type = rust-* (rust-crate, rust-crate-wasm)
 cargo fmt -- --check
 cargo clippy --all-targets --all-features -- -D warnings
 
-# build and test debug version
+# repo.yml.type = rust-* (rust-crate, rust-crate-wasm)
 cargo test
 
-# test packaging but do not publish
+# repo.yml.type = rust-* (rust-crate, rust-crate-wasm)
+#
+# Tries to create the package, but not publish it
 cargo package
