@@ -3,19 +3,15 @@
 set -e
 set -o pipefail
 
-cargo test
+# good to have if we cache builds
+cargo clean
+
+# linters
 cargo fmt -- --check
+cargo clippy --all-targets --all-features -- -D warnings
 
-if [ ! "$CI" == "true" ]; then
-    # When running locally, we have to clean the project, otherwise clippy
-    # won't do nothing if the project was already compiled
-    cargo clippy --all-targets --all-features -- -D warnings
-fi
-cargo clippy
+# build and test debug version
+cargo test
 
-if [ ! "$CI" == "true" ]; then
-    # Allow uncommitted changes when running locally
-    CARGO_PACKAGE_FLAGS="--allow-dirty"
-fi
-
-cargo package ${CARGO_PACKAGE_FLAGS}
+# test packaging but do not publish
+cargo package
