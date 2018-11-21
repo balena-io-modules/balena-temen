@@ -1,4 +1,25 @@
 - commits:
+    - subject: Reformat with new rustfmt
+      hash: 3253fe60b2c8430770f4c1bee2042c5fc3bf9506
+      body: |
+        New version of rustfmt just got released and it got downloaded on travis
+        and it has more strict checks - make the checks happy again.
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Cyryl Płotnicki
+    - subject: Optimize CI scripts
+      hash: 16efd8c67f514bdb1b23b83206ad287ff1180cb7
+      body: |
+        Make CI scripts generic and also optimize for speed of giving feedback.
+        Install rustup explicitly.
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Cyryl Płotnicki
+  version: 0.0.15
+  date: 2018-11-21T13:07:19.455Z
+- commits:
     - subject: Add docs links to README.md
       hash: 411b1b8c197b6ca3bb89a7c1eaa1efaad2b73edd
       body: ''
