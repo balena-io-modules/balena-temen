@@ -120,15 +120,15 @@ fn fail_on_unknown_dotted_identifier() {
 #[test]
 fn dotted_identifier_integer_index() {
     let data = json!({
-        "root": [
-            "hallo",
-            10,
-            3.2,
-            true,
-            ["a", "b"],
-            {"a": "b"},
-            null
-        ]});
+    "root": [
+        "hallo",
+        10,
+        3.2,
+        true,
+        ["a", "b"],
+        {"a": "b"},
+        null
+    ]});
 
     test_lookup_eq!("root.0", data, json!("hallo"));
     test_lookup_eq!("root.1", data, json!(10));
@@ -142,15 +142,15 @@ fn dotted_identifier_integer_index() {
 #[test]
 fn fail_on_dotted_identifier_integer_index_out_of_bounds() {
     let data = json!({
-        "root": [
-            "hallo",
-            10,
-            3.2,
-            true,
-            ["a", "b"],
-            {"a": "b"},
-            null
-        ]});
+    "root": [
+        "hallo",
+        10,
+        3.2,
+        true,
+        ["a", "b"],
+        {"a": "b"},
+        null
+    ]});
 
     test_lookup_err!("root.7", data);
 }
@@ -158,14 +158,14 @@ fn fail_on_dotted_identifier_integer_index_out_of_bounds() {
 #[test]
 fn dotted_identifier_integer_index_mixed() {
     let data = json!({
-        "people": [
-            {
-                "name": "Robert"
-            },
-            {
-                "name": "Cyryl"
-            }
-        ]});
+    "people": [
+        {
+            "name": "Robert"
+        },
+        {
+            "name": "Cyryl"
+        }
+    ]});
 
     test_lookup_eq!("people.0[`name`]", data, json!("Robert"));
     test_lookup_eq!("people.0.name", data, json!("Robert"));
@@ -221,15 +221,15 @@ fn fail_on_square_bracket_string_invalid_index() {
 #[test]
 fn square_bracket_integer() {
     let data = json!({
-        "root": [
-            "hallo",
-            10,
-            3.2,
-            true,
-            ["a", "b"],
-            {"a": "b"},
-            null
-        ]});
+    "root": [
+        "hallo",
+        10,
+        3.2,
+        true,
+        ["a", "b"],
+        {"a": "b"},
+        null
+    ]});
 
     test_lookup_eq!("root[0]", data, json!("hallo"));
     test_lookup_eq!("root[1]", data, json!(10));
@@ -243,15 +243,15 @@ fn square_bracket_integer() {
 #[test]
 fn fail_on_square_bracket_integer_out_of_bounds() {
     let data = json!({
-        "root": [
-            "hallo",
-            10,
-            3.2,
-            true,
-            ["a", "b"],
-            {"a": "b"},
-            null
-        ]});
+    "root": [
+        "hallo",
+        10,
+        3.2,
+        true,
+        ["a", "b"],
+        {"a": "b"},
+        null
+    ]});
 
     test_lookup_err!("root[7]", data);
 }
@@ -259,15 +259,15 @@ fn fail_on_square_bracket_integer_out_of_bounds() {
 #[test]
 fn square_bracket_negative_integer() {
     let data = json!({
-        "root": [
-            "hallo",
-            10,
-            3.2,
-            true,
-            ["a", "b"],
-            {"a": "b"},
-            null
-        ]});
+    "root": [
+        "hallo",
+        10,
+        3.2,
+        true,
+        ["a", "b"],
+        {"a": "b"},
+        null
+    ]});
 
     test_lookup_eq!("root[-7]", data, json!("hallo"));
     test_lookup_eq!("root[-6]", data, json!(10));
@@ -281,15 +281,15 @@ fn square_bracket_negative_integer() {
 #[test]
 fn fail_on_square_bracket_negative_integer_out_of_bounds() {
     let data = json!({
-        "root": [
-            "hallo",
-            10,
-            3.2,
-            true,
-            ["a", "b"],
-            {"a": "b"},
-            null
-        ]});
+    "root": [
+        "hallo",
+        10,
+        3.2,
+        true,
+        ["a", "b"],
+        {"a": "b"},
+        null
+    ]});
 
     test_lookup_err!("root[-8]", data);
 }
@@ -297,14 +297,14 @@ fn fail_on_square_bracket_negative_integer_out_of_bounds() {
 #[test]
 fn square_bracket_mixed() {
     let data = json!({
-        "people": [
-            {
-                "name": "Robert"
-            },
-            {
-                "name": "Cyryl"
-            }
-        ]});
+    "people": [
+        {
+            "name": "Robert"
+        },
+        {
+            "name": "Cyryl"
+        }
+    ]});
 
     test_lookup_eq!("people[0][`name`]", data, json!("Robert"));
     test_lookup_eq!("people[0].name", data, json!("Robert"));
@@ -315,20 +315,20 @@ fn square_bracket_mixed() {
 #[test]
 fn square_bracket_indirect() {
     let data = json!({
-        "first": 0,
-        "second": 1,
-        "boolean": true,
-        "array": ["a", "b"],
-        "object": {"a": "b"},
-        "null": null,
-        "people": [
-            {
-                "name": "Robert"
-            },
-            {
-                "name": "Cyryl"
-            }
-        ]});
+    "first": 0,
+    "second": 1,
+    "boolean": true,
+    "array": ["a", "b"],
+    "object": {"a": "b"},
+    "null": null,
+    "people": [
+        {
+            "name": "Robert"
+        },
+        {
+            "name": "Cyryl"
+        }
+    ]});
 
     test_lookup_eq!("people[first][`name`]", data, json!("Robert"));
     test_lookup_eq!("people[first].name", data, json!("Robert"));
@@ -339,20 +339,20 @@ fn square_bracket_indirect() {
 #[test]
 fn fail_on_square_bracket_indirect_invalid_type() {
     let data = json!({
-        "first": 0,
-        "second": 1,
-        "boolean": true,
-        "array": ["a", "b"],
-        "object": {"a": "b"},
-        "null": null,
-        "people": [
-            {
-                "name": "Robert"
-            },
-            {
-                "name": "Cyryl"
-            }
-        ]});
+    "first": 0,
+    "second": 1,
+    "boolean": true,
+    "array": ["a", "b"],
+    "object": {"a": "b"},
+    "null": null,
+    "people": [
+        {
+            "name": "Robert"
+        },
+        {
+            "name": "Cyryl"
+        }
+    ]});
 
     test_lookup_err!("people[boolean].name", data);
     test_lookup_err!("people[array].name", data);
@@ -363,19 +363,19 @@ fn fail_on_square_bracket_indirect_invalid_type() {
 #[test]
 fn square_bracket_multiple_indirect() {
     let data = json!({
-        "country": "Czech Republic",
-        "city": "Hradec Kralove",
-        "data": {
-            "country": {
-                "Czech Republic": {
-                    "city": {
-                        "Hradec Kralove": {
-                            "rust-developers": 1
-                        }
+    "country": "Czech Republic",
+    "city": "Hradec Kralove",
+    "data": {
+        "country": {
+            "Czech Republic": {
+                "city": {
+                    "Hradec Kralove": {
+                        "rust-developers": 1
                     }
                 }
             }
-        }});
+        }
+    }});
 
     test_lookup_eq!("data.country[country].city[city]['rust-developers']", data, json!(1));
 }
@@ -383,17 +383,17 @@ fn square_bracket_multiple_indirect() {
 #[test]
 fn square_bracket_nested_indirect() {
     let data = json!({
-        "name": "czech",
+    "name": "czech",
+    "country": {
+        "czech": "Czech Republic"
+    },
+    "data": {
         "country": {
-            "czech": "Czech Republic"
-        },
-        "data": {
-            "country": {
-                "Czech Republic": {
-                    "rust-developers": 2
-                }
+            "Czech Republic": {
+                "rust-developers": 2
             }
-        }});
+        }
+    }});
 
     test_lookup_eq!("data.country[country[name]]['rust-developers']", data, json!(2));
 }
@@ -401,12 +401,12 @@ fn square_bracket_nested_indirect() {
 #[test]
 fn relative_lookup() {
     let data = json!({
-        "first": 0,
-        "second": 1,
-        "names": [
-            "Robert",
-            "Cyryl"
-        ]});
+    "first": 0,
+    "second": 1,
+    "names": [
+        "Robert",
+        "Cyryl"
+    ]});
 
     test_lookup_eq!("this", data.clone(), "first", json!(0));
     test_lookup_eq!("this.this.this", data.clone(), "first", json!(0));
