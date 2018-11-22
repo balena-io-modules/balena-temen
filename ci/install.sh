@@ -7,6 +7,7 @@ set -o pipefail
 #
 # Install Rust in a version specified in the `rust-toolchain` file
 curl https://sh.rustup.rs -sSf | sh -s -- -y --default-toolchain `cat rust-toolchain`
+source $HOME/.cargo/env
 rustup component add clippy-preview
 rustup component add rustfmt-preview
 
