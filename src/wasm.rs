@@ -31,7 +31,7 @@ mod tests {
     wasm_bindgen_test_configure!(run_in_browser);
 
     #[wasm_bindgen_test]
-    fn run_as_wasm_in_browser() {
+    fn run_in_browser() {
         let data = JsValue::from_serde(&json!(
         {
             "number": 3,
