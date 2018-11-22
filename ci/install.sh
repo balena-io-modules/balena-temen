@@ -11,4 +11,5 @@ rustup component add clippy-preview
 rustup component add rustfmt-preview
 
 # repo.yml.type = rust-crate-wasm (wasm-only)
+rustup target add wasm32-unknown-unknown
 cargo install wasm-pack
