@@ -14,3 +14,6 @@ cargo test
 #
 # Tries to create the package, but not publish it
 cargo package
+
+# repo.yml.type = rust-crate-wasm (wasm-only)
+wasm-pack test --chrome --firefox --headless
