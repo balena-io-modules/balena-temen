@@ -8,3 +8,7 @@ install:
 script:
   - ci/test.sh
   - ci/publish.sh
+
+addons:
+  firefox: latest
+  chrome: stable
