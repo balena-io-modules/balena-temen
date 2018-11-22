@@ -1,7 +1,9 @@
 language: generic
 
 cache:
-  cargo: true
+  directories:
+    - /home/travis/.cargo/
+    - target/
   timeout: 1000
 
 install:
