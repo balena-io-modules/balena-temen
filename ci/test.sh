@@ -3,6 +3,9 @@
 set -e
 set -o pipefail
 
+# load up the environment - makes the tools be added to the path etc
+source $HOME/.cargo/env
+
 # repo.yml.type = rust-* (rust-crate, rust-crate-wasm)
 # these are linters
 cargo fmt -- --check
