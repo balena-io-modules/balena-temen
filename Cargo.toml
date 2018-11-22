@@ -26,7 +26,7 @@ slug = "0.1"
 uuid = { version = "0.7", features = ["v4"] }
 
 # WASM stuff
-wasm-bindgen="0.2"
+wasm-bindgen= { version="0.2", features = ["serde-serialize"] }
 # The `console_error_panic_hook` crate provides better debugging of panics by
 # logging them with `console.error`. This is great for development, but requires
 # all the `std::fmt` and `std::panicking` infrastructure, so isn't great for
@@ -34,6 +34,7 @@ wasm-bindgen="0.2"
 console_error_panic_hook = { version = "0.1.1"}
 [dev-dependencies]
 wasm-bindgen-test = "0.2"
+pretty_assertions = "0.5"
 
 [lib]
 # cdylib required for WASM
