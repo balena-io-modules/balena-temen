@@ -16,4 +16,5 @@ cargo test
 cargo package
 
 # repo.yml.type = rust-crate-wasm (wasm-only)
+wasm-pack build
 wasm-pack test --chrome --firefox --headless

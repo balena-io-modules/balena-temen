@@ -9,7 +9,10 @@ set -o pipefail
 curl https://sh.rustup.rs -sSf | sh -s -- -y --default-toolchain `cat rust-toolchain`
 rustup component add clippy-preview
 rustup component add rustfmt-preview
+(test -x $HOME/.cargo/bin/cargo-install-update || cargo install cargo-update)
+cargo install-update -a
 
 # repo.yml.type = rust-crate-wasm (wasm-only)
-rustup target add wasm32-unknown-unknown
-cargo install wasm-pack
+curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh -s -- -f
+
+
