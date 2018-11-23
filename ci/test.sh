@@ -24,7 +24,7 @@ cargo package
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null && pwd )"
 "$DIR/build-wasm.sh"
 
-# # repo.yml.type = rust-crate-wasm
+# repo.yml.type = rust-crate-wasm
 #
 # this runs tests from WASM
 # this needs Chrome and Firefox installed, see .travis.yml

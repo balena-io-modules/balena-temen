@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
 
+source $HOME/.nvm/nvm.sh
+nvm use 10
+
 # TODO: investigate if there is way for `wasm-pack test` to use the isomorphic package built in the previous step
 wasm-pack test --chrome --firefox --headless
 # test unified package as used from node
