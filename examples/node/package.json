@@ -1,5 +1,8 @@
 {
     "name": "temen-node",
+    "scripts": {
+        "start": "node index.js"
+    },
     "dependencies": {
         "balena-temen": "0.0.15"
     }
