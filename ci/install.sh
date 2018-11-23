@@ -11,12 +11,12 @@ source $HOME/.cargo/env
 rustup component add clippy-preview
 rustup component add rustfmt-preview
 
-# repo.yml.type = rust-crate-wasm (wasm-only)
-
-# update all tools installed using cargo
+# update all tools installed using cargo - @zrzka Why do we need this? Travis CI caching?
 (test -x $HOME/.cargo/bin/cargo-install-update || cargo install cargo-update)
 cargo install-update -a
+
+# repo.yml.type = rust-crate-wasm
+#
 # install wasm-pack and its dependencies, a tool that builds node packages from rust crates
 curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh -s -- -f
-
-
+npm install -g npm-cli-login

@@ -20,9 +20,11 @@ cargo test
 # Tries to create the package, but not publish it
 cargo package
 
-# repo.yml.type = rust-crate-wasm (wasm-only)
+# repo.yml.type = rust-crate-wasm
 wasm-pack build
 
+# # repo.yml.type = rust-crate-wasm
+#
 # this runs tests from WASM
 # this needs Chrome and Firefox installed, see .travis.yml
 wasm-pack test --chrome --firefox --headless
