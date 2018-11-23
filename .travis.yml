@@ -15,7 +15,7 @@ script:
 deploy:
   provider: script
   script: ci/publish.sh
-  on: tag IS present
+  on: tag NOT present
 
 addons:
   firefox: latest
