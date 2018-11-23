@@ -17,7 +17,8 @@ deploy:
   script: ci/publish.sh
   skip_cleanup: true
   on:
-    tags: true
+    tags: false
+    branch: wasm
 
 addons:
   firefox: latest
