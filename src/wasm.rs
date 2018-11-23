@@ -7,9 +7,8 @@ use wasm_bindgen::prelude::wasm_bindgen;
 
 use crate::eval;
 
-/// This re-exports `eval` into WASM-land, as `temen_evaluate`, with a prefix to avoid global namespace confusion
 #[wasm_bindgen]
-pub fn temen_evaluate(data: JsValue) -> Result<JsValue, JsValue> {
+pub fn evaluate(data: JsValue) -> Result<JsValue, JsValue> {
     // use console.log for nice errors from Rust-land
     console_error_panic_hook::set_once();
 
@@ -24,7 +23,6 @@ mod tests {
     use wasm_bindgen_test::wasm_bindgen_test;
     use wasm_bindgen_test::wasm_bindgen_test_configure;
     use serde_json::json;
-    use pretty_assertions::assert_eq;
 
     use super::*;
 
@@ -41,7 +39,7 @@ mod tests {
         }))
         .unwrap();
 
-        let evaluated = temen_evaluate(data).unwrap().as_string().unwrap();
+        let evaluated = evaluate(data).unwrap().as_string().unwrap();
         // use same serde_json `.to_string` to format both, to not rely on
         // JSValue formatter and serde_json formatter to be same
         let evaluated: serde_json::Value = serde_json::from_str(&evaluated).unwrap();

@@ -86,10 +86,10 @@ Add as a dependency to your `package.json`:
 Evaluate simple JSON:
 
 ```js
-const t = require('balena-temen');
+const temen = require('balena-temen');
 
 console.log(
-    t.temen_evaluate({
+    temen.evaluate({
         "ssid": "Some Cool SSID!",
         "id": {
             "$$eval": "super.ssid | slugify"
@@ -123,7 +123,7 @@ Evaluate simple JSON:
 ```js
 import * as temen from "balena-temen";
 
-console.log(temen.temen_evaluate({
+console.log(temen.evaluate({
     "ssid": "Some Cool SSID Network!",
     "id": {
         "$$eval": "super.ssid | slugify"
