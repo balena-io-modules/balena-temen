@@ -12,7 +12,7 @@
     },
     "author": "Robert Vojta <robert@balena.io>",
     "dependencies": {
-        "balena-temen": "0.0.15"
+        "balena-temen": "0"
     },
     "devDependencies": {
         "hello-wasm-pack": "^0.1.0",

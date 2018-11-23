@@ -4,6 +4,6 @@
         "start": "node index.js"
     },
     "dependencies": {
-        "balena-temen": "0.0.15"
+        "balena-temen": "0"
     }
 }
