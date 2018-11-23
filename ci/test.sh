@@ -21,10 +21,12 @@ cargo test
 cargo package
 
 # repo.yml.type = rust-crate-wasm
-wasm-pack build
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null && pwd )"
+"$DIR/wasm-build.sh"
 
 # # repo.yml.type = rust-crate-wasm
 #
 # this runs tests from WASM
 # this needs Chrome and Firefox installed, see .travis.yml
 wasm-pack test --chrome --firefox --headless
+# TODO add testing with node as well

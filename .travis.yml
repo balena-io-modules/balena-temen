@@ -11,7 +11,11 @@ install:
 
 script:
   - ci/test.sh
-  - ci/publish.sh
+
+deploy:
+  provider: script
+  script: ci/publish.sh
+  on: tag IS present
 
 addons:
   firefox: latest
