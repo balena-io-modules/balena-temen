@@ -11,7 +11,7 @@ source $HOME/.cargo/env
 rustup component add clippy-preview
 rustup component add rustfmt-preview
 
-# update all tools installed using cargo - @zrzka Why do we need this? Travis CI caching?
+# update all tools installed using cargo - useful if caching of builds is enabled
 (test -x $HOME/.cargo/bin/cargo-install-update || cargo install cargo-update)
 cargo install-update -a
 
