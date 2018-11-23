@@ -13,7 +13,6 @@ cargo login "$CARGO_API_TOKEN"
 # repo.yml.type == rust-crate-wasm
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null && pwd )"
 "$DIR/wasm-build.sh"
-# NPM_USER, _PASS, _EMAIL as Travis CI variables
-npm-cli-login
+echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" > ~/.npmrc
 # Uncomment for balenaCI, for now, we will do it manually
 # npm publish --access public pkg

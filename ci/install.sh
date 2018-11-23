@@ -19,4 +19,3 @@ cargo install-update -a
 #
 # install wasm-pack and its dependencies, a tool that builds node packages from rust crates
 curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh -s -- -f
-npm install -g npm-cli-login
