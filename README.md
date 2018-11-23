@@ -26,13 +26,10 @@ no public / open specification yet, but we're working on it and it will be publi
 
 ## Supported platforms
 
-Anyone should be able to use this crate:
+This library is written in the Rust language and can be used:
 
 * as a Rust crate
-* as an NPM package (Node.js)
-* in the browser (Web Assembly)
-
-NPM package / browser (Web Assembly) parts are not done yet and are under the construction.
+* as an isomorphic NPM package (NodeJS & browser)
 
 ## Documentation
 
@@ -40,6 +37,8 @@ NPM package / browser (Web Assembly) parts are not done yet and are under the co
 * [Expression language documentation]
 
 ## Usage 
+
+### Rust
 
 Add as a dependency to your `Cargo.toml`:
 
@@ -71,6 +70,76 @@ let evaluated = json!({
 
 assert_eq!(eval(data).unwrap(), evaluated);
 ```
+
+### Node
+
+Add as a dependency to your `package.json`:
+
+```json
+{
+    "dependencies": {
+        "balena-temen": "0.0.15"
+    }
+}
+```
+
+Evaluate simple JSON:
+
+```js
+const t = require('balena-temen');
+
+console.log(
+    t.temen_evaluate({
+        "ssid": "Some Cool SSID!",
+        "id": {
+            "$$eval": "super.ssid | slugify"
+        }
+    })
+);
+```
+
+Fully working example available in the `examples/node` folder:
+
+```bash
+cd examples/node
+npm install
+node index.js
+```
+
+### Browser
+
+Add as a dependency to your `package.json`:
+
+```json
+{
+    "dependencies": {
+        "balena-temen": "0.0.15"
+    }
+}
+```
+
+Evaluate simple JSON:
+
+```js
+import * as temen from "balena-temen";
+
+console.log(temen.temen_evaluate({
+    "ssid": "Some Cool SSID Network!",
+    "id": {
+        "$$eval": "super.ssid | slugify"
+    }
+}));
+```
+
+Fully working example available in the `examples/browser` folder:
+
+```bash
+cd examples/browser
+npm install
+npm start
+```
+
+Open your browser and you should see evaluated JSON in the browser console.
 
 ## Support
 
