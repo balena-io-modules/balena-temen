@@ -139,7 +139,7 @@ npm install
 npm start
 ```
 
-Open your browser and you should see evaluated JSON in the browser console.
+Open `localhost:8080` in your browser and you should see evaluated JSON in the browser console.
 
 ## Support
 
