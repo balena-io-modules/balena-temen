@@ -1,0 +1,6 @@
+{
+    "name": "temen-node",
+    "dependencies": {
+        "balena-temen": "0.0.15"
+    }
+}
