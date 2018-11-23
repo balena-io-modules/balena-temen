@@ -28,8 +28,8 @@ no public / open specification yet, but we're working on it and it will be publi
 
 This library is written in the Rust language and can be used:
 
-* as a Rust crate
-* as an isomorphic NPM package (NodeJS & browser)
+* directly, as a [Rust crate]
+* as an isomorphic [NPM package] (NodeJS & browser)
 
 ## Documentation
 
@@ -103,7 +103,7 @@ Fully working example available in the `examples/node` folder:
 ```bash
 cd examples/node
 npm install
-node index.js
+npm start
 ```
 
 ### Browser
@@ -148,7 +148,7 @@ will be happy to help.
 
 ## License
 
-`balena-temen` is free software, and may be redistributed under the terms specified in
+`balena-temen` is open source software, and may be redistributed under the terms specified in
 the [license].
 
 [balena.io]: https://www.balena.io/
@@ -157,3 +157,5 @@ the [license].
 [API documentation]: https://docs.rs/balena-temen/latest/balena_temen/
 [license]: https://github.com/balena-io-modules/balena-temen/blob/master/LICENSE
 [Expression language documentation]: https://github.com/balena-io-modules/balena-temen/blob/master/docs/expression.md
+[Rust crate]: https://crates.io/crates/balena-temen
+[NPM package]: https://www.npmjs.com/package/balena-temen
