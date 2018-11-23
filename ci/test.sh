@@ -22,7 +22,7 @@ cargo package
 
 # repo.yml.type = rust-crate-wasm
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null && pwd )"
-"$DIR/wasm-build.sh"
+"$DIR/build-wasm.sh"
 
 # # repo.yml.type = rust-crate-wasm
 #

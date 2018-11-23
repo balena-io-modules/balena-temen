@@ -12,6 +12,7 @@ fi
 OUTPUT_DIR="pkg"
 BROWSER_OUTPUT_DIR="$OUTPUT_DIR/browser"
 NODE_OUTPUT_DIR="$OUTPUT_DIR/node"
+# 'isomorphic' is a long word, using 'unified' instead in this script
 UNIFIED_OUTPUT_DIR="$OUTPUT_DIR/unified"
 
 # Clean previous packages
