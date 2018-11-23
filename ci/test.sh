@@ -28,5 +28,6 @@ DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null && pwd )"
 #
 # this runs tests from WASM
 # this needs Chrome and Firefox installed, see .travis.yml
+# TODO: investigate if there is way for `wasm-pack test` to use the isomorphic package built in the previous step
 wasm-pack test --chrome --firefox --headless
-# TODO add testing with node as well
+# TODO add testing with node target as well
