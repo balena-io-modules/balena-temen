@@ -17,5 +17,10 @@ cargo install-update -a
 
 # repo.yml.type = rust-crate-wasm
 #
+# control version of node on the build machine:
+curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.33.11/install.sh | bash
+source $HOME/.nvm/nvm.sh
+nvm install 10
+nvm use 10
 # install wasm-pack and its dependencies, a tool that builds node packages from rust crates
 curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh -s -- -f
