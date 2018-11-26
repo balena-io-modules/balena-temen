@@ -1,4 +1,16 @@
 - commits:
+    - subject: Improve documentation for Javascript
+      hash: c29426309cdadc37c635d11b19e7dcecaaf5caaa
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Lucian <lucian.buzzo@gmail.com>
+        signed-off-by: Lucian <lucian.buzzo@gmail.com>
+      author: Lucian
+  version: 0.0.17
+  date: 2018-11-26T11:06:34.043Z
+- commits:
     - subject: Rename eval to evaluate
       hash: c2b11885cd59b5bdb5d7c0da03dd5f91a8580d43
       body: ''
