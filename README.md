@@ -71,16 +71,12 @@ let evaluated = json!({
 assert_eq!(evaluate(data).unwrap(), evaluated);
 ```
 
-### Node
+### Javascript
 
-Add as a dependency to your `package.json`:
+Install via npm
 
-```json
-{
-    "dependencies": {
-        "balena-temen": "0"
-    }
-}
+```
+npm install --save balena-temen
 ```
 
 Evaluate simple JSON:
@@ -98,7 +94,7 @@ console.log(
 );
 ```
 
-Fully working example available in the `examples/node` folder:
+An example of using this module in nodeJS is available in the `examples/node` folder:
 
 ```bash
 cd examples/node
@@ -106,34 +102,7 @@ npm install
 npm start
 ```
 
-### Browser
-
-Add as a dependency to your `package.json`:
-
-```json
-{
-    "dependencies": {
-        "balena-temen": "0"
-    }
-}
-```
-
-Evaluate simple JSON:
-
-```js
-import * as bt from "balena-temen";
-
-console.log(
-    bt.evaluate({
-        "ssid": "Some Cool SSID Network!",
-        "id": {
-            "$$eval": "super.ssid | slugify"
-        }
-    })
-);
-```
-
-Fully working example available in the `examples/browser` folder:
+An example of using this module in the browser is available in the `examples/browser` folder:
 
 ```bash
 cd examples/browser
