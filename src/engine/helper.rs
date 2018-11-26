@@ -182,6 +182,11 @@ fn eval_with_items(data: Value, items: &[Item], engine: &Engine, context: &mut C
     }
 }
 
+#[deprecated(since = "0.0.16", note = "please use `evaluate` instead")]
+pub fn eval(data: Value) -> Result<Value> {
+    evaluate(data)
+}
+
 /// Evaluates the whole JSON
 ///
 /// # Arguments
@@ -193,20 +198,20 @@ fn eval_with_items(data: Value, items: &[Item], engine: &Engine, context: &mut C
 /// An object evaluation.
 ///
 /// ```rust
-/// use balena_temen::{eval, Value};
+/// use balena_temen::{evaluate, Value};
 /// use serde_json::json;
 ///
 /// let data = json!({
 ///   "$$eval": "1 + 2"
 /// });
 ///
-/// assert_eq!(eval(data).unwrap(), json!(3));
+/// assert_eq!(evaluate(data).unwrap(), json!(3));
 /// ```
 ///
 /// Chained dependencies evaluation.
 ///
 /// ```rust
-/// use balena_temen::{eval, Value};
+/// use balena_temen::{evaluate, Value};
 /// use serde_json::json;
 ///
 /// let data = json!({
@@ -225,9 +230,9 @@ fn eval_with_items(data: Value, items: &[Item], engine: &Engine, context: &mut C
 ///     "upperId": "ZRZKA-5G"
 /// });
 ///
-/// assert_eq!(eval(data).unwrap(), evaluated);
+/// assert_eq!(evaluate(data).unwrap(), evaluated);
 /// ```
-pub fn eval(data: Value) -> Result<Value> {
+pub fn evaluate(data: Value) -> Result<Value> {
     let engine = Engine::default();
     let mut context = Context::default();
 
@@ -247,7 +252,7 @@ pub fn eval(data: Value) -> Result<Value> {
 /// # Examples
 ///
 /// ```rust
-/// use balena_temen::{Context, eval_with_engine, Engine, EngineBuilder, Value};
+/// use balena_temen::{Context, evaluate_with_engine, Engine, EngineBuilder, Value};
 /// use serde_json::json;
 ///
 /// let mut context = Context::default();
@@ -259,17 +264,77 @@ pub fn eval(data: Value) -> Result<Value> {
 ///   "evalMePlease": "1 + 2"
 /// });
 ///
-/// assert_eq!(eval_with_engine(data, &engine, &mut context).unwrap(), json!(3));
+/// assert_eq!(evaluate_with_engine(data, &engine, &mut context).unwrap(), json!(3));
 /// ```
 ///
 /// Check the [`eval`] function for more examples.
 ///
 /// [`eval`]: fn.eval.html
 /// [`Engine`]: struct.Engine.html
-pub fn eval_with_engine(data: Value, engine: &Engine, context: &mut Context) -> Result<Value> {
+pub fn evaluate_with_engine(data: Value, engine: &Engine, context: &mut Context) -> Result<Value> {
     if let Some(items) = items_to_eval(&data, &Identifier::default(), engine.eval_keyword())? {
         eval_with_items(data, &items, engine, context)
     } else {
         Ok(data)
+    }
+}
+
+#[deprecated(since = "0.0.16", note = "please use `evaluate_with_engine` instead")]
+pub fn eval_with_engine(data: Value, engine: &Engine, context: &mut Context) -> Result<Value> {
+    evaluate_with_engine(data, engine, context)
+}
+
+#[cfg(target_arch = "wasm32")]
+pub mod wasm {
+    // https://github.com/rustwasm/console_error_panic_hook#readme
+    pub use console_error_panic_hook::set_once as set_panic_hook;
+    use wasm_bindgen::prelude::*;
+
+    use super::evaluate;
+
+    /// Evaluates the whole JSON
+    #[wasm_bindgen(js_name = "evaluate")]
+    pub fn js_evaluate(data: JsValue) -> Result<JsValue, JsValue> {
+        // use console.log for nice errors from Rust-land
+        console_error_panic_hook::set_once();
+
+        let data = data.into_serde().map_err(|e| JsValue::from(format!("{:#?}", e)))?;
+
+        let evaluated = evaluate(data).map_err(|e| JsValue::from(format!("{:#?}", e)))?;
+
+        let result = JsValue::from_serde(&evaluated).map_err(|e| JsValue::from(format!("{:#?}", e)))?;
+
+        Ok(result)
+    }
+
+    #[cfg(test)]
+    mod tests {
+        use serde_json::{json, Value};
+        use wasm_bindgen::prelude::*;
+        use wasm_bindgen_test::*;
+
+        use super::js_evaluate;
+
+        wasm_bindgen_test_configure!(run_in_browser);
+
+        #[wasm_bindgen_test]
+        fn run_in_browser() {
+            let input = json!({
+                "number": 3,
+                "value": {
+                    "$$eval": "super.number + 5"
+                }
+            });
+            let js_input = JsValue::from_serde(&input).unwrap();
+            let js_output: JsValue = js_evaluate(js_input).unwrap();
+            let output: Value = js_output.into_serde().unwrap();
+
+            let valid_output = json!({
+                "number": 3,
+                "value": 8
+            });
+
+            assert_eq!(output, valid_output);
+        }
     }
 }

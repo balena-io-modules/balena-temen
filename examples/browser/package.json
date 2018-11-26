@@ -1,0 +1,23 @@
+{
+    "name": "balena-temen-browser-example",
+    "version": "0.0.1",
+    "main": "index.js",
+    "bin": {
+        "create-wasm-app": ".bin/create-wasm-app.js"
+    },
+    "scripts": {
+        "build": "webpack --config webpack.config.js",
+        "start": "webpack-dev-server"
+    },
+    "author": "Robert Vojta <robert@balena.io>",
+    "dependencies": {
+        "balena-temen": "0"
+    },
+    "devDependencies": {
+        "hello-wasm-pack": "^0.1.0",
+        "webpack": "^4.16.3",
+        "webpack-cli": "^3.1.0",
+        "webpack-dev-server": "^3.1.5",
+        "copy-webpack-plugin": "^4.5.2"
+    }
+}
