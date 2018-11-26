@@ -14,7 +14,7 @@ script:
 
 deploy:
   provider: script
-  script: ci/publish.sh
+  script: ci/deploy.sh
   skip_cleanup: true
   on:
     tags: true
