@@ -182,6 +182,11 @@ fn eval_with_items(data: Value, items: &[Item], engine: &Engine, context: &mut C
     }
 }
 
+#[deprecated(since = "0.0.16", note = "please use `evaluate` instead")]
+pub fn eval(data: Value) -> Result<Value> {
+    evaluate(data)
+}
+
 /// Evaluates the whole JSON
 ///
 /// # Arguments
@@ -193,20 +198,20 @@ fn eval_with_items(data: Value, items: &[Item], engine: &Engine, context: &mut C
 /// An object evaluation.
 ///
 /// ```rust
-/// use balena_temen::{eval, Value};
+/// use balena_temen::{evaluate, Value};
 /// use serde_json::json;
 ///
 /// let data = json!({
 ///   "$$eval": "1 + 2"
 /// });
 ///
-/// assert_eq!(eval(data).unwrap(), json!(3));
+/// assert_eq!(evaluate(data).unwrap(), json!(3));
 /// ```
 ///
 /// Chained dependencies evaluation.
 ///
 /// ```rust
-/// use balena_temen::{eval, Value};
+/// use balena_temen::{evaluate, Value};
 /// use serde_json::json;
 ///
 /// let data = json!({
@@ -225,9 +230,9 @@ fn eval_with_items(data: Value, items: &[Item], engine: &Engine, context: &mut C
 ///     "upperId": "ZRZKA-5G"
 /// });
 ///
-/// assert_eq!(eval(data).unwrap(), evaluated);
+/// assert_eq!(evaluate(data).unwrap(), evaluated);
 /// ```
-pub fn eval(data: Value) -> Result<Value> {
+pub fn evaluate(data: Value) -> Result<Value> {
     let engine = Engine::default();
     let mut context = Context::default();
 
@@ -247,7 +252,7 @@ pub fn eval(data: Value) -> Result<Value> {
 /// # Examples
 ///
 /// ```rust
-/// use balena_temen::{Context, eval_with_engine, Engine, EngineBuilder, Value};
+/// use balena_temen::{Context, evaluate_with_engine, Engine, EngineBuilder, Value};
 /// use serde_json::json;
 ///
 /// let mut context = Context::default();
@@ -259,17 +264,23 @@ pub fn eval(data: Value) -> Result<Value> {
 ///   "evalMePlease": "1 + 2"
 /// });
 ///
-/// assert_eq!(eval_with_engine(data, &engine, &mut context).unwrap(), json!(3));
+/// assert_eq!(evaluate_with_engine(data, &engine, &mut context).unwrap(), json!(3));
 /// ```
 ///
 /// Check the [`eval`] function for more examples.
 ///
 /// [`eval`]: fn.eval.html
 /// [`Engine`]: struct.Engine.html
-pub fn eval_with_engine(data: Value, engine: &Engine, context: &mut Context) -> Result<Value> {
+pub fn evaluate_with_engine(data: Value, engine: &Engine, context: &mut Context) -> Result<Value> {
     if let Some(items) = items_to_eval(&data, &Identifier::default(), engine.eval_keyword())? {
         eval_with_items(data, &items, engine, context)
     } else {
         Ok(data)
     }
 }
+
+#[deprecated(since = "0.0.16", note = "please use `evaluate_with_engine` instead")]
+pub fn eval_with_engine(data: Value, engine: &Engine, context: &mut Context) -> Result<Value> {
+    evaluate_with_engine(data, engine, context)
+}
+

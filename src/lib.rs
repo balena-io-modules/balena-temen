@@ -24,7 +24,7 @@
 //! ### JSON evaluation
 //!
 //! ```rust
-//! use balena_temen::{eval, Value};
+//! use balena_temen::{evaluate, Value};
 //! use serde_json::json;
 //!
 //! let data = json!({
@@ -41,13 +41,13 @@
 //!         "id": "balena-ltd"
 //!     }
 //! });
-//! assert_eq!(eval(data).unwrap(), evaluated);
+//! assert_eq!(evaluate(data).unwrap(), evaluated);
 //! ```
 //!
 //! ### JSON with custom evaluation keyword
 //!
 //! ```rust
-//! use balena_temen::{Context, Engine, EngineBuilder, eval_with_engine, Value};
+//! use balena_temen::{Context, Engine, EngineBuilder, evaluate_with_engine, Value};
 //! use serde_json::json;
 //!
 //! let data = json!({
@@ -60,7 +60,7 @@
 //!     .eval_keyword("evalMePlease")
 //!     .into();
 //!
-//! assert_eq!(eval_with_engine(data, &engine, &mut ctx).unwrap(), evaluated);
+//! assert_eq!(evaluate_with_engine(data, &engine, &mut ctx).unwrap(), evaluated);
 //! ```
 //!
 //! ## Intermediate
@@ -202,11 +202,14 @@ pub use crate::{
         builder::EngineBuilder,
         Engine,
         helper::{
-            eval,
-            eval_with_engine
+            evaluate,
+            evaluate_with_engine
         }
     }
 };
+
+#[allow(deprecated)]
+pub use crate::engine::helper::{eval, eval_with_engine};
 
 pub(crate) mod builtin;
 

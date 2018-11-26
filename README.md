@@ -50,7 +50,7 @@ balena-temen = "0.1"
 Evaluate simple JSON:
 
 ```rust
-use balena_temen::eval;
+use balena_temen::evaluate;
 use serde_json::json;
 
 let data = json!({
@@ -68,7 +68,7 @@ let evaluated = json!({
     }
 });
 
-assert_eq!(eval(data).unwrap(), evaluated);
+assert_eq!(evaluate(data).unwrap(), evaluated);
 ```
 
 ### Node

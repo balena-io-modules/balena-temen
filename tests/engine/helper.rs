@@ -1,24 +1,24 @@
 use serde_json::json;
 
-use balena_temen::{Context, Engine, EngineBuilder, eval, eval_with_engine};
+use balena_temen::{Context, Engine, EngineBuilder, evaluate, evaluate_with_engine};
 
 #[test]
 fn primitive_types_pass_through() {
-    assert_eq!(eval(json!(true)).unwrap(), json!(true));
-    assert_eq!(eval(json!(10)).unwrap(), json!(10));
-    assert_eq!(eval(json!(10.5)).unwrap(), json!(10.5));
-    assert_eq!(eval(json!("hallo")).unwrap(), json!("hallo"));
+    assert_eq!(evaluate(json!(true)).unwrap(), json!(true));
+    assert_eq!(evaluate(json!(10)).unwrap(), json!(10));
+    assert_eq!(evaluate(json!(10.5)).unwrap(), json!(10.5));
+    assert_eq!(evaluate(json!("hallo")).unwrap(), json!("hallo"));
 }
 
 #[test]
 fn root_object() {
-    assert_eq!(eval(json!({"$$eval": "1 + 2"})).unwrap(), json!(3));
+    assert_eq!(evaluate(json!({"$$eval": "1 + 2"})).unwrap(), json!(3));
 }
 
 #[test]
 fn nested_object() {
     assert_eq!(
-        eval(json!({"nested": {"$$eval": "1 + 2"}})).unwrap(),
+        evaluate(json!({"nested": {"$$eval": "1 + 2"}})).unwrap(),
         json!({"nested": 3})
     );
 }
@@ -34,7 +34,7 @@ fn array() {
         "d"
     ]);
 
-    assert_eq!(eval(data).unwrap(), json!(["a", "b", "c", "d"]));
+    assert_eq!(evaluate(data).unwrap(), json!(["a", "b", "c", "d"]));
 }
 
 #[test]
@@ -58,7 +58,7 @@ fn chained_references() {
         "fourth": "aaaa"
     });
 
-    assert_eq!(eval(data).unwrap(), evaluated);
+    assert_eq!(evaluate(data).unwrap(), evaluated);
 }
 
 #[test]
@@ -72,7 +72,7 @@ fn fail_on_circular_dependencies() {
         }
     });
 
-    assert!(eval(data).is_err());
+    assert!(evaluate(data).is_err());
 }
 
 #[test]
@@ -81,7 +81,7 @@ fn custom_keyword() {
     let mut context = Context::default();
 
     assert_eq!(
-        eval_with_engine(json!({"evalMePlease": "1 + 2"}), &engine, &mut context).unwrap(),
+        evaluate_with_engine(json!({"evalMePlease": "1 + 2"}), &engine, &mut context).unwrap(),
         json!(3)
     );
 }
