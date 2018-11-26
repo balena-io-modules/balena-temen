@@ -1,4 +1,16 @@
 - commits:
+    - subject: Make browser example interactive
+      hash: c8e410b71d41ceb45d24632a53b35ec1634ce353
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Lucian <lucian.buzzo@gmail.com>
+        signed-off-by: Lucian <lucian.buzzo@gmail.com>
+      author: Lucian
+  version: 0.0.18
+  date: 2018-11-26T11:57:45.654Z
+- commits:
     - subject: Improve documentation for Javascript
       hash: c29426309cdadc37c635d11b19e7dcecaaf5caaa
       body: ''
