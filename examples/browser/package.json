@@ -1,7 +1,6 @@
 {
-    "name": "temen-example-app",
+    "name": "balena-temen-browser-example",
     "version": "0.0.1",
-    "description": "Sample application for the balena-temen crate",
     "main": "index.js",
     "bin": {
         "create-wasm-app": ".bin/create-wasm-app.js"

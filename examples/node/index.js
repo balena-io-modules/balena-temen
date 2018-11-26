@@ -1,7 +1,7 @@
-const temen = require('balena-temen');
+const bt = require('balena-temen');
 
 console.log(
-    temen.evaluate({
+    bt.evaluate({
         "ssid": "Some Cool SSID!",
         "id": {
             "$$eval": "super.ssid | slugify"
