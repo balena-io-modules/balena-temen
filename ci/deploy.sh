@@ -6,6 +6,16 @@ source "${HOME}/.cargo/env"
 source "${HOME}/.nvm/nvm.sh"
 nvm use
 
+################################################################################
+#
+# @nazrhom - this deploy script must be called only when following conditions
+#            are met:
+#
+# * we're on `master` branch
+# * version number was bumped
+# * we're on the commit == published tag
+#
+
 
 ################################################################################
 #
