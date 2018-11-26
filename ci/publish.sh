@@ -2,21 +2,48 @@
 
 set -e
 
-echo "Publishing ..."
+source "${HOME}/.cargo/env"
+source "${HOME}/.nvm/nvm.sh"
+nvm use
 
-# load up the environment - makes the tools be added to the path etc
-source $HOME/.cargo/env
 
-echo "Authenticating to cargo..."
-# repo.yml.type == rust-* (rust-crate, rust-crate-wasm)
-cargo login "$CARGO_API_TOKEN"
-echo "Publishing to crates.io..."
+################################################################################
+#
+# @nazrhom - following section publishes Rust crate (package)
+#
+# CARGO_API_TOKEN env variable required. It does contain API token from crates.io
+# (Fotis did create an account there and he has the token).
+#
+# ----> Applies to both types `rust-crate` & `rust-crate-wasm`
+#
+echo "Authenticating to crates.io..."
+cargo login "${CARGO_API_TOKEN}"
+echo "Publishing Rust crate..."
 cargo publish
 
-# repo.yml.type == rust-crate-wasm
-echo "Authenticating to npm..."
-echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" > ~/.npmrc
-echo "Publishing to npm..."
-npm publish --access public pkg/unified
 
-echo "Done publishing to crates.io and npm"
+#--------------------------- another repo.org.type ----------------------------#
+
+
+################################################################################
+#
+# @nazrhom - following section publishes isomorphic NPM package
+#
+# NPM_TOKEN env variable required. It does contain API token required for
+# npmjs.com registry.
+#
+# ----> Applies to `rust-crate-wasm` only
+#
+echo "Authenticating to npmjs.org registry..."
+echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" > ~/.npmrc
+
+# Build NPM package again, because ...
+#
+# a) script must succeed even if it is called without prior call to `ci/test.sh`
+#    where the package is built,
+# b) we don't know what happened in the meanwhile (between `ci/test.sh` & `ci/publish.sh`),
+#    so, we build it again
+ci/build-wasm.sh
+
+echo "Publishing NPM package..."
+npm publish --access public target/npm/pkg
