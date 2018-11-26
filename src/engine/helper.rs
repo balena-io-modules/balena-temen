@@ -284,3 +284,57 @@ pub fn eval_with_engine(data: Value, engine: &Engine, context: &mut Context) -> 
     evaluate_with_engine(data, engine, context)
 }
 
+#[cfg(target_arch = "wasm32")]
+pub mod wasm {
+    // https://github.com/rustwasm/console_error_panic_hook#readme
+    pub use console_error_panic_hook::set_once as set_panic_hook;
+    use wasm_bindgen::prelude::*;
+
+    use super::evaluate;
+
+    /// Evaluates the whole JSON
+    #[wasm_bindgen(js_name = "evaluate")]
+    pub fn js_evaluate(data: JsValue) -> Result<JsValue, JsValue> {
+        // use console.log for nice errors from Rust-land
+        console_error_panic_hook::set_once();
+
+        let data = data.into_serde().map_err(|e| JsValue::from(format!("{:#?}", e)))?;
+
+        let evaluated = evaluate(data).map_err(|e| JsValue::from(format!("{:#?}", e)))?;
+
+        let result = JsValue::from_serde(&evaluated).map_err(|e| JsValue::from(format!("{:#?}", e)))?;
+
+        Ok(result)
+    }
+
+    #[cfg(test)]
+    mod tests {
+        use serde_json::{json, Value};
+        use wasm_bindgen::prelude::*;
+        use wasm_bindgen_test::*;
+
+        use super::js_evaluate;
+
+        wasm_bindgen_test_configure!(run_in_browser);
+
+        #[wasm_bindgen_test]
+        fn run_in_browser() {
+            let input = json!({
+                "number": 3,
+                "value": {
+                    "$$eval": "super.number + 5"
+                }
+            });
+            let js_input = JsValue::from_serde(&input).unwrap();
+            let js_output: JsValue = js_evaluate(js_input).unwrap();
+            let output: Value = js_output.into_serde().unwrap();
+
+            let valid_output = json!({
+                "number": 3,
+                "value": 8
+            });
+
+            assert_eq!(output, valid_output);
+        }
+    }
+}
