@@ -21,7 +21,7 @@ echo "Testing Rust crate..."
 cargo test
 
 echo "Trying to package Rust crate..."
-cargo package --allow-dirty
+cargo package
 
 
 #--------------------------- another repo.org.type ----------------------------#
