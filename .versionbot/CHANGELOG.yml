@@ -1,4 +1,37 @@
 - commits:
+    - subject: Rename eval to evaluate
+      hash: c2b11885cd59b5bdb5d7c0da03dd5f91a8580d43
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Robert Vojta <robert@balena.io>
+        signed-off-by: Robert Vojta <robert@balena.io>
+      author: Robert Vojta
+    - subject: Loosen up requirements for the node package in examples
+      hash: 4e9d01e72db77941d627e13112dd66ce8d3231b0
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Cyryl Płotnicki
+    - subject: 'Use `helper::eval` as the function to be exported to WASM'
+      hash: 66325185b822281ea6026e6bd05f9f54bd7bf7f0
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Cyryl Płotnicki
+    - subject: Basic wasm support
+      hash: 76e716ceb28d13419dee6ef2a3b9b5565ad5f97f
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Cyryl Płotnicki
+  version: 0.0.16
+  date: 2018-11-26T07:15:31.181Z
+- commits:
     - subject: Reformat with new rustfmt
       hash: 3253fe60b2c8430770f4c1bee2042c5fc3bf9506
       body: |
