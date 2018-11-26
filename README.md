@@ -78,7 +78,7 @@ Add as a dependency to your `package.json`:
 ```json
 {
     "dependencies": {
-        "balena-temen": "0.0.15"
+        "balena-temen": "0"
     }
 }
 ```
@@ -86,10 +86,10 @@ Add as a dependency to your `package.json`:
 Evaluate simple JSON:
 
 ```js
-const temen = require('balena-temen');
+const bt = require('balena-temen');
 
 console.log(
-    temen.evaluate({
+    bt.evaluate({
         "ssid": "Some Cool SSID!",
         "id": {
             "$$eval": "super.ssid | slugify"
@@ -113,7 +113,7 @@ Add as a dependency to your `package.json`:
 ```json
 {
     "dependencies": {
-        "balena-temen": "0.0.15"
+        "balena-temen": "0"
     }
 }
 ```
@@ -121,14 +121,16 @@ Add as a dependency to your `package.json`:
 Evaluate simple JSON:
 
 ```js
-import * as temen from "balena-temen";
+import * as bt from "balena-temen";
 
-console.log(temen.evaluate({
-    "ssid": "Some Cool SSID Network!",
-    "id": {
-        "$$eval": "super.ssid | slugify"
-    }
-}));
+console.log(
+    bt.evaluate({
+        "ssid": "Some Cool SSID Network!",
+        "id": {
+            "$$eval": "super.ssid | slugify"
+        }
+    })
+);
 ```
 
 Fully working example available in the `examples/browser` folder:
