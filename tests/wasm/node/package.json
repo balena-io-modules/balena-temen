@@ -1,6 +1,0 @@
-{
-    "name": "test_isomorphic_package_from_node",
-    "scripts": {
-        "test-require": "node test-require.js"
-    }
-}
