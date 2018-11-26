@@ -1,5 +1,5 @@
 {
-    "name": "temen-node",
+    "name": "balena-temen-node-example",
     "scripts": {
         "start": "node index.js"
     },
