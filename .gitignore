@@ -8,7 +8,7 @@
 
 # WASM
 bin/
-*.log
+wasm-pack.log
 
 # balenaCI
 /package-lock.json
