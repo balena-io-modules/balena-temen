@@ -27,7 +27,7 @@ if ! [ "$CI" = true ]; then
     # Allow to test uncommitted changes locally
     CARGO_PACKAGE_ARGS='--allow-dirty'
 fi
-cargo package "${CARGO_PACKAGE_ARGS}"
+cargo package ${CARGO_PACKAGE_ARGS}
 
 
 #--------------------------- another repo.org.type ----------------------------#
