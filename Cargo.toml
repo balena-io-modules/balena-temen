@@ -33,6 +33,9 @@ version = "2"
 [dependencies.pest_derive]
 version = "2"
 
+[dependencies.rand]
+version = "0.6"
+
 [dependencies.serde]
 version = "1"
 
@@ -46,18 +49,13 @@ version = "1"
 version = "0.1"
 
 [dependencies.uuid]
-# https://github.com/balena-io-modules/balena-temen/issues/35
-git = "https://github.com/zrzka/uuid.git"
-branch = "feature/wasm"
-features = ["v4"]
+version = "0.7"
 
 [target.wasm32-unknown-unknown.dependencies.console_error_panic_hook]
 version = "0.1"
 
-[target.wasm32-unknown-unknown.dependencies.uuid]
-# https://github.com/balena-io-modules/balena-temen/issues/35
-git = "https://github.com/zrzka/uuid.git"
-branch = "feature/wasm"
+[target.wasm32-unknown-unknown.dependencies.rand]
+version = "0.6"
 features = ["wasm-bindgen"]
 
 [target.wasm32-unknown-unknown.dependencies.wasm-bindgen]

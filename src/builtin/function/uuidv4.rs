@@ -1,5 +1,6 @@
 use std::collections::HashMap;
 
+use rand::{self, RngCore};
 use serde_json::Value;
 use uuid::Uuid;
 
@@ -7,7 +8,18 @@ use crate::context::Context;
 use crate::error::Result;
 
 pub(crate) fn uuidv4(_args: &HashMap<String, Value>, _context: &mut Context) -> Result<Value> {
-    Ok(Value::String(Uuid::new_v4().to_hyphenated().to_string()))
+    // We're using uuid crate with disabled v4 feature, because of the wasm issue
+    // (rand requires stdweb / wasm-bindgen feature enabled to work on the wasm32 arch).
+    // We have added rand as our direct dependency with wasm-bindgen feature enabled
+    // and following is a copy & paste of the Uuid::new_v4() method to make it working.
+    let mut rng = rand::thread_rng();
+    let mut bytes = [0; 16];
+
+    rng.fill_bytes(&mut bytes);
+
+    let uuid = Uuid::from_random_bytes(bytes);
+
+    Ok(Value::String(uuid.to_hyphenated().to_string()))
 }
 
 #[cfg(test)]
