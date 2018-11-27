@@ -1,4 +1,14 @@
 - commits:
+    - subject: Cleanup unneeded dependencies in the browser example
+      hash: 051bef34bd10a2798838b8ec95fb1962171ccd32
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Cyryl Płotnicki
+  version: 0.0.21
+  date: 2018-11-27T11:39:18.709Z
+- commits:
     - subject: Add temporary fix for the now() fn (wasm)
       hash: 751ca66b6e3d72bbb6eaa69cedcccae4aa37c3b9
       body: ''
