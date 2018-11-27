@@ -1,4 +1,16 @@
 - commits:
+    - subject: Add note about functions & NPM package
+      hash: f77b487c8fae82ad1e17462c041afb5d31c7a2bb
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Robert Vojta <robert@balena.io>
+        signed-off-by: Robert Vojta <robert@balena.io>
+      author: Robert Vojta
+  version: 0.0.19
+  date: 2018-11-26T13:21:36.346Z
+- commits:
     - subject: Make browser example interactive
       hash: c8e410b71d41ceb45d24632a53b35ec1634ce353
       body: ''

@@ -271,6 +271,11 @@ Functions can be called without arguments (`uuidv4()`) or with named arguments
 | [`uuidv4`](#function-uuidv4) | Generates random UUID v4 |
 | [`now`](#function-now) | Returns the local date time / timestamp |
 
+**WARNING**: None of these functions do work if `balena-temen` NPM package is used.
+See [#35](https://github.com/balena-io-modules/balena-temen/issues/35) and
+[#37](https://github.com/balena-io-modules/balena-temen/issues/37). Waiting
+for upstream fixes. There're no issues if you do use `balena-temen` as a Rust crate.
+
 #### Function uuidv4
 
 Generates random UUID v4 in a hexadecimal, lower case, notation.
