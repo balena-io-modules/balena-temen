@@ -23,3 +23,7 @@ deploy:
 addons:
   firefox: latest
   chrome: stable
+
+notifications:
+  email:
+    on_success: never
