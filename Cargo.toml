@@ -20,9 +20,7 @@ travis-ci = { repository = "balena-io-modules/balena-temen", branch = "master" }
 version = "0.3"
 
 [dependencies.chrono]
-# https://github.com/balena-io-modules/balena-temen/issues/37
-git = "https://github.com/jjpe/chrono"
-rev = "52adf963e6e98cd75a4c4523abd7a1465e2ac63d"
+version = "0.4"
 
 [dependencies.lazy_static]
 version = "1"
@@ -53,6 +51,9 @@ version = "0.7"
 
 [target.wasm32-unknown-unknown.dependencies.console_error_panic_hook]
 version = "0.1"
+
+[target.wasm32-unknown-unknown.dependencies.js-sys]
+version = "0.3"
 
 [target.wasm32-unknown-unknown.dependencies.rand]
 version = "0.6"
