@@ -1,4 +1,16 @@
 - commits:
+    - subject: Add temporary fix for the now() fn (wasm)
+      hash: 751ca66b6e3d72bbb6eaa69cedcccae4aa37c3b9
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Robert Vojta <robert@balena.io>
+        signed-off-by: Robert Vojta <robert@balena.io>
+      author: Robert Vojta
+  version: 0.0.20
+  date: 2018-11-27T10:57:16.330Z
+- commits:
     - subject: Add note about functions & NPM package
       hash: f77b487c8fae82ad1e17462c041afb5d31c7a2bb
       body: ''
