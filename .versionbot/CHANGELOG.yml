@@ -1,4 +1,25 @@
 - commits:
+    - subject: Fix now() for wasm
+      hash: a16933e9f5cc5ed96ecf508eaa3da7ee027bd101
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Robert Vojta <robert@balena.io>
+        signed-off-by: Robert Vojta <robert@balena.io>
+      author: Robert Vojta
+    - subject: Fix uuidv4() for wasm
+      hash: 737b578ae6a0efdbf6a8a197ae5702e5b7ddbbdd
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Robert Vojta <robert@balena.io>
+        signed-off-by: Robert Vojta <robert@balena.io>
+      author: Robert Vojta
+  version: 0.0.22
+  date: 2018-11-27T14:08:02.079Z
+- commits:
     - subject: Cleanup unneeded dependencies in the browser example
       hash: 051bef34bd10a2798838b8ec95fb1962171ccd32
       body: ''
