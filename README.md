@@ -35,6 +35,7 @@ This library is written in the Rust language and can be used:
 
 * [API documentation]
 * [Expression language documentation]
+* [Changelog]
 
 ## Usage 
 
@@ -130,3 +131,4 @@ the [license].
 [Expression language documentation]: https://github.com/balena-io-modules/balena-temen/blob/master/docs/expression.md
 [Rust crate]: https://crates.io/crates/balena-temen
 [NPM package]: https://www.npmjs.com/package/balena-temen
+[Changelog]: https://github.com/balena-io-modules/balena-temen/blob/master/CHANGELOG.md
