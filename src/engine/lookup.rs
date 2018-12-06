@@ -172,7 +172,7 @@ impl<'a> Lookup<'a> {
                         return Err(Error::with_message("unable to lookup identifier")
                             .context("reason", "identifier does not point to an integer / string")
                             .context("identifier", format!("{:?}", identifier))
-                            .context("position", format!("{:?}", position)))
+                            .context("position", format!("{:?}", position)));
                     }
                 };
             }
