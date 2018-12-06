@@ -356,16 +356,16 @@ impl Engine {
                 }
             }
             ExpressionValue::Boolean(_) => {
-                return Err(unable_to_evaluate_as_a_number_error().context("value", format!("{:?}", value)))
+                return Err(unable_to_evaluate_as_a_number_error().context("value", format!("{:?}", value)));
             }
             ExpressionValue::String(_) => {
-                return Err(unable_to_evaluate_as_a_number_error().context("value", format!("{:?}", value)))
+                return Err(unable_to_evaluate_as_a_number_error().context("value", format!("{:?}", value)));
             }
             ExpressionValue::Logical(_) => {
-                return Err(unable_to_evaluate_as_a_number_error().context("value", format!("{:?}", value)))
+                return Err(unable_to_evaluate_as_a_number_error().context("value", format!("{:?}", value)));
             }
             ExpressionValue::StringConcat(_) => {
-                return Err(unable_to_evaluate_as_a_number_error().context("value", format!("{:?}", value)))
+                return Err(unable_to_evaluate_as_a_number_error().context("value", format!("{:?}", value)));
             }
         };
 
@@ -438,7 +438,7 @@ impl Engine {
                                 _ => {
                                     return Err(Error::with_message("unable to concatenate string")
                                         .context("expected", "number")
-                                        .context("value", format!("{:?}", x)))
+                                        .context("value", format!("{:?}", x)));
                                 }
                             }
                         }
@@ -481,7 +481,7 @@ impl Engine {
             | ExpressionValue::String(_)
             | ExpressionValue::Math(_)
             | ExpressionValue::StringConcat(_) => {
-                return Err(unable_to_evaluate_as_a_bool_error().context("value", format!("{:?}", value)))
+                return Err(unable_to_evaluate_as_a_bool_error().context("value", format!("{:?}", value)));
             }
             ExpressionValue::Boolean(x) => *x,
             ExpressionValue::Identifier(identifier) => {
