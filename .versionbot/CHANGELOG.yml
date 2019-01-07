@@ -1,4 +1,17 @@
 - commits:
+    - subject: Fix WASM build
+      hash: 0b25159388f99c09c3140f8f7be7f8169fb5f159
+      body: |
+        It seems that something introduced in `rand 0.6.3` made it not compile
+        with WASM target anymore. Added a version boundary in `Cargo.toml` to
+        make `temen` compile.
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Cyryl Płotnicki
+  version: 0.0.26
+  date: 2019-01-07T12:58:16.540Z
+- commits:
     - subject: Rust toolchain stable
       hash: e0ac9eac2273cde74ce06ad722e6ddfe4bc783a1
       body: ''
