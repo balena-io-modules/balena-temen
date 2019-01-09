@@ -3,7 +3,7 @@ import * as bt from "balena-temen";
 const initialValue = {
     "ssid": "Some Cool SSID Network!",
     "id": {
-        "$$eval": "super.ssid | slugify"
+        "$$formula": "super.ssid | slugify"
     }
 }
 const stringify = (value) => JSON.stringify(value, null, 2)

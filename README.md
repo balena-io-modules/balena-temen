@@ -37,13 +37,23 @@ This library is written in the Rust language and can be used:
 * [Expression language documentation]
 * [Changelog]
 
-## Usage 
+## Breaking changes
+
+### Version 0.1
+
+`$$eval` keyword was renamed to `$$formula`. You can still use `$$eval` if you want
+by instantiating your own [Engine](https://docs.rs/balena-temen/latest/balena_temen/struct.Engine.html)
+with the [EngineBuilder](https://docs.rs/balena-temen/latest/balena_temen/struct.EngineBuilder.html) and
+[custom eval keyword](https://docs.rs/balena-temen/latest/balena_temen/struct.EngineBuilder.html#method.eval_keyword)
+ registration.
+
+## Usage
 
 ### Rust
 
 Add as a dependency to your `Cargo.toml`:
 
-```
+```toml
 [dependencies]
 balena-temen = "0.1"
 ```
@@ -58,7 +68,7 @@ let data = json!({
     "wifi": {
         "ssid": "Balena Ltd",
         "id": {
-            "$$eval": "super.ssid | slugify"
+            "$$formula": "super.ssid | slugify"
         }
     }
 });
@@ -76,7 +86,7 @@ assert_eq!(evaluate(data).unwrap(), evaluated);
 
 Install via npm
 
-```
+```sh
 npm install --save balena-temen
 ```
 
@@ -89,7 +99,7 @@ console.log(
     bt.evaluate({
         "ssid": "Some Cool SSID!",
         "id": {
-            "$$eval": "super.ssid | slugify"
+            "$$formula": "super.ssid | slugify"
         }
     })
 );

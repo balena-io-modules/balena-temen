@@ -8,7 +8,7 @@ test('uuidv4() generates proper random UUID', () => {
     expect(
         bt.evaluate({
             "id": {
-                "$$eval": "uuidv4()"
+                "$$formula": "uuidv4()"
             }
         })
     ).toMatchObject(result);

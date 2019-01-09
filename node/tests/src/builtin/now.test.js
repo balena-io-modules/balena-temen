@@ -8,7 +8,7 @@ test('now() generates timestamp', () => {
     expect(
         bt.evaluate({
             "timestamp": {
-                "$$eval": "now(timestamp=true)"
+                "$$formula": "now(timestamp=true)"
             }
         })
     ).toMatchObject(result);
@@ -22,7 +22,7 @@ test('now() generates rfc 3339', () => {
     expect(
         bt.evaluate({
             "date": {
-                "$$eval": "now()"
+                "$$formula": "now()"
             }
         })
     ).toMatchObject(result);
