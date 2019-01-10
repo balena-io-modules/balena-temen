@@ -31,7 +31,7 @@
 //!     "wifi": {
 //!         "ssid": "Balena Ltd",
 //!         "id": {
-//!             "$$eval": "super.ssid | slugify"
+//!             "$$formula": "super.ssid | slugify"
 //!         }
 //!     }
 //! });

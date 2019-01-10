@@ -12,13 +12,13 @@ fn primitive_types_pass_through() {
 
 #[test]
 fn root_object() {
-    assert_eq!(evaluate(json!({"$$eval": "1 + 2"})).unwrap(), json!(3));
+    assert_eq!(evaluate(json!({"$$formula": "1 + 2"})).unwrap(), json!(3));
 }
 
 #[test]
 fn nested_object() {
     assert_eq!(
-        evaluate(json!({"nested": {"$$eval": "1 + 2"}})).unwrap(),
+        evaluate(json!({"nested": {"$$formula": "1 + 2"}})).unwrap(),
         json!({"nested": 3})
     );
 }
@@ -29,7 +29,7 @@ fn array() {
         "a",
         "b",
         {
-            "$$eval": "`C` | lower"
+            "$$formula": "`C` | lower"
         },
         "d"
     ]);
@@ -42,13 +42,13 @@ fn chained_references() {
     let data = json!({
         "first": "a",
         "second": {
-            "$$eval": "first ~ `a`"
+            "$$formula": "first ~ `a`"
         },
         "third": {
-            "$$eval": "second ~ `a`"
+            "$$formula": "second ~ `a`"
         },
         "fourth": {
-            "$$eval": "third ~ `a`"
+            "$$formula": "third ~ `a`"
         },
     });
     let evaluated = json!({
@@ -65,10 +65,10 @@ fn chained_references() {
 fn fail_on_circular_dependencies() {
     let data = json!({
         "first": {
-            "$$eval": "second"
+            "$$formula": "second"
         },
         "second": {
-            "$$eval": "first"
+            "$$formula": "first"
         }
     });
 

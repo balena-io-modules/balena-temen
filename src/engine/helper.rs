@@ -9,13 +9,13 @@ use crate::error::*;
 struct Item {
     /// Item position
     position: Identifier,
-    /// Item expression (`$$eval` value)
+    /// Item expression (`$$formula` value)
     expression: String,
 }
 
 /// Creates an item to evaluate if applicable
 ///
-/// `value` must be an object containing the `$$eval` keyword and value of this
+/// `value` must be an object containing the `$$formula` keyword and value of this
 /// keyword must be a `String`.
 ///
 /// # Arguments
@@ -27,7 +27,7 @@ fn item_to_eval(value: &Value, position: &Identifier, keyword: &str) -> Result<O
     match value {
         Value::Object(ref object) => {
             if let Some(ref value) = object.get(keyword) {
-                // Object with $$eval keyword, must be a string
+                // Object with $$formula keyword, must be a string
                 let expression = value.as_str().ok_or_else(|| {
                     Error::with_message("unable to evaluate")
                         .context("reason", "eval keyword value is not a string")
@@ -39,7 +39,7 @@ fn item_to_eval(value: &Value, position: &Identifier, keyword: &str) -> Result<O
                     expression: expression.to_string(),
                 }))
             } else {
-                // Object, but not $$eval keyword
+                // Object, but not $$formula keyword
                 Ok(None)
             }
         }
@@ -83,11 +83,11 @@ fn items_to_eval(value: &Value, position: &Identifier, keyword: &str) -> Result<
         }
         Value::Object(ref object) => match item_to_eval(value, &position, keyword)? {
             Some(item) => {
-                // Object contains $$eval and value is a string
+                // Object contains $$formula and value is a string
                 Ok(Some(vec![item]))
             }
             None => {
-                // Object does not contain $$eval, check object key/value pairs recursively
+                // Object does not contain $$formula, check object key/value pairs recursively
                 let mut result = vec![];
 
                 for (k, v) in object {
@@ -202,7 +202,7 @@ pub fn eval(data: Value) -> Result<Value> {
 /// use serde_json::json;
 ///
 /// let data = json!({
-///   "$$eval": "1 + 2"
+///   "$$formula": "1 + 2"
 /// });
 ///
 /// assert_eq!(evaluate(data).unwrap(), json!(3));
@@ -217,10 +217,10 @@ pub fn eval(data: Value) -> Result<Value> {
 /// let data = json!({
 ///     "ssid": "Zrzka 5G",
 ///     "id": {
-///         "$$eval": "super.ssid | slugify"
+///         "$$formula": "super.ssid | slugify"
 ///     },
 ///     "upperId": {
-///         "$$eval": "super.id | upper"
+///         "$$formula": "super.id | upper"
 ///     }
 /// });
 ///
@@ -322,7 +322,7 @@ pub mod wasm {
             let input = json!({
                 "number": 3,
                 "value": {
-                    "$$eval": "super.number + 5"
+                    "$$formula": "super.number + 5"
                 }
             });
             let js_input = JsValue::from_serde(&input).unwrap();

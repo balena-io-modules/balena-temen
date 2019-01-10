@@ -1,32 +1,32 @@
 # Expression language
 
 The expression language inspiration comes from:
- 
+
 * [Jinja2](http://jinja.pocoo.org/docs/2.10/)
 * [Django](https://docs.djangoproject.com/en/2.1/intro/overview/#design-your-templates)
 * [Tera](https://github.com/Keats/tera) crate by [Vincent Prouillet](https://github.com/Keats)
 
-## Evaluation
+## Formula evaluation
 
 Templating engine allows you to specify dynamic value for any object field
-with the `$$eval` keyword. Following example shows how to generate UUID v4 value
+with the `$$formula` keyword. Following example shows how to generate UUID v4 value
 for the `id` field.
 
 ```json
 {
     "id": {
-        "$$eval": "uuidv4()"
+        "$$formula": "uuidv4()"
     }
 }
 ```
 
-The `$$eval` keyword supports:
- 
+The `$$formula` keyword supports:
+
 * literals
 * variable access (= JSON fields)
 * expressions with arithmetic, relational and logical operators
 * filters (variable modification)
-* functions (generators) 
+* functions (generators)
 
 ## Grammar
 
@@ -57,7 +57,7 @@ Given the following JSON:
         },
         {
             "ssid": "Balena Guest"
-        }    
+        }
     ]
 }
 ```
@@ -76,13 +76,13 @@ Given the following JSON:
     "wifi": {
         "ssid": "Balena Guest",
         "id": {
-            "$$eval": "super.ssid | slugify"
-        }        
+            "$$formula": "super.ssid | slugify"
+        }
     }
 }
 ```
 
-* `wifi.id` contains the `$$eval` keyword with the `super.ssid | slugify` value
+* `wifi.id` contains the `$$formula` keyword with the `super.ssid | slugify` value
 * `super` is evaluated as the `wifi` object
 * `super.ssid` is evaluated as the `wifi.ssid` field
 * `wifi.ssid` is evaluated as the `"Balena Guest"` string
@@ -111,12 +111,12 @@ Square brackets allows you to use variables as well. Given the following JSON:
         }
     },
     "bossCompanyName": {
-        "$$eval": "people[bossId].company"
+        "$$formula": "people[bossId].company"
     }
 }
-``` 
+```
 
-* `bossCompanyName` contains the `$$eval` keyword with the `people[bossId].company` value
+* `bossCompanyName` contains the `$$formula` keyword with the `people[bossId].company` value
 * `bossId` is a variable (no `''`, `""` or back ticks) and is evaluated as the `"123"` string
 * the intermediate expression is `people["123"].company`
 * `people["123"]` is evaluated as the `{ "company": "Balena" }` object
@@ -170,7 +170,7 @@ Example:
 ```json
 {
     "id": {
-        "$$eval": "super.ssid | lower"
+        "$$formula": "super.ssid | lower"
     },
     "ssid": "Balena"
 }

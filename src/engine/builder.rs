@@ -221,7 +221,7 @@ impl EngineBuilder {
 
     /// Registers custom evaluation keyword
     ///
-    /// Defaults to `$$eval` if no keyword is registered.
+    /// Defaults to `$$formula` if no keyword is registered.
     ///
     /// # Arguments
     ///
@@ -247,7 +247,7 @@ impl From<EngineBuilder> for Engine {
         Engine {
             functions: builder.functions,
             filters: builder.filters,
-            eval_keyword: builder.eval_keyword.unwrap_or_else(|| "$$eval".into()),
+            eval_keyword: builder.eval_keyword.unwrap_or_else(|| "$$formula".into()),
         }
     }
 }
