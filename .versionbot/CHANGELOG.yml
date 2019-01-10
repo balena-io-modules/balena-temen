@@ -1,4 +1,16 @@
 - commits:
+    - subject: Rename $$eval to $$formula
+      hash: 8ac396610fa62e0ae5d1d5ad95e418849c123e38
+      body: ''
+      footer:
+        Change-type: minor
+        change-type: minor
+        Signed-off-by: Robert Vojta <robert@balena.io>
+        signed-off-by: Robert Vojta <robert@balena.io>
+      author: Robert Vojta
+  version: 0.1.0
+  date: 2019-01-09T15:34:39.100Z
+- commits:
     - subject: Fix WASM build
       hash: 0b25159388f99c09c3140f8f7be7f8169fb5f159
       body: |
