@@ -3,16 +3,12 @@ use std::collections::HashMap;
 use lazy_static::lazy_static;
 use pest::{
     iterators::Pair,
-    Parser,
     prec_climber::{Assoc, Operator, PrecClimber},
+    Parser,
 };
 use pest_derive::Parser;
 
-use crate::{
-    ast::*,
-    error::*,
-    utils::validate_f64,
-};
+use crate::{ast::*, error::*, utils::validate_f64};
 
 lazy_static! {
     static ref MATH_CLIMBER: PrecClimber<Rule> = PrecClimber::new(vec![
@@ -70,7 +66,7 @@ fn parse_function_call(pair: Pair<Rule>) -> Result<FunctionCall> {
 
     for p in pair.into_inner() {
         match p.as_rule() {
-            Rule::identifier => name = Some(p.into_span().as_str().to_string()),
+            Rule::function_identifier => name = Some(p.into_span().as_str().to_string()),
             Rule::kwarg => {
                 let (name, value) = parse_kwarg(p)?;
                 args.insert(name, value);
@@ -93,7 +89,7 @@ fn parse_filter(pair: Pair<Rule>) -> Result<FunctionCall> {
     let mut args = HashMap::new();
     for p in pair.into_inner() {
         match p.as_rule() {
-            Rule::identifier => name = Some(p.into_span().as_str().to_string()),
+            Rule::function_identifier => name = Some(p.into_span().as_str().to_string()),
             Rule::kwarg => {
                 let (name, value) = parse_kwarg(p)?;
                 args.insert(name, value);

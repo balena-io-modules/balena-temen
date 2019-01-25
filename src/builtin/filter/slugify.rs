@@ -34,7 +34,7 @@ mod tests {
 
     use serde_json::json;
 
-    use super::{Context, slugify};
+    use super::{slugify, Context};
 
     #[test]
     fn result_is_trimmed() {

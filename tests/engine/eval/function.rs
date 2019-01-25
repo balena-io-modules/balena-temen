@@ -9,13 +9,13 @@ use crate::{test_eval_eq, test_eval_err, test_eval_ok};
 #[test]
 fn default_functions_are_registered() {
     // All functions have unit tests and it's enough to test if they're called / registered / work
-    test_eval_ok!("uuidv4()");
-    test_eval_ok!("now()");
+    test_eval_ok!("UUIDV4()");
+    test_eval_ok!("NOW()");
 }
 
 #[test]
 fn fail_on_unknown_function() {
-    test_eval_err!("fndoesnotexistoratleastitshouldnot()");
+    test_eval_err!("FNDOESNOTEXISTORATLEASTITSHOULDNOT()");
 }
 
 #[test]
@@ -28,8 +28,8 @@ fn custom_function() {
         }
     };
 
-    let engine: Engine = EngineBuilder::default().function("echo", cf).into();
+    let engine: Engine = EngineBuilder::default().function("ECHO", cf).into();
 
-    test_eval_eq!(engine, "echo()", json!("no-value-passed"));
-    test_eval_eq!(engine, "echo(value=`Zrzka`)", json!("Zrzka"));
+    test_eval_eq!(engine, "ECHO()", json!("no-value-passed"));
+    test_eval_eq!(engine, "ECHO(value=`Zrzka`)", json!("Zrzka"));
 }

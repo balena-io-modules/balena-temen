@@ -5,8 +5,8 @@ use crate::{fn_args_map, test_parse_eq};
 #[test]
 fn without_arguments() {
     test_parse_eq!(
-        "uuid()",
-        Expression::new(ExpressionValue::FunctionCall(FunctionCall::new("uuid", fn_args_map!())))
+        "UUID()",
+        Expression::new(ExpressionValue::FunctionCall(FunctionCall::new("UUID", fn_args_map!())))
     );
 }
 
@@ -18,7 +18,7 @@ fn with_arguments() {
     };
 
     test_parse_eq!(
-        "uuid(v=4, dummy=`abc`)",
-        Expression::new(ExpressionValue::FunctionCall(FunctionCall::new("uuid", args)))
+        "UUID(v=4, dummy=`abc`)",
+        Expression::new(ExpressionValue::FunctionCall(FunctionCall::new("UUID", args)))
     );
 }

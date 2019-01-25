@@ -1,6 +1,6 @@
 const bt = require('balena-temen');
 
-test('now() generates timestamp', () => {
+test('NOW() generates timestamp', () => {
     const result = {
         timestamp: expect.any(Number)
     };
@@ -8,13 +8,13 @@ test('now() generates timestamp', () => {
     expect(
         bt.evaluate({
             "timestamp": {
-                "$$formula": "now(timestamp=true)"
+                "$$formula": "NOW(timestamp=true)"
             }
         })
     ).toMatchObject(result);
 });
 
-test('now() generates rfc 3339', () => {
+test('NOW() generates rfc 3339', () => {
     const result = {
         date: expect.stringMatching(/^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}\.[0-9]{3}\+[0-9]{2}:[0-9]{2}$/)
     };
@@ -22,7 +22,7 @@ test('now() generates rfc 3339', () => {
     expect(
         bt.evaluate({
             "date": {
-                "$$formula": "now()"
+                "$$formula": "NOW()"
             }
         })
     ).toMatchObject(result);

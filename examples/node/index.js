@@ -4,7 +4,7 @@ console.log(
     bt.evaluate({
         "ssid": "Some Cool SSID!",
         "id": {
-            "$$formula": "super.ssid | slugify"
+            "$$formula": "super.ssid | SLUGIFY"
         }
     })
 );

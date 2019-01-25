@@ -22,7 +22,7 @@ mod tests {
 
     use serde_json::json;
 
-    use super::{Context, trim};
+    use super::{trim, Context};
 
     #[test]
     fn result_is_trimmed() {
