@@ -1,6 +1,6 @@
-use chrono::{DateTime, Utc};
 #[cfg(target_arch = "wasm32")]
 use chrono::NaiveDateTime;
+use chrono::{DateTime, Utc};
 
 #[cfg(not(target_arch = "wasm32"))]
 fn utc_now() -> DateTime<Utc> {

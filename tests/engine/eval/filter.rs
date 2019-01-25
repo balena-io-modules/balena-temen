@@ -2,7 +2,7 @@ use std::collections::HashMap;
 
 use serde_json::json;
 
-use balena_temen::{Context, Engine, EngineBuilder, error::*, Value};
+use balena_temen::{error::*, Context, Engine, EngineBuilder, Value};
 
 use crate::{test_eval_eq, test_eval_err};
 

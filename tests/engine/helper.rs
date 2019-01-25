@@ -1,6 +1,6 @@
 use serde_json::json;
 
-use balena_temen::{Context, Engine, EngineBuilder, evaluate, evaluate_with_engine};
+use balena_temen::{evaluate, evaluate_with_engine, Context, Engine, EngineBuilder};
 
 #[test]
 fn primitive_types_pass_through() {

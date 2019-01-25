@@ -21,7 +21,7 @@ mod tests {
 
     use serde_json::json;
 
-    use super::{Context, lower};
+    use super::{lower, Context};
 
     #[test]
     fn result_is_lower_cased() {

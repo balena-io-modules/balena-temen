@@ -5,13 +5,10 @@ use serde_json::{Number, Value};
 
 use crate::{
     ast::*,
-    builtin::{
-        filter::FilterFn,
-        function::FunctionFn,
-    },
+    builtin::{filter::FilterFn, function::FunctionFn},
     context::Context,
     error::*,
-    utils::{RelativeEq, validate_f64}
+    utils::{validate_f64, RelativeEq},
 };
 
 use self::builder::EngineBuilder;

@@ -193,19 +193,13 @@
 pub use serde_json::Value;
 
 pub use crate::{
-    builtin::{
-        filter::FilterFn,
-        function::FunctionFn,
-    },
+    builtin::{filter::FilterFn, function::FunctionFn},
     context::Context,
     engine::{
         builder::EngineBuilder,
+        helper::{evaluate, evaluate_with_engine},
         Engine,
-        helper::{
-            evaluate,
-            evaluate_with_engine
-        }
-    }
+    },
 };
 
 #[allow(deprecated)]

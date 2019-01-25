@@ -24,10 +24,7 @@
 //! [grammar]: https://github.com/balena-io-modules/balena-temen/blob/master/src/parser/grammar.pest
 use std::{collections::HashMap, str::FromStr};
 
-use crate::{
-    error::*,
-    parser::parse
-};
+use crate::{error::*, parser::parse};
 
 /// Math operator
 #[derive(Copy, Clone, Debug, PartialEq)]

@@ -3,16 +3,12 @@ use std::collections::HashMap;
 use lazy_static::lazy_static;
 use pest::{
     iterators::Pair,
-    Parser,
     prec_climber::{Assoc, Operator, PrecClimber},
+    Parser,
 };
 use pest_derive::Parser;
 
-use crate::{
-    ast::*,
-    error::*,
-    utils::validate_f64,
-};
+use crate::{ast::*, error::*, utils::validate_f64};
 
 lazy_static! {
     static ref MATH_CLIMBER: PrecClimber<Rule> = PrecClimber::new(vec![

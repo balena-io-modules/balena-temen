@@ -21,7 +21,7 @@ mod tests {
 
     use serde_json::json;
 
-    use super::{Context, upper};
+    use super::{upper, Context};
 
     #[test]
     fn result_is_upper_cased() {
