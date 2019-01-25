@@ -1,4 +1,18 @@
 - commits:
+    - subject: Function / filters must be in UPPER case
+      hash: dfa85a52d611253dc94f49483908927cedd1a75c
+      body: >
+        All functions & filters were “renamed” and they must be in UPPER case
+        only.
+      footer:
+        Change-type: minor
+        change-type: minor
+        Signed-off-by: Robert Vojta <robert@balena.io>
+        signed-off-by: Robert Vojta <robert@balena.io>
+      author: Robert Vojta
+  version: 0.2.0
+  date: 2019-01-25T14:31:55.003Z
+- commits:
     - subject: Rename $$eval to $$formula
       hash: 8ac396610fa62e0ae5d1d5ad95e418849c123e38
       body: ''
