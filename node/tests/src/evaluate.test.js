@@ -23,3 +23,18 @@ test('evaluate fn throws', () => {
         }
     ).toThrow();
 });
+
+test('evaluate fn throws with one failing and one succeeding formula', () => {
+    expect(
+        () => {
+            bt.evaluate({
+                "foo": {
+                    "$$formula": "UUIDV4()"
+                },
+                "prop": {
+                    "$$formula": "super.notExistingProperty"
+                }
+            });
+        }
+    ).toThrow();
+});

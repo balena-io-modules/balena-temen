@@ -11,6 +11,8 @@ struct Item {
     position: Identifier,
     /// Item expression (`$$formula` value)
     expression: String,
+    /// Set to `true` if evaluated
+    evaluated: bool,
 }
 
 /// Creates an item to evaluate if applicable
@@ -37,6 +39,7 @@ fn item_to_eval(value: &Value, position: &Identifier, keyword: &str) -> Result<O
                 Ok(Some(Item {
                     position: position.clone(),
                     expression: expression.to_string(),
+                    evaluated: false,
                 }))
             } else {
                 // Object, but not $$formula keyword
@@ -148,7 +151,7 @@ fn replace_value(data: Value, new_value: Value, position: &Identifier) -> Value 
 // We will see what kind of DSLs we will have and if we will need to create
 // dependency tree, detect circular dependencies, analyze if we can evaluate
 // before the actual evaluation, etc.
-fn eval_with_items(data: Value, items: &[Item], engine: &Engine, context: &mut Context) -> Result<Value> {
+fn eval_with_items(data: Value, mut items: Vec<Item>, engine: &Engine, context: &mut Context) -> Result<Value> {
     let mut fail_counter;
     let mut success_counter;
     let mut data = data;
@@ -157,12 +160,13 @@ fn eval_with_items(data: Value, items: &[Item], engine: &Engine, context: &mut C
         fail_counter = 0;
         success_counter = 0;
 
-        for item in items {
+        for item in items.iter_mut().filter(|x| !x.evaluated) {
             match engine.eval(&item.expression, &item.position, &data, context) {
                 Err(_) => fail_counter += 1,
                 Ok(new_value) => {
                     data = replace_value(data, new_value, &item.position);
                     success_counter += 1;
+                    item.evaluated = true;
                 }
             };
         }
@@ -237,7 +241,7 @@ pub fn evaluate(data: Value) -> Result<Value> {
     let mut context = Context::default();
 
     if let Some(items) = items_to_eval(&data, &Identifier::default(), engine.eval_keyword())? {
-        eval_with_items(data, &items, &engine, &mut context)
+        eval_with_items(data, items, &engine, &mut context)
     } else {
         Ok(data)
     }
@@ -273,7 +277,7 @@ pub fn evaluate(data: Value) -> Result<Value> {
 /// [`Engine`]: struct.Engine.html
 pub fn evaluate_with_engine(data: Value, engine: &Engine, context: &mut Context) -> Result<Value> {
     if let Some(items) = items_to_eval(&data, &Identifier::default(), engine.eval_keyword())? {
-        eval_with_items(data, &items, engine, context)
+        eval_with_items(data, items, engine, context)
     } else {
         Ok(data)
     }
