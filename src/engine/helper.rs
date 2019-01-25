@@ -217,10 +217,10 @@ pub fn eval(data: Value) -> Result<Value> {
 /// let data = json!({
 ///     "ssid": "Zrzka 5G",
 ///     "id": {
-///         "$$formula": "super.ssid | slugify"
+///         "$$formula": "super.ssid | SLUGIFY"
 ///     },
 ///     "upperId": {
-///         "$$formula": "super.id | upper"
+///         "$$formula": "super.id | UPPER"
 ///     }
 /// });
 ///

@@ -47,6 +47,14 @@ identifier = @{
     )
 }
 
+function_identifier = @{
+    !reserved ~
+    (
+        "this" | "super" |
+        ( ('A'..'Z' | "_") ~ all_chars{,63} )
+    )
+}
+
 square_brackets = _{
     "[" ~ (integer | string | dotted_square_bracket_identifier) ~ "]"
 }
@@ -122,7 +130,7 @@ logical_expression = { logical_value ~ ((logical_or | logical_and) ~ logical_val
 
 kwarg = { identifier ~ "=" ~ (logical_expression | basic_expression_filter) }
 kwargs = _{ kwarg ~ ("," ~ kwarg )* }
-function_call = { identifier ~ "(" ~ kwargs? ~ ")" }
-filter  = { "|" ~ (function_call | identifier) }
+function_call = { function_identifier ~ "(" ~ kwargs? ~ ")" }
+filter  = { "|" ~ (function_call | function_identifier) }
 
 content = { SOI ~ (logical_expression | basic_expression_filter) ~ EOI }

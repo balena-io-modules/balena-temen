@@ -29,7 +29,7 @@ fn array() {
         "a",
         "b",
         {
-            "$$formula": "`C` | lower"
+            "$$formula": "`C` | LOWER"
         },
         "d"
     ]);

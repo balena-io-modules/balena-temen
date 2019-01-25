@@ -31,7 +31,7 @@
 //!     "wifi": {
 //!         "ssid": "Balena Ltd",
 //!         "id": {
-//!             "$$formula": "super.ssid | slugify"
+//!             "$$formula": "super.ssid | SLUGIFY"
 //!         }
 //!     }
 //! });
@@ -85,7 +85,7 @@
 //! );
 //!
 //! assert_eq!(
-//!     engine.eval("`Balena templating engine!` | slugify", &position, &data, &mut ctx).unwrap(),
+//!     engine.eval("`Balena templating engine!` | SLUGIFY", &position, &data, &mut ctx).unwrap(),
 //!     json!("balena-templating-engine")
 //! );
 //! ```

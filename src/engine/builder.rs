@@ -25,15 +25,15 @@ impl Default for EngineBuilder {
     /// [`EngineBuilder`]: struct.EngineBuilder.html
     fn default() -> EngineBuilder {
         EngineBuilder::new()
-            .filter("upper", filter::upper)
-            .filter("lower", filter::lower)
-            .filter("time", filter::time)
-            .filter("date", filter::date)
-            .filter("datetime", filter::datetime)
-            .filter("trim", filter::trim)
-            .filter("slugify", filter::slugify)
-            .function("uuidv4", function::uuidv4)
-            .function("now", function::now)
+            .filter("UPPER", filter::upper)
+            .filter("LOWER", filter::lower)
+            .filter("TIME", filter::time)
+            .filter("DATE", filter::date)
+            .filter("DATETIME", filter::datetime)
+            .filter("TRIM", filter::trim)
+            .filter("SLUGIFY", filter::slugify)
+            .function("UUIDV4", function::uuidv4)
+            .function("NOW", function::now)
     }
 }
 
@@ -114,22 +114,22 @@ impl EngineBuilder {
     /// };
     ///
     /// let engine: Engine = EngineBuilder::default()
-    ///     .filter("text", text_filter)
+    ///     .filter("TEXT", text_filter)
     ///     .into();
     /// let mut ctx = Context::default();
     /// let position = Identifier::default();
     /// let data = Value::Null;
     ///
     /// assert_eq!(
-    ///     engine.eval("` abc ` | text", &position, &data, &mut ctx).unwrap(),
+    ///     engine.eval("` abc ` | TEXT", &position, &data, &mut ctx).unwrap(),
     ///     json!(" abc ")
     /// );
     /// assert_eq!(
-    ///     engine.eval("` abc ` | text(trim=true)", &position, &data, &mut ctx).unwrap(),
+    ///     engine.eval("` abc ` | TEXT(trim=true)", &position, &data, &mut ctx).unwrap(),
     ///     json!("abc")
     /// );
     /// assert_eq!(
-    ///     engine.eval("` abc ` | text(trim=true, upper=true)", &position, &data, &mut ctx).unwrap(),
+    ///     engine.eval("` abc ` | TEXT(trim=true, upper=true)", &position, &data, &mut ctx).unwrap(),
     ///     json!("ABC")
     /// );
     /// ```
@@ -186,22 +186,22 @@ impl EngineBuilder {
     /// };
     ///
     /// let engine: Engine = EngineBuilder::default()
-    ///     .function("echo", echo_function)
+    ///     .function("ECHO", echo_function)
     ///     .into();
     /// let mut ctx = Context::default();
     /// let position = Identifier::default();
     /// let data = Value::Null;
     ///
     /// assert_eq!(
-    ///     engine.eval("echo()", &position, &data, &mut ctx).unwrap(),
+    ///     engine.eval("ECHO()", &position, &data, &mut ctx).unwrap(),
     ///     json!("echo")
     /// );
     /// assert_eq!(
-    ///     engine.eval("echo(value=`Hallo`)", &position, &data, &mut ctx).unwrap(),
+    ///     engine.eval("ECHO(value=`Hallo`)", &position, &data, &mut ctx).unwrap(),
     ///     json!("Hallo")
     /// );
     /// assert!(
-    ///     engine.eval("echo(value=1)", &position, &data, &mut ctx).is_err()
+    ///     engine.eval("ECHO(value=1)", &position, &data, &mut ctx).is_err()
     /// );
     /// ```
     ///

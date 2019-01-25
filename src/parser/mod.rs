@@ -70,7 +70,7 @@ fn parse_function_call(pair: Pair<Rule>) -> Result<FunctionCall> {
 
     for p in pair.into_inner() {
         match p.as_rule() {
-            Rule::identifier => name = Some(p.into_span().as_str().to_string()),
+            Rule::function_identifier => name = Some(p.into_span().as_str().to_string()),
             Rule::kwarg => {
                 let (name, value) = parse_kwarg(p)?;
                 args.insert(name, value);
@@ -93,7 +93,7 @@ fn parse_filter(pair: Pair<Rule>) -> Result<FunctionCall> {
     let mut args = HashMap::new();
     for p in pair.into_inner() {
         match p.as_rule() {
-            Rule::identifier => name = Some(p.into_span().as_str().to_string()),
+            Rule::function_identifier => name = Some(p.into_span().as_str().to_string()),
             Rule::kwarg => {
                 let (name, value) = parse_kwarg(p)?;
                 args.insert(name, value);

@@ -39,6 +39,11 @@ This library is written in the Rust language and can be used:
 
 ## Breaking changes
 
+### Version 0.2
+
+* All function and filter identifiers were uppercased
+  * An example `uuidv4()` -> `UUIDV4()`
+
 ### Version 0.1
 
 `$$eval` keyword was renamed to `$$formula`. You can still use `$$eval` if you want

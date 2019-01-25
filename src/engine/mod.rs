@@ -92,7 +92,7 @@ impl Engine {
     /// // Filters
     ///
     /// assert_eq!(
-    ///     engine.eval("`Balena is great!` | slugify", &position, &data, &mut ctx).unwrap(),
+    ///     engine.eval("`Balena is great!` | SLUGIFY", &position, &data, &mut ctx).unwrap(),
     ///     json!("balena-is-great")
     /// );
     ///

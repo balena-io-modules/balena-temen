@@ -15,7 +15,7 @@ for the `id` field.
 ```json
 {
     "id": {
-        "$$formula": "uuidv4()"
+        "$$formula": "UUIDV4()"
     }
 }
 ```
@@ -76,17 +76,17 @@ Given the following JSON:
     "wifi": {
         "ssid": "Balena Guest",
         "id": {
-            "$$formula": "super.ssid | slugify"
+            "$$formula": "super.ssid | SLUGIFY"
         }
     }
 }
 ```
 
-* `wifi.id` contains the `$$formula` keyword with the `super.ssid | slugify` value
+* `wifi.id` contains the `$$formula` keyword with the `super.ssid | SLUGIFY` value
 * `super` is evaluated as the `wifi` object
 * `super.ssid` is evaluated as the `wifi.ssid` field
 * `wifi.ssid` is evaluated as the `"Balena Guest"` string
-* `| slugify` applies `slugify` filter to the input value
+* `| SLUGIFY` applies `SLUGIFY` filter to the input value
 * the whole expression is evaluated as the `"balena-guest"` string
   
 The sample JSON evaluates to:
@@ -170,7 +170,7 @@ Example:
 ```json
 {
     "id": {
-        "$$formula": "super.ssid | lower"
+        "$$formula": "super.ssid | LOWER"
     },
     "ssid": "Balena"
 }
@@ -182,13 +182,13 @@ Example:
 
 | Filter | Description |
 | --- | --- |
-| [`date`](#filter-date) | Formats a timestamp as a date (`YYYY-MM-DD`) |
-| [`datetime`](#filter-datetime) | Formats a timestamp as a date time (`YYYY-MM-DDTHH:MM:SSZ`) |
-| [`lower`](#filter-lower) | Lower cases a string |
-| [`slugify`](#filter-slugify) |  Transforms a string into a slug |
-| [`time`](#filter-time) | Formats a timestamp as a time (`HH:MM:SS`) |
-| [`trim`](#filter-trim) | Removes leading and trailing whitespaces |
-| [`upper`](#filter-upper) | Upper cases a string |
+| [`DATE`](#filter-date) | Formats a timestamp as a date (`YYYY-MM-DD`) |
+| [`DATETIME`](#filter-datetime) | Formats a timestamp as a date time (`YYYY-MM-DDTHH:MM:SSZ`) |
+| [`LOWER`](#filter-lower) | Lower cases a string |
+| [`SLUGIFY`](#filter-slugify) |  Transforms a string into a slug |
+| [`TIME`](#filter-time) | Formats a timestamp as a time (`HH:MM:SS`) |
+| [`TRIM`](#filter-trim) | Removes leading and trailing whitespaces |
+| [`UPPER`](#filter-upper) | Upper cases a string |
 
 #### Filter lower
 
@@ -196,7 +196,7 @@ Lower cases a string.
 
 Example:
 
-* `"HaLlO" | lower` is resolved as `"hallo"`
+* `"HaLlO" | LOWER` is resolved as `"hallo"`
 
 #### Filter slugify
 
@@ -205,7 +205,7 @@ hyphens and all other (not letters, numbers, hyphens) characters removed.
 
 Example:
 
-* `"  Balena Ltd! " | slugify` is resolved as `"balena-ltd"`
+* `"  Balena Ltd! " | SLUGIFY` is resolved as `"balena-ltd"`
 
 #### Filter trim
 
@@ -213,7 +213,7 @@ Leading and trailing whitespace characters are removed.
 
 Example:
 
-* `"  aa   " | trim` is resolved as `"aa"`
+* `"  aa   " | TRIM` is resolved as `"aa"`
 
 #### Filter date
 
@@ -224,8 +224,8 @@ Full reference of the format syntax is available in the [chrono documentation].
 
 Example:
 
-* `12345678 | date`
-* `12345678 | date(format="%Y-%m-%d %H:%M")`
+* `12345678 | DATE`
+* `12345678 | DATE(format="%Y-%m-%d %H:%M")`
 
 #### Filter time
 
@@ -236,8 +236,8 @@ Full reference of the format syntax is available in the [chrono documentation].
 
 Example:
 
-* `12345678 | time`
-* `12345678 | time(format="%Y-%m-%d %H:%M")`
+* `12345678 | TIME`
+* `12345678 | TIME(format="%Y-%m-%d %H:%M")`
 
 #### Filter datetime
 
@@ -248,8 +248,8 @@ Full reference of the format syntax is available in the [chrono documentation].
 
 Example:
 
-* `12345678 | datetime`
-* `12345678 | datetime(format="%Y-%m-%d %H:%M")`
+* `12345678 | DATETIME`
+* `12345678 | DATETIME(format="%Y-%m-%d %H:%M")`
 
 #### Filter upper
 
@@ -257,19 +257,19 @@ Upper cases a string.
 
 Example:
 
-* `"HaLlO" | upper` is resolved as `"HALLO"`
+* `"HaLlO" | UPPER` is resolved as `"HALLO"`
 
 ## Functions
 
-Functions can be called without arguments (`uuidv4()`) or with named arguments
-(`now(timestamp=true)`). Positional arguments are not supported.
+Functions can be called without arguments (`UUIDV4()`) or with named arguments
+(`NOW(timestamp=true)`). Positional arguments are not supported.
 
 ### Builtin functions
 
 | Filter | Description |
 | --- | --- |
-| [`uuidv4`](#function-uuidv4) | Generates random UUID v4 |
-| [`now`](#function-now) | Returns the local date time / timestamp |
+| [`UUIDV4`](#function-uuidv4) | Generates random UUID v4 |
+| [`NOW`](#function-now) | Returns the local date time / timestamp |
 
 #### Function uuidv4
 
@@ -277,7 +277,7 @@ Generates random UUID v4 in a hexadecimal, lower case, notation.
 
 Example:
 
-* `uuidv4()`
+* `UUIDV4()`
 
 #### Function now
 

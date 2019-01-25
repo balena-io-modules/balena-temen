@@ -19,10 +19,10 @@ fn equal() {
 
 #[test]
 fn equal_with_filter() {
-    test_eval_eq!("`abc` | upper == 'ABC'", json!(true));
-    test_eval_eq!("`ABC` | lower == 'abc'", json!(true));
-    test_eval_eq!("`ABC` == 'abc' | upper", json!(true));
-    test_eval_eq!("`abc` == 'ABC' | lower", json!(true));
+    test_eval_eq!("`abc` | UPPER == 'ABC'", json!(true));
+    test_eval_eq!("`ABC` | LOWER == 'abc'", json!(true));
+    test_eval_eq!("`ABC` == 'abc' | UPPER", json!(true));
+    test_eval_eq!("`abc` == 'ABC' | LOWER", json!(true));
 }
 
 #[test]
