@@ -34,6 +34,8 @@ impl Default for EngineBuilder {
             .filter("SLUGIFY", filter::slugify)
             .function("UUIDV4", function::uuidv4)
             .function("NOW", function::now)
+            .function("POW", function::math::pow)
+            .function("LOG10", function::math::log10)
     }
 }
 

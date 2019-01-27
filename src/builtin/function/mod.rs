@@ -6,6 +6,7 @@ use crate::error::Result;
 pub(crate) use self::now::now;
 pub(crate) use self::uuidv4::uuidv4;
 
+pub(crate) mod math;
 mod now;
 mod uuidv4;
 
