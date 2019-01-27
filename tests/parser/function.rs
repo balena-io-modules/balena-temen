@@ -1,24 +1,35 @@
 use balena_temen::ast::*;
 
-use crate::{fn_args_map, test_parse_eq};
+use crate::test_parse_eq;
 
 #[test]
 fn without_arguments() {
     test_parse_eq!(
         "UUID()",
-        Expression::new(ExpressionValue::FunctionCall(FunctionCall::new("UUID", fn_args_map!())))
+        Expression::new(ExpressionValue::FunctionCall(FunctionCall::new("UUID", vec![])))
+    );
+}
+
+#[test]
+fn with_positional_arguments() {
+    test_parse_eq!(
+        "UUID(1)",
+        Expression::new(ExpressionValue::FunctionCall(FunctionCall::new(
+            "UUID",
+            vec![Expression::new(ExpressionValue::Integer(1))]
+        )))
     );
 }
 
 #[test]
 fn with_arguments() {
-    let args = fn_args_map! {
-        "v" => ExpressionValue::Integer(4),
-        "dummy" => ExpressionValue::String("abc".to_string())
-    };
+    let args = vec![
+        Expression::new(ExpressionValue::Integer(4)),
+        Expression::new(ExpressionValue::String("abc".to_string())),
+    ];
 
     test_parse_eq!(
-        "UUID(v=4, dummy=`abc`)",
+        "UUID(4, `abc`)",
         Expression::new(ExpressionValue::FunctionCall(FunctionCall::new("UUID", args)))
     );
 }

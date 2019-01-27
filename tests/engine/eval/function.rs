@@ -1,5 +1,3 @@
-use std::collections::HashMap;
-
 use serde_json::json;
 
 use balena_temen::{Context, Engine, EngineBuilder, Value};
@@ -20,8 +18,8 @@ fn fail_on_unknown_function() {
 
 #[test]
 fn custom_function() {
-    let cf = |args: &HashMap<String, Value>, _: &mut Context| {
-        if let Some(name) = args.get("value") {
+    let cf = |args: &[Value], _: &mut Context| {
+        if let Some(name) = args.first() {
             Ok(name.clone())
         } else {
             Ok(Value::String("no-value-passed".to_string()))
@@ -31,5 +29,5 @@ fn custom_function() {
     let engine: Engine = EngineBuilder::default().function("ECHO", cf).into();
 
     test_eval_eq!(engine, "ECHO()", json!("no-value-passed"));
-    test_eval_eq!(engine, "ECHO(value=`Zrzka`)", json!("Zrzka"));
+    test_eval_eq!(engine, "ECHO(`Zrzka`)", json!("Zrzka"));
 }

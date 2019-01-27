@@ -1,17 +1,10 @@
-use std::collections::HashMap;
-
 use chrono::{DateTime, NaiveDateTime, Utc};
 use serde_json::Value;
 
 use crate::context::Context;
 use crate::error::*;
 
-fn format_timestamp(
-    filter: &'static str,
-    input: &Value,
-    args: &HashMap<String, Value>,
-    default: &str,
-) -> Result<Value> {
+fn format_timestamp(filter: &'static str, input: &Value, args: &[Value], default: &str) -> Result<Value> {
     let ts = input.as_i64().ok_or_else(|| {
         Error::with_message("invalid input type")
             .context("filter", filter)
@@ -19,7 +12,7 @@ fn format_timestamp(
             .context("input", input.to_string())
     })?;
 
-    let format = match args.get("format") {
+    let format = match args.first() {
         Some(x) => x.as_str().ok_or_else(|| {
             Error::with_message("invalid argument type")
                 .context("filter", filter)
@@ -35,22 +28,20 @@ fn format_timestamp(
     Ok(Value::String(dt.format(format).to_string()))
 }
 
-pub(crate) fn time(input: &Value, args: &HashMap<String, Value>, _context: &mut Context) -> Result<Value> {
-    format_timestamp("time", input, args, "%H:%M:%S")
+pub(crate) fn time(input: &Value, args: &[Value], _context: &mut Context) -> Result<Value> {
+    format_timestamp("TIME", input, args, "%H:%M:%S")
 }
 
-pub(crate) fn date(input: &Value, args: &HashMap<String, Value>, _context: &mut Context) -> Result<Value> {
-    format_timestamp("date", input, args, "%Y-%m-%d")
+pub(crate) fn date(input: &Value, args: &[Value], _context: &mut Context) -> Result<Value> {
+    format_timestamp("DATE", input, args, "%Y-%m-%d")
 }
 
-pub(crate) fn datetime(input: &Value, args: &HashMap<String, Value>, _context: &mut Context) -> Result<Value> {
-    format_timestamp("datetime", input, args, "%Y-%m-%dT%H:%M:%S%:z")
+pub(crate) fn datetime(input: &Value, args: &[Value], _context: &mut Context) -> Result<Value> {
+    format_timestamp("DATETIME", input, args, "%Y-%m-%dT%H:%M:%S%:z")
 }
 
 #[cfg(test)]
 mod tests {
-    use std::collections::HashMap;
-
     use serde_json::json;
 
     use crate::context::Context;
@@ -59,69 +50,62 @@ mod tests {
 
     #[test]
     fn time_default_format() {
-        let args = HashMap::new();
         let mut ctx = Context::default();
 
-        assert_eq!(time(&json!(1_541_485_381), &args, &mut ctx).unwrap(), json!("06:23:01"));
+        assert_eq!(time(&json!(1_541_485_381), &[], &mut ctx).unwrap(), json!("06:23:01"));
     }
 
     #[test]
     fn date_default_format() {
-        let args = HashMap::new();
         let mut ctx = Context::default();
 
-        assert_eq!(
-            date(&json!(1_541_485_381), &args, &mut ctx).unwrap(),
-            json!("2018-11-06")
-        );
+        assert_eq!(date(&json!(1_541_485_381), &[], &mut ctx).unwrap(), json!("2018-11-06"));
     }
 
     #[test]
     fn datetime_default_format() {
-        let args = HashMap::new();
         let mut ctx = Context::default();
 
         assert_eq!(
-            datetime(&json!(1_541_485_381), &args, &mut ctx).unwrap(),
+            datetime(&json!(1_541_485_381), &[], &mut ctx).unwrap(),
             json!("2018-11-06T06:23:01+00:00")
         );
     }
 
     #[test]
     fn format_argument() {
-        let mut args = HashMap::new();
+        let args = vec![json!("%Y")];
 
-        args.insert("format".to_string(), json!("%Y"));
         assert_eq!(
             format_timestamp("", &json!(1_541_485_381), &args, "").unwrap(),
             json!("2018")
         );
 
-        args.insert("format".to_string(), json!("%m"));
+        let args = vec![json!("%m")];
         assert_eq!(
             format_timestamp("", &json!(1_541_485_381), &args, "").unwrap(),
             json!("11")
         );
 
-        args.insert("format".to_string(), json!("%d"));
+        let args = vec![json!("%d")];
         assert_eq!(
             format_timestamp("", &json!(1_541_485_381), &args, "").unwrap(),
             json!("06")
         );
 
-        args.insert("format".to_string(), json!("%H"));
+        let args = vec![json!("%H")];
         assert_eq!(
             format_timestamp("", &json!(1_541_485_381), &args, "").unwrap(),
             json!("06")
         );
 
-        args.insert("format".to_string(), json!("%M"));
+        let args = vec![json!("%M")];
         assert_eq!(
             format_timestamp("", &json!(1_541_485_381), &args, "").unwrap(),
             json!("23")
         );
 
-        args.insert("format".to_string(), json!("%S"));
+        let args = vec![json!("%S")];
         assert_eq!(
             format_timestamp("", &json!(1_541_485_381), &args, "").unwrap(),
             json!("01")
@@ -130,21 +114,19 @@ mod tests {
 
     #[test]
     fn fail_on_invalid_format_argument_type() {
-        let mut args = HashMap::new();
-
-        args.insert("format".to_string(), json!(1));
+        let args = vec![json!(1)];
         assert!(format_timestamp("", &json!(1_541_485_381), &args, "").is_err());
 
-        args.insert("format".to_string(), json!(1.2));
+        let args = vec![json!(1.2)];
         assert!(format_timestamp("", &json!(1_541_485_381), &args, "").is_err());
 
-        args.insert("format".to_string(), json!(true));
+        let args = vec![json!(true)];
         assert!(format_timestamp("", &json!(1_541_485_381), &args, "").is_err());
 
-        args.insert("format".to_string(), json!(["a", "b"]));
+        let args = vec![json!(["a", "b"])];
         assert!(format_timestamp("", &json!(1_541_485_381), &args, "").is_err());
 
-        args.insert("format".to_string(), json!({"a": "b"}));
+        let args = vec![json!({"a": "b"})];
         assert!(format_timestamp("", &json!(1_541_485_381), &args, "").is_err());
     }
 }

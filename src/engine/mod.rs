@@ -255,18 +255,15 @@ impl Engine {
 
     fn eval_args(
         &self,
-        args: &HashMap<String, Expression>,
+        args: &[Expression],
         position: &Identifier,
         data: &Value,
         context: &mut Context,
-    ) -> Result<HashMap<String, Value>> {
-        let mut result = HashMap::new();
+    ) -> Result<Vec<Value>> {
+        let mut result = vec![];
 
-        for (k, v) in args.iter() {
-            result.insert(
-                k.to_string(),
-                self.eval_expression(v, position, data, context)?.into_owned(),
-            );
+        for arg in args {
+            result.push(self.eval_expression(arg, position, data, context)?.into_owned());
         }
 
         Ok(result)
@@ -275,7 +272,7 @@ impl Engine {
     fn eval_function<'a>(
         &self,
         name: &str,
-        args: &'a HashMap<String, Expression>,
+        args: &'a [Expression],
         position: &Identifier,
         data: &Value,
         context: &mut Context,
@@ -293,7 +290,7 @@ impl Engine {
         &self,
         name: &str,
         input: &Value,
-        args: &'a HashMap<String, Expression>,
+        args: &'a [Expression],
         position: &Identifier,
         data: &Value,
         context: &mut Context,
@@ -340,13 +337,9 @@ impl Engine {
                 match value {
                     Value::Number(num) => num.clone(),
                     _ => {
-                        let mut error = unable_to_evaluate_as_a_number_error()
+                        let error = unable_to_evaluate_as_a_number_error()
                             .context("value", format!("{:?}", value))
                             .context("function", name.to_string());
-
-                        for (k, v) in args {
-                            error = error.context(format!("argument[{}]", k), format!("{:?}", v));
-                        }
 
                         return Err(error);
                     }
@@ -547,17 +540,9 @@ impl Engine {
                 if let Value::Bool(value) = value.as_ref() {
                     *value
                 } else {
-                    return Err({
-                        let mut error = unable_to_evaluate_as_a_bool_error()
-                            .context("value", format!("{:?}", value))
-                            .context("function", name.to_string());
-
-                        for (k, v) in args {
-                            error = error.context(format!("argument[{}]", k), format!("{:?}", v));
-                        }
-
-                        error
-                    });
+                    return Err(unable_to_evaluate_as_a_bool_error()
+                        .context("value", format!("{:?}", value))
+                        .context("function", name.to_string()));
                 }
             }
         };

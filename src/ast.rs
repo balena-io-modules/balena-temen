@@ -22,7 +22,7 @@
 //!
 //! [The Elegant Parser]: https://github.com/pest-parser/pest
 //! [grammar]: https://github.com/balena-io-modules/balena-temen/blob/master/src/parser/grammar.pest
-use std::{collections::HashMap, str::FromStr};
+use std::str::FromStr;
 
 use crate::{error::*, parser::parse};
 
@@ -67,8 +67,8 @@ pub enum LogicalOperator {
 pub struct FunctionCall {
     /// A function name
     pub name: String,
-    /// A function arguments (kwargs style, see Python)
-    pub args: HashMap<String, Expression>,
+    /// Positional arguments
+    pub args: Vec<Expression>,
 }
 
 impl FunctionCall {
@@ -77,8 +77,8 @@ impl FunctionCall {
     /// # Arguments
     ///
     /// * `name` - A function name
-    /// * `args` - A function arguments (empty map allowed)
-    pub fn new<S>(name: S, args: HashMap<String, Expression>) -> FunctionCall
+    /// * `args` - Positional arguments
+    pub fn new<S>(name: S, args: Vec<Expression>) -> FunctionCall
     where
         S: Into<String>,
     {

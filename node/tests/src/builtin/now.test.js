@@ -8,7 +8,7 @@ test('NOW() generates timestamp', () => {
     expect(
         bt.evaluate({
             "timestamp": {
-                "$$formula": "NOW(timestamp=true)"
+                "$$formula": "NOW(true, true)"
             }
         })
     ).toMatchObject(result);
