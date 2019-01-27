@@ -142,7 +142,7 @@ impl EngineBuilder {
         S: Into<String>,
     {
         let mut filters = self.filters;
-        filters.insert(name.into(), filter);
+        filters.insert(name.into().to_uppercase(), filter);
         EngineBuilder {
             functions: self.functions,
             filters,
@@ -213,7 +213,7 @@ impl EngineBuilder {
         S: Into<String>,
     {
         let mut functions = self.functions;
-        functions.insert(name.into(), function);
+        functions.insert(name.into().to_uppercase(), function);
         EngineBuilder {
             functions,
             filters: self.filters,
