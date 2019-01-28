@@ -1,4 +1,35 @@
 - commits:
+    - subject: NOW() accepts one boolean argument only
+      hash: fc7d3863fde72b04692538a633f72bda60602ffc
+      body: ''
+      footer:
+        Change-type: minor
+        change-type: minor
+        Signed-off-by: Robert Vojta <robert@balena.io>
+        signed-off-by: Robert Vojta <robert@balena.io>
+      author: Robert Vojta
+    - subject: Add POW & LOG10 functions
+      hash: e8e210ce419be6febe64c15970ecf57330209ef0
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Robert Vojta <robert@balena.io>
+        signed-off-by: Robert Vojta <robert@balena.io>
+      author: Robert Vojta
+    - subject: Replace kwargs with positional arguments
+      hash: 38312d34f3f50763319153b1fa2733963dd65bcc
+      body: |
+        Functions and filters do accept positional arguments only.
+      footer:
+        Change-type: minor
+        change-type: minor
+        Signed-off-by: Robert Vojta <robert@balena.io>
+        signed-off-by: Robert Vojta <robert@balena.io>
+      author: Robert Vojta
+  version: 0.3.0
+  date: 2019-01-28T10:11:01.548Z
+- commits:
     - subject: Function / filters must be in UPPER case
       hash: dfa85a52d611253dc94f49483908927cedd1a75c
       body: >
