@@ -14,7 +14,7 @@ test('MIN(10, 2) is 2', () => {
     ).toMatchObject(result);
 });
 
-test('MIN(1, 2, 3, 4, 5) is 5', () => {
+test('MIN(1, 2, 3, 4, 5) is 1', () => {
     const result = {
         result: 1
     };
