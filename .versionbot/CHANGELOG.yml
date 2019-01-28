@@ -1,4 +1,16 @@
 - commits:
+    - subject: Add MIN/MAX functions
+      hash: b2e8f79ee0a607f1a55244274108f98076ac0a41
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Robert Vojta <robert@balena.io>
+        signed-off-by: Robert Vojta <robert@balena.io>
+      author: Robert Vojta
+  version: 0.3.1
+  date: 2019-01-28T15:27:19.918Z
+- commits:
     - subject: NOW() accepts one boolean argument only
       hash: fc7d3863fde72b04692538a633f72bda60602ffc
       body: ''
