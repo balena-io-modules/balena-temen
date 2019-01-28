@@ -3,21 +3,31 @@ use serde_json::{Number, Value};
 use crate::context::Context;
 use crate::error::{Error, Result};
 
-fn validate_args_len(args: &[Value], expected: usize, name: &'static str) -> Result<()> {
-    if args.len() != expected {
-        return Err(Error::with_message("invalid number of arguments")
-            .context("function", name)
-            .context("argument count", format!("{}", args.len()))
-            .context("expected", format!("{}", expected)));
+fn validate_args_len(args: &[Value], min: Option<usize>, max: Option<usize>, name: &'static str) -> Result<()> {
+    if let Some(min) = min {
+        if args.len() < min {
+            return Err(Error::with_message("invalid number of arguments")
+                .context("function", name)
+                .context("argument count", format!("{}", args.len()))
+                .context("expected", format!("{}", min)));
+        }
+    }
+    if let Some(max) = max {
+        if args.len() > max {
+            return Err(Error::with_message("invalid number of arguments")
+                .context("function", name)
+                .context("argument count", format!("{}", args.len()))
+                .context("expected", format!("{}", max)));
+        }
     }
     Ok(())
 }
 
-fn get_one_arg<T, F>(args: &[Value], f: F) -> Result<T>
+fn get_arg<T, F>(args: &[Value], index: usize, f: F) -> Result<T>
 where
     F: FnOnce(&Value) -> Option<T>,
 {
-    args.first()
+    args.get(index)
         .and_then(f)
         .ok_or_else(|| Error::with_message("invalid argument type"))
 }
@@ -39,7 +49,7 @@ where
 }
 
 pub(crate) fn pow(args: &[Value], _context: &mut Context) -> Result<Value> {
-    validate_args_len(args, 2, "POW")?;
+    validate_args_len(args, Some(2), Some(2), "POW")?;
 
     if let Ok((b, e)) = get_two_args(args, Value::as_i64, Value::as_u64) {
         return Ok(Value::from(b.pow(e as u32)));
@@ -52,11 +62,47 @@ pub(crate) fn pow(args: &[Value], _context: &mut Context) -> Result<Value> {
 }
 
 pub(crate) fn log10(args: &[Value], _context: &mut Context) -> Result<Value> {
-    validate_args_len(args, 1, "LOG10")?;
+    validate_args_len(args, Some(1), Some(1), "LOG10")?;
 
-    let x = get_one_arg(args, Value::as_f64)?;
+    let x = get_arg(args, 0, Value::as_f64)?;
     Ok(Value::Number(Number::from_f64(x.log10()).ok_or_else(|| {
         Error::with_message("expressions results to NaN").context("function", "LOG10")
+    })?))
+}
+
+pub(crate) fn max(args: &[Value], _context: &mut Context) -> Result<Value> {
+    validate_args_len(args, Some(1), None, "MAX")?;
+
+    if let Ok(result) = args.iter().try_fold(std::i64::MIN, |acc, x| -> Result<i64> {
+        Ok(acc.max(x.as_i64().ok_or_else(|| Error::with_message("invalid argument"))?))
+    }) {
+        return Ok(Value::Number(Number::from(result)));
+    }
+
+    let result = args.iter().try_fold(std::f64::MIN, |acc, x| -> Result<f64> {
+        Ok(acc.max(x.as_f64().ok_or_else(|| Error::with_message("invalid argument"))?))
+    })?;
+
+    Ok(Value::Number(Number::from_f64(result).ok_or_else(|| {
+        Error::with_message("expressions results to NaN").context("function", "MAX")
+    })?))
+}
+
+pub(crate) fn min(args: &[Value], _context: &mut Context) -> Result<Value> {
+    validate_args_len(args, Some(1), None, "MIN")?;
+
+    if let Ok(result) = args.iter().try_fold(std::i64::MAX, |acc, x| -> Result<i64> {
+        Ok(acc.min(x.as_i64().ok_or_else(|| Error::with_message("invalid argument"))?))
+    }) {
+        return Ok(Value::Number(Number::from(result)));
+    }
+
+    let result = args.iter().try_fold(std::f64::MAX, |acc, x| -> Result<f64> {
+        Ok(acc.min(x.as_f64().ok_or_else(|| Error::with_message("invalid argument"))?))
+    })?;
+
+    Ok(Value::Number(Number::from_f64(result).ok_or_else(|| {
+        Error::with_message("expressions results to NaN").context("function", "MIN")
     })?))
 }
 
@@ -64,6 +110,92 @@ pub(crate) fn log10(args: &[Value], _context: &mut Context) -> Result<Value> {
 mod tests {
     use super::*;
     use approx::*;
+    use serde_json::json;
+
+    #[test]
+    fn min_multiple_values() {
+        let mut ctx = Context::default();
+        let args = [-100, 200, 10_000, -1, -10_235]
+            .iter()
+            .map(|x| Value::Number(Number::from(*x)))
+            .collect::<Vec<Value>>();
+
+        let result = min(&args, &mut ctx).unwrap().as_i64().unwrap();
+        assert_eq!(result, -10_235);
+    }
+
+    #[test]
+    fn min_two_values() {
+        let mut ctx = Context::default();
+        let args = [-100, 200]
+            .iter()
+            .map(|x| Value::Number(Number::from(*x)))
+            .collect::<Vec<Value>>();
+
+        let result = min(&args, &mut ctx).unwrap().as_i64().unwrap();
+        assert_eq!(result, -100);
+    }
+
+    #[test]
+    fn min_with_floats_and_integers() {
+        let mut ctx = Context::default();
+        let args = vec![json!(-10.5), json!(200), json!(-10)];
+
+        let result = min(&args, &mut ctx).unwrap().as_f64().unwrap();
+        assert_relative_eq!(result, -10.5);
+    }
+
+    #[test]
+    fn min_fails_without_arguments() {
+        let mut ctx = Context::default();
+        assert!(min(&[], &mut ctx).is_err());
+    }
+
+    #[test]
+    fn min_fails_with_strings() {
+        let mut ctx = Context::default();
+        let args = vec![json!(-10.5), json!("foo")];
+
+        assert!(min(&args, &mut ctx).is_err());
+    }
+
+    #[test]
+    fn max_multiple_values() {
+        let mut ctx = Context::default();
+        let args = [1, 2, 3, 4]
+            .iter()
+            .map(|x| Value::Number(Number::from(*x)))
+            .collect::<Vec<Value>>();
+
+        let result = max(&args, &mut ctx).unwrap().as_i64().unwrap();
+        assert_eq!(result, 4);
+    }
+
+    #[test]
+    fn max_two_values() {
+        let mut ctx = Context::default();
+        let args = [10, 7]
+            .iter()
+            .map(|x| Value::Number(Number::from(*x)))
+            .collect::<Vec<Value>>();
+
+        let result = max(&args, &mut ctx).unwrap().as_i64().unwrap();
+        assert_eq!(result, 10);
+    }
+
+    #[test]
+    fn max_fails_without_arguments() {
+        let mut ctx = Context::default();
+        assert!(max(&[], &mut ctx).is_err());
+    }
+
+    #[test]
+    fn max_fails_with_strings() {
+        let mut ctx = Context::default();
+        let args = vec![json!(-10.5), json!("foo")];
+
+        assert!(max(&args, &mut ctx).is_err());
+    }
 
     #[test]
     fn pow_10_2() {
