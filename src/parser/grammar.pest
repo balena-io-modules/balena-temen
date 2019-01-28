@@ -128,9 +128,12 @@ comparison_expression = { comparison_value ~ (comparison_operator ~ comparison_v
 logical_value  = { logical_not? ~ comparison_expression }
 logical_expression = { logical_value ~ ((logical_or | logical_and) ~ logical_value)* }
 
-kwarg = { identifier ~ "=" ~ (logical_expression | basic_expression_filter) }
-kwargs = _{ kwarg ~ ("," ~ kwarg )* }
-function_call = { function_identifier ~ "(" ~ kwargs? ~ ")" }
+
+arg = { logical_expression | basic_expression_filter }
+args = _{ arg ~ ("," ~ arg)* }
+
+function_call = { function_identifier ~ "(" ~ args? ~ ")" }
+
 filter  = { "|" ~ (function_call | function_identifier) }
 
 content = { SOI ~ (logical_expression | basic_expression_filter) ~ EOI }

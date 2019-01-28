@@ -219,37 +219,37 @@ Example:
 
 Formats a timestamp into a date string.
 
-Format defaults to `YYYY-MM-DD` and can be changed via the `format` argument.
+Format defaults to `YYYY-MM-DD`. You can pass your own format as a first filter argument.
 Full reference of the format syntax is available in the [chrono documentation].
 
 Example:
 
 * `12345678 | DATE`
-* `12345678 | DATE(format="%Y-%m-%d %H:%M")`
+* `12345678 | DATE("%Y-%m-%d %H:%M")`
 
 #### Filter time
 
 Formats a timestamp into a time string.
 
-Format defaults to `HH:MM:SS` and can be changed via the `format` argument.
+Format defaults to `HH:MM:SS`. You can pass your own format as a first filter argument.
 Full reference of the format syntax is available in the [chrono documentation].
 
 Example:
 
 * `12345678 | TIME`
-* `12345678 | TIME(format="%Y-%m-%d %H:%M")`
+* `12345678 | TIME("%Y-%m-%d %H:%M")`
 
 #### Filter datetime
 
 Formats a timestamp into a date time string.
 
-Format defaults to `YYYY-MM-DDTHH:MM:SSZ` and can be changed via the `format` argument.
+Format defaults to `YYYY-MM-DDTHH:MM:SSZ`. You can pass your own format as a first filter argument.
 Full reference of the format syntax is available in the [chrono documentation].
 
 Example:
 
 * `12345678 | DATETIME`
-* `12345678 | DATETIME(format="%Y-%m-%d %H:%M")`
+* `12345678 | DATETIME("%Y-%m-%d %H:%M")`
 
 #### Filter upper
 
@@ -261,8 +261,8 @@ Example:
 
 ## Functions
 
-Functions can be called without arguments (`UUIDV4()`) or with named arguments
-(`NOW(timestamp=true)`). Positional arguments are not supported.
+Functions can be called without arguments (`UUIDV4()`) or with positional arguments
+(`NOW(true)`).
 
 ### Builtin functions
 
@@ -281,14 +281,11 @@ Example:
 
 #### Function now
 
-Returns the local date time as a string (by default) or as a timestamp (integer).
+Returns the UTC date time as a string (by default) or as a timestamp (integer).
 
-Arguments:
+Example:
 
-* `timestamp` - whether to return the timestamp (integer) instead of the date time (string)
-  * defaults to `false`
-* `utc` - whether to return the UTC date time instead of the local one
-  * defaults to `false`
-  * argument is ignored if the `timestamp` argument is set to `true`
+* `NOW()`, `NOW(false)` - UTC date time as a RFC 3339 string
+* `NOW(true)` - timestamp
 
 [chrono documentation]: https://docs.rs/chrono/*/chrono/format/strftime/index.html

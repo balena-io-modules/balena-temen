@@ -1,5 +1,3 @@
-use std::collections::HashMap;
-
 use serde_json::Value;
 
 use crate::context::Context;
@@ -8,6 +6,7 @@ use crate::error::Result;
 pub(crate) use self::now::now;
 pub(crate) use self::uuidv4::uuidv4;
 
+pub(crate) mod math;
 mod now;
 mod uuidv4;
 
@@ -17,7 +16,7 @@ mod uuidv4;
 ///
 /// # Arguments
 ///
-/// * `args` - A function arguments
+/// * `args` - List of arguments
 /// * `context` - An evaluation context
 ///
 /// # Examples
@@ -25,16 +24,16 @@ mod uuidv4;
 /// `random()`:
 ///
 /// * `random` - function name
-/// * `args` - empty map
+/// * `args` - empty slice
 ///
-/// `random(max=1024)`
+/// `random(1024)`
 ///
 /// * `random` - function name
-/// * `args` - map contains `max` key with the `Value::Number(1024)` value
+/// * `args` - first slice element contains the `Value::Number(1024)` value
 ///
 /// Visit [`function`] method documentation to see how to register custom function
 /// and how it should look like.
 ///
 /// [`Engine`]: struct.Engine.html
 /// [`function`]: struct.EngineBuilder.html#method.function
-pub type FunctionFn = fn(args: &HashMap<String, Value>, context: &mut Context) -> Result<Value>;
+pub type FunctionFn = fn(args: &[Value], context: &mut Context) -> Result<Value>;

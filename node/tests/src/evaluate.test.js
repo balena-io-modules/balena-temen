@@ -38,3 +38,25 @@ test('evaluate fn throws with one failing and one succeeding formula', () => {
         }
     ).toThrow();
 });
+
+test('chained evaluation', () => {
+    expect(
+        bt.evaluate({
+            "first": "a",
+            "second": {
+                "$$formula": "first ~ `a`"
+            },
+            "third": {
+                "$$formula": "second ~ `a`"
+            },
+            "fourth": {
+                "$$formula": "third ~ `a`"
+            }
+        })
+    ).toEqual({
+        "first": "a",
+        "second": "aa",
+        "third": "aaa",
+        "fourth": "aaaa"
+    });
+});

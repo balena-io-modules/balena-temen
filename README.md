@@ -39,6 +39,12 @@ This library is written in the Rust language and can be used:
 
 ## Breaking changes
 
+### Version 0.3
+
+* Python style `kwargs` were removed in favor of positional arguments. All functions
+  and filters do accept positional arguments only.
+* `NOW()` function accepts one `boolean` argument only
+
 ### Version 0.2
 
 * All function and filter identifiers were uppercased

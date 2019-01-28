@@ -1,5 +1,3 @@
-use std::collections::HashMap;
-
 use serde_json::Value;
 
 use crate::context::Context;
@@ -33,17 +31,17 @@ mod upper;
 ///
 /// * `"hallo"` - filter `input`
 /// * `upper` - filter name
-/// * `args` - empty map
+/// * `args` - empty slice
 ///
-/// `"hallo" | upper(trim=true)`
+/// `"hallo" | upper(true)`
 ///
 /// * `"hallo"` - filter `input`
 /// * `upper` - filter name
-/// * `args` - map contains `trim` key with the `Value::Boolean(true)` value
+/// * `args` - slice contains `Value::Boolean(true)` as a first item
 ///
 /// Visit [`filter`] method documentation to see how to register custom function
 /// and how it should look like.
 ///
 /// [`Engine`]: struct.Engine.html
 /// [`filter`]: struct.EngineBuilder.html#method.filter
-pub type FilterFn = fn(input: &Value, args: &HashMap<String, Value>, context: &mut Context) -> Result<Value>;
+pub type FilterFn = fn(input: &Value, args: &[Value], context: &mut Context) -> Result<Value>;

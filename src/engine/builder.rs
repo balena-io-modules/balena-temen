@@ -34,6 +34,8 @@ impl Default for EngineBuilder {
             .filter("SLUGIFY", filter::slugify)
             .function("UUIDV4", function::uuidv4)
             .function("NOW", function::now)
+            .function("POW", function::math::pow)
+            .function("LOG10", function::math::log10)
     }
 }
 
@@ -73,7 +75,7 @@ impl EngineBuilder {
     /// use serde_json::json;
     /// use std::collections::HashMap;
     ///
-    /// fn text_filter(input: &Value, args: &HashMap<String, Value>, _: &mut Context) -> Result<Value> {
+    /// fn text_filter(input: &Value, args: &[Value], _: &mut Context) -> Result<Value> {
     ///     let input = input.as_str()
     ///         .ok_or_else(|| {
     ///             Error::with_message("invalid input type")
@@ -81,7 +83,7 @@ impl EngineBuilder {
     ///                 .context("value", input.to_string())
     ///     })?;
     ///
-    ///     let trim = args.get("trim")
+    ///     let trim = args.get(0)
     ///         .unwrap_or_else(|| &Value::Bool(false));
     ///     let trim = trim
     ///         .as_bool()
@@ -92,7 +94,7 @@ impl EngineBuilder {
     ///                 .context("value", trim.to_string())
     ///         })?;
     ///
-    ///     let upper = args.get("upper")
+    ///     let upper = args.get(1)
     ///         .unwrap_or_else(|| &Value::Bool(false));
     ///     let upper = upper
     ///         .as_bool()
@@ -125,11 +127,11 @@ impl EngineBuilder {
     ///     json!(" abc ")
     /// );
     /// assert_eq!(
-    ///     engine.eval("` abc ` | TEXT(trim=true)", &position, &data, &mut ctx).unwrap(),
+    ///     engine.eval("` abc ` | TEXT(true)", &position, &data, &mut ctx).unwrap(),
     ///     json!("abc")
     /// );
     /// assert_eq!(
-    ///     engine.eval("` abc ` | TEXT(trim=true, upper=true)", &position, &data, &mut ctx).unwrap(),
+    ///     engine.eval("` abc ` | TEXT(true, true)", &position, &data, &mut ctx).unwrap(),
     ///     json!("ABC")
     /// );
     /// ```
@@ -140,7 +142,7 @@ impl EngineBuilder {
         S: Into<String>,
     {
         let mut filters = self.filters;
-        filters.insert(name.into(), filter);
+        filters.insert(name.into().to_uppercase(), filter);
         EngineBuilder {
             functions: self.functions,
             filters,
@@ -170,8 +172,8 @@ impl EngineBuilder {
     /// use serde_json::json;
     /// use std::collections::HashMap;
     ///
-    /// fn echo_function(args: &HashMap<String, Value>, _: &mut Context) -> Result<Value> {
-    ///     let value = match args.get("value") {
+    /// fn echo_function(args: &[Value], _: &mut Context) -> Result<Value> {
+    ///     let value = match args.first() {
     ///         Some(x) => {
     ///             x.as_str().ok_or_else(|| {
     ///                 Error::with_message("invalid argument type")
@@ -197,11 +199,11 @@ impl EngineBuilder {
     ///     json!("echo")
     /// );
     /// assert_eq!(
-    ///     engine.eval("ECHO(value=`Hallo`)", &position, &data, &mut ctx).unwrap(),
+    ///     engine.eval("ECHO(`Hallo`)", &position, &data, &mut ctx).unwrap(),
     ///     json!("Hallo")
     /// );
     /// assert!(
-    ///     engine.eval("ECHO(value=1)", &position, &data, &mut ctx).is_err()
+    ///     engine.eval("ECHO(1)", &position, &data, &mut ctx).is_err()
     /// );
     /// ```
     ///
@@ -211,7 +213,7 @@ impl EngineBuilder {
         S: Into<String>,
     {
         let mut functions = self.functions;
-        functions.insert(name.into(), function);
+        functions.insert(name.into().to_uppercase(), function);
         EngineBuilder {
             functions,
             filters: self.filters,

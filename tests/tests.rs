@@ -119,17 +119,3 @@ macro_rules! test_parse_err {
         assert!(($e.parse() as balena_temen::error::Result<balena_temen::ast::Expression>).is_err());
     };
 }
-
-#[macro_export]
-macro_rules! fn_args_map(
-    () => { std::collections::HashMap::new() };
-    { $($key:expr => $value:expr),+ } => {
-        {
-            let mut m = std::collections::HashMap::new();
-            $(
-                m.insert($key.to_string(), balena_temen::ast::Expression::new($value));
-            )+
-            m
-        }
-     };
-);

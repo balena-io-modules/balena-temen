@@ -1,5 +1,3 @@
-use std::collections::HashMap;
-
 use lazy_static::lazy_static;
 use pest::{
     iterators::Pair,
@@ -35,42 +33,28 @@ lazy_static! {
 #[grammar = "parser/grammar.pest"]
 struct ExpressionParser;
 
-//
-// kwarg = { identifier ~ "=" ~ (logical_expression | basic_expression_filter) }
-//
-fn parse_kwarg(pair: Pair<Rule>) -> Result<(String, Expression)> {
-    let mut name = None;
+fn parse_arg(pair: Pair<Rule>) -> Result<Expression> {
     let mut value = None;
 
     for p in pair.into_inner() {
         match p.as_rule() {
-            Rule::identifier => name = Some(p.into_span().as_str().to_string()),
             Rule::logical_expression => value = Some(parse_logical_expression(p)?),
             Rule::basic_expression_filter => value = Some(parse_basic_expression_with_filters(p)?),
             _ => unreachable!("invalid grammar: {}", p.to_string()),
         };
     }
 
-    Ok((
-        name.expect("invalid grammar: no kwarg name"),
-        value.expect("invalid grammar: no kwarg value"),
-    ))
+    Ok(value.expect("invalid grammar: no parg"))
 }
 
-//
-// function_call = { identifier ~ "(" ~ kwargs? ~ ")" }
-//
 fn parse_function_call(pair: Pair<Rule>) -> Result<FunctionCall> {
     let mut name = None;
-    let mut args = HashMap::new();
+    let mut args = vec![];
 
     for p in pair.into_inner() {
         match p.as_rule() {
             Rule::function_identifier => name = Some(p.into_span().as_str().to_string()),
-            Rule::kwarg => {
-                let (name, value) = parse_kwarg(p)?;
-                args.insert(name, value);
-            }
+            Rule::arg => args.push(parse_arg(p)?),
             _ => unreachable!("invalid grammar: {}", p.as_str()),
         };
     }
@@ -86,14 +70,11 @@ fn parse_function_call(pair: Pair<Rule>) -> Result<FunctionCall> {
 //
 fn parse_filter(pair: Pair<Rule>) -> Result<FunctionCall> {
     let mut name = None;
-    let mut args = HashMap::new();
+    let mut args = vec![];
     for p in pair.into_inner() {
         match p.as_rule() {
             Rule::function_identifier => name = Some(p.into_span().as_str().to_string()),
-            Rule::kwarg => {
-                let (name, value) = parse_kwarg(p)?;
-                args.insert(name, value);
-            }
+            Rule::arg => args.push(parse_arg(p)?),
             Rule::function_call => {
                 return parse_function_call(p);
             }
@@ -392,8 +373,11 @@ fn parse_content(pair: Pair<Rule>) -> Result<Expression> {
 }
 
 pub(crate) fn parse(expression: &str) -> Result<Expression> {
-    let mut pairs = ExpressionParser::parse(Rule::content, expression)
-        .map_err(|_| Error::with_message("unable to parse expression").context("expression", expression.to_string()))?;
+    let mut pairs = ExpressionParser::parse(Rule::content, expression).map_err(|e| {
+        Error::with_message("unable to parse expression")
+            .context("expression", expression.to_string())
+            .context("pest", e.to_string())
+    })?;
     let next = pairs.next().ok_or_else(|| {
         Error::with_message("unable to parse expression").context("expression", expression.to_string())
     })?;

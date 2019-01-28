@@ -1,5 +1,3 @@
-use std::collections::HashMap;
-
 use serde_json::json;
 
 use balena_temen::{error::*, Context, Engine, EngineBuilder, Value};
@@ -31,7 +29,7 @@ fn fail_on_unknown_filter() {
 
 #[test]
 fn custom_filter() {
-    let cf = |input: &Value, _: &HashMap<String, Value>, _: &mut Context| {
+    let cf = |input: &Value, _: &[Value], _: &mut Context| {
         if input.is_string() {
             Ok(Value::String(input.as_str().unwrap().replace("a", "b")))
         } else {
