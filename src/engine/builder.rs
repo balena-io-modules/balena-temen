@@ -36,6 +36,8 @@ impl Default for EngineBuilder {
             .function("NOW", function::now)
             .function("POW", function::math::pow)
             .function("LOG10", function::math::log10)
+            .function("MIN", function::math::min)
+            .function("MAX", function::math::max)
     }
 }
 
