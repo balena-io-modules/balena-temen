@@ -4,3 +4,4 @@ mod function;
 mod logical;
 mod lookup;
 mod math;
+mod ternary;

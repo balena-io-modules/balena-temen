@@ -129,6 +129,7 @@ fn parse_basic_expression(pair: Pair<Rule>) -> Result<ExpressionValue> {
         Rule::dotted_square_bracket_identifier => parse_dotted_square_bracket_identifier(pair)?,
         Rule::string_concat => parse_string_concat(pair)?,
         Rule::basic_expression => MATH_CLIMBER.climb(pair.into_inner(), primary, infix)?,
+        Rule::ternary_expression => parse_ternary_expression(pair)?,
         _ => unreachable!("invalid grammar: {}", pair.as_str()),
     };
 
@@ -188,6 +189,38 @@ fn parse_logical_expression(pair: Pair<Rule>) -> Result<Expression> {
     }
 }
 
+fn parse_ternary_expression(pair: Pair<Rule>) -> Result<ExpressionValue> {
+    // TODO Add precedence climber, so, we can remove `()` around ternary expression
+    let mut condition = None;
+    let mut truthy = None;
+    let mut falsy = None;
+
+    for p in pair.into_inner() {
+        match p.as_rule() {
+            Rule::logical_expression => condition = Some(parse_logical_expression(p)?),
+            Rule::basic_expression => {
+                let exp = parse_basic_expression(p)?;
+                if truthy.is_none() {
+                    truthy = Some(exp);
+                } else {
+                    falsy = Some(exp);
+                }
+            }
+            _ => unreachable!("invalid grammar: {}", p.as_str()),
+        };
+    }
+
+    let condition = condition.expect("aa");
+    let truthy = truthy.expect("aa");
+    let falsy = falsy.expect("aa");
+
+    Ok(ExpressionValue::Ternary(TernaryExpression::new(
+        condition,
+        Expression::new(truthy),
+        Expression::new(falsy),
+    )))
+}
+
 //
 // basic_expression_filter = { basic_expression ~ filter* }
 //
@@ -199,7 +232,7 @@ fn parse_basic_expression_with_filters(pair: Pair<Rule>) -> Result<Expression> {
         match p.as_rule() {
             Rule::basic_expression => expression = Some(parse_basic_expression(p)?),
             Rule::filter => filters.push(parse_filter(p)?),
-            _ => unreachable!("invalid grammar"),
+            _ => unreachable!("invalid grammar: {:?}", p),
         };
     }
 
