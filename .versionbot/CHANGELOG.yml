@@ -1,4 +1,16 @@
 - commits:
+    - subject: Add ternary operator support
+      hash: 2b5f1f7dc95314fce65a3bcc3f9722551117025a
+      body: ''
+      footer:
+        Change-type: minor
+        change-type: minor
+        Signed-off-by: Robert Vojta <robert@balena.io>
+        signed-off-by: Robert Vojta <robert@balena.io>
+      author: Robert Vojta
+  version: 0.4.0
+  date: 2019-01-30T16:30:58.256Z
+- commits:
     - subject: Add MIN/MAX functions
       hash: b2e8f79ee0a607f1a55244274108f98076ac0a41
       body: ''
