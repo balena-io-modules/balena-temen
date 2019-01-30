@@ -118,7 +118,7 @@ relational_operator = _{
 
 basic_value  = _{ boolean | function_call | string_concat | dotted_square_bracket_identifier | float | integer | string }
 basic_operator   = _{ math_operator }
-basic_expression = { ("(" ~ basic_expression ~ ")" | basic_value) ~ (basic_operator ~ ("(" ~ basic_expression ~ ")" | basic_value))* }
+basic_expression = { ("(" ~ ( ternary_expression | basic_expression ) ~ ")" | basic_value ) ~ (basic_operator ~ ("(" ~ ( ternary_expression | basic_expression ) ~ ")" | basic_value ))* }
 basic_expression_filter = { basic_expression ~ filter* }
 
 comparison_value  = { basic_expression_filter ~ (basic_operator ~ basic_expression_filter)* }
@@ -128,6 +128,7 @@ comparison_expression = { comparison_value ~ (comparison_operator ~ comparison_v
 logical_value  = { logical_not? ~ comparison_expression }
 logical_expression = { logical_value ~ ((logical_or | logical_and) ~ logical_value)* }
 
+ternary_expression = { logical_expression ~ "?" ~ basic_expression ~ ":" ~ basic_expression }
 
 arg = { logical_expression | basic_expression_filter }
 args = _{ arg ~ ("," ~ arg)* }

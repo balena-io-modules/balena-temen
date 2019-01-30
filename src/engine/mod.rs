@@ -332,6 +332,17 @@ impl Engine {
                 let rhs = self.eval_as_number(rhs, position, data, context)?;
                 self.eval_math(&lhs, &rhs, *operator)?
             }
+            ExpressionValue::Ternary(TernaryExpression {
+                ref condition,
+                ref truthy,
+                ref falsy,
+            }) => {
+                let value = &*self.eval_ternary_expression(condition, truthy, falsy, position, data, context)?;
+                match value {
+                    Value::Number(num) => num.clone(),
+                    _ => return Err(unable_to_evaluate_as_a_number_error().context("value", format!("{:?}", value))),
+                }
+            }
             ExpressionValue::FunctionCall(FunctionCall { ref name, ref args }) => {
                 let value = &*self.eval_function(name, args, position, data, context)?;
                 match value {
@@ -386,6 +397,22 @@ impl Engine {
         }
     }
 
+    fn eval_ternary_expression<'a>(
+        &self,
+        condition: &'a Expression,
+        truthy: &'a Expression,
+        falsy: &'a Expression,
+        position: &Identifier,
+        data: &'a Value,
+        context: &mut Context,
+    ) -> Result<Cow<'a, Value>> {
+        if self.eval_expression_as_bool(condition, position, data, context)? {
+            self.eval_expression(truthy, position, data, context)
+        } else {
+            self.eval_expression(falsy, position, data, context)
+        }
+    }
+
     fn eval_expression<'a>(
         &self,
         expression: &'a Expression,
@@ -413,6 +440,11 @@ impl Engine {
             ExpressionValue::FunctionCall(FunctionCall { ref name, ref args }) => {
                 self.eval_function(name, args, position, data, context)?
             }
+            ExpressionValue::Ternary(TernaryExpression {
+                ref condition,
+                ref truthy,
+                ref falsy,
+            }) => self.eval_ternary_expression(condition, truthy, falsy, position, data, context)?,
             ExpressionValue::StringConcat(StringConcat { ref values }) => {
                 let mut result = String::new();
 
@@ -482,6 +514,18 @@ impl Engine {
                     return Err(unable_to_evaluate_as_a_bool_error()
                         .context("value", value.to_string())
                         .context("identifier", format!("{:?}", identifier)));
+                }
+            }
+            ExpressionValue::Ternary(TernaryExpression {
+                ref condition,
+                ref truthy,
+                ref falsy,
+            }) => {
+                let value = self.eval_ternary_expression(condition, truthy, falsy, position, data, context)?;
+                if let Value::Bool(value) = value.as_ref() {
+                    *value
+                } else {
+                    return Err(unable_to_evaluate_as_a_bool_error().context("value", value.to_string()));
                 }
             }
             ExpressionValue::Logical(LogicalExpression {

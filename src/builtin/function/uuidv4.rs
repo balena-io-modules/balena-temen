@@ -1,9 +1,9 @@
 use rand::{self, RngCore};
 use serde_json::Value;
-use uuid::Uuid;
+use uuid::{builder::Builder, Variant, Version};
 
 use crate::context::Context;
-use crate::error::Result;
+use crate::error::{Error, Result};
 
 pub(crate) fn uuidv4(_args: &[Value], _context: &mut Context) -> Result<Value> {
     // We're using uuid crate with disabled v4 feature, because of the wasm issue
@@ -15,7 +15,11 @@ pub(crate) fn uuidv4(_args: &[Value], _context: &mut Context) -> Result<Value> {
 
     rng.fill_bytes(&mut bytes);
 
-    let uuid = Uuid::from_random_bytes(bytes);
+    let uuid = Builder::from_slice(&bytes)
+        .map_err(|_| Error::with_message("random generator failure"))?
+        .set_version(Version::Random)
+        .set_variant(Variant::RFC4122)
+        .build();
 
     Ok(Value::String(uuid.to_hyphenated().to_string()))
 }

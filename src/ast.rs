@@ -117,6 +117,24 @@ impl MathExpression {
     }
 }
 
+/// Math expression
+#[derive(Clone, Debug, PartialEq)]
+pub struct TernaryExpression {
+    pub condition: Box<Expression>,
+    pub truthy: Box<Expression>,
+    pub falsy: Box<Expression>,
+}
+
+impl TernaryExpression {
+    pub fn new(condition: Expression, truthy: Expression, falsy: Expression) -> TernaryExpression {
+        TernaryExpression {
+            condition: Box::new(condition),
+            truthy: Box::new(truthy),
+            falsy: Box::new(falsy),
+        }
+    }
+}
+
 /// Logical expression
 #[derive(Clone, Debug, PartialEq)]
 pub struct LogicalExpression {
@@ -492,6 +510,8 @@ pub enum ExpressionValue {
     FunctionCall(FunctionCall),
     /// String concatenation
     StringConcat(StringConcat),
+    /// Ternary expression
+    Ternary(TernaryExpression),
 }
 
 /// An expression
