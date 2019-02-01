@@ -1,4 +1,16 @@
 - commits:
+    - subject: Rename the js files in the resulting npm package.
+      hash: a15bc81a76c5e313df7a0221ec2ffc68ce4e29c7
+      body: |
+        This should allow for easier time using `resolve` in webpack, the
+        statement being less rigid.
+      footer:
+        Change-type: minor
+        change-type: minor
+      author: Cyryl Płotnicki
+  version: 0.5.0
+  date: 2019-02-01T10:45:02.527Z
+- commits:
     - subject: Add ternary operator support
       hash: 2b5f1f7dc95314fce65a3bcc3f9722551117025a
       body: ''
