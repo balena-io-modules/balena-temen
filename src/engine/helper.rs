@@ -288,7 +288,7 @@ pub fn eval_with_engine(data: Value, engine: &Engine, context: &mut Context) -> 
     evaluate_with_engine(data, engine, context)
 }
 
-#[cfg(target_arch = "wasm32")]
+#[cfg(all(target_arch = "wasm32", not(feature = "disable-wasm-bindings")))]
 pub mod wasm {
     // https://github.com/rustwasm/console_error_panic_hook#readme
     pub use console_error_panic_hook::set_once as set_panic_hook;
