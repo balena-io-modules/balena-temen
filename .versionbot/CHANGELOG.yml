@@ -1,4 +1,16 @@
 - commits:
+    - subject: Compile wasm bindings conditionally
+      hash: adf5a8bfd38c6b8faf279073f8457180dfb1e213
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Robert Vojta <robert@balena.io>
+        signed-off-by: Robert Vojta <robert@balena.io>
+      author: Robert Vojta
+  version: 0.5.1
+  date: 2019-02-05T08:55:10.782Z
+- commits:
     - subject: Rename the js files in the resulting npm package.
       hash: a15bc81a76c5e313df7a0221ec2ffc68ce4e29c7
       body: |
