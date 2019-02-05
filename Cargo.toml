@@ -13,6 +13,10 @@ readme = "README.md"
 [lib]
 crate-type = ["lib", "cdylib"]
 
+[features]
+default = []
+disable-wasm-bindings = []
+
 [badges]
 travis-ci = { repository = "balena-io-modules/balena-temen", branch = "master" }
 
