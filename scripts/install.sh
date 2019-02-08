@@ -11,8 +11,15 @@ set -o pipefail
 #
 # ----> Applies to both types `rust-crate` & `rust-crate-wasm`
 #
+RUSTUP_COMMAND="curl https://sh.rustup.rs -sSf | sh -s -- -y"
+if [ ! -z "${CI}" ]; then
+    DEFAULT_COMPILER=`cat rust-toolchain`
+    echo "Setting the default compiler to ${DEFAULT_COMPILER}"
+    RUSTUP_COMMAND="$RUSTUP_COMMAND --default-toolchain ${DEFAULT_COMPILER}"
+fi
 echo "Installing Rust toolchain..."
-curl https://sh.rustup.rs -sSf | sh -s -- -y --default-toolchain $(cat rust-toolchain)
+eval "${RUSTUP_COMMAND}"
+
 source "${HOME}/.cargo/env"
 rustup component add clippy
 rustup component add rustfmt
@@ -26,7 +33,6 @@ rustup component add rustfmt
 echo "Updating Rust toolchain..."
 (test -x "${HOME}/.cargo/bin/cargo-install-update" || cargo install cargo-update)
 cargo install-update -a
-
 
 #--------------------------- another repo.org.type ----------------------------#
 

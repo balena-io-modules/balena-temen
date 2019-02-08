@@ -15,12 +15,11 @@
 # This script builds NPM package for NodeJS, another one for browser and then
 # these two packages are merged into one isomorphic package.
 #
-# This script is executed from the `ci/publish.sh` script.
+# This script is executed from the `scripts/deploy.sh` script.
 #
 
 set -e
 set -o pipefail
-
 
 # Check if jq is installed
 if ! [ -x "$(command -v jq)" ]; then
@@ -28,6 +27,12 @@ if ! [ -x "$(command -v jq)" ]; then
     exit 1
 fi
 
+source "${HOME}/.nvm/nvm.sh"
+nvm use
+source "${HOME}/.cargo/env"
+
+echo "Setting rustup override for this project"
+rustup override set $(cat rust-toolchain)
 
 ################################################################################
 #
@@ -43,12 +48,10 @@ NODE_PKG_DIR="${TARGET_DIR}/pkg-node"
 # Final / isomorphic NPM package
 PKG_DIR="${TARGET_DIR}/pkg"
 
-
 if [ -d "${TARGET_DIR}" ]; then
     rm -rf "${TARGET_DIR}"
 fi
 mkdir -p "${TARGET_DIR}"
-
 
 echo "Packing NodeJS NPM package..."
 wasm-pack build --target nodejs  --out-dir "${NODE_PKG_DIR}"

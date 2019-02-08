@@ -7,6 +7,6 @@ because these things are tested in the Rust crate itself.
 
 ## Run tests
 
-* Build isomorphic NPM package with `ci/build-wasm.sh` script
+* Build isomorphic NPM package with `scripts/build-wasm.sh` script
 * Install dependencies with `npm install`
 * Run tests with `npm test`
