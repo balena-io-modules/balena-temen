@@ -1,4 +1,14 @@
 - commits:
+    - subject: Add Fuzzer support
+      hash: 36e17e2a2df190e200f058f8991bfd620175f673
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Cyryl Płotnicki
+  version: 0.5.2
+  date: 2019-02-08T12:10:33.993Z
+- commits:
     - subject: Compile wasm bindings conditionally
       hash: adf5a8bfd38c6b8faf279073f8457180dfb1e213
       body: ''
