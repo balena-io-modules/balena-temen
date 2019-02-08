@@ -380,7 +380,24 @@ impl Engine {
         data: &Value,
         context: &mut Context,
     ) -> Result<Number> {
-        self.eval_value_as_number(&expression.value, position, data, context)
+        let mut result = Cow::Owned(Value::Number(self.eval_value_as_number(
+            &expression.value,
+            position,
+            data,
+            context,
+        )?));
+
+        for filter in expression.filters.iter() {
+            result = self.eval_filter(&filter.name, &result, &filter.args, position, data, context)?;
+        }
+
+        if let Value::Number(x) = result.into_owned() {
+            Ok(x)
+        } else {
+            Err(Error::with_message("unable to evaluated as number")
+                .context("expected", "number")
+                .context("expression", format!("{:?}", expression)))
+        }
     }
 
     fn eval_ternary_expression<'a>(
