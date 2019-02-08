@@ -1,11 +1,5 @@
 #!/usr/bin/env bash
 
-set -e
-
-source "${HOME}/.cargo/env"
-source "${HOME}/.nvm/nvm.sh"
-nvm use
-
 ################################################################################
 #
 # @nazrhom - this deploy script must be called only when following conditions
@@ -16,6 +10,13 @@ nvm use
 # * we're on the commit == published tag
 #
 
+set -e
+
+HERE="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null && pwd )"
+
+source "${HOME}/.cargo/env"
+source "${HOME}/.nvm/nvm.sh"
+nvm use
 
 ################################################################################
 #
@@ -26,14 +27,15 @@ nvm use
 #
 # ----> Applies to both types `rust-crate` & `rust-crate-wasm`
 #
+echo "Setting rustup override for this project"
+rustup override set $(cat rust-toolchain)
+
 echo "Authenticating to crates.io..."
 cargo login "${CARGO_API_TOKEN}"
 echo "Publishing Rust crate..."
 cargo publish
 
-
 #--------------------------- another repo.org.type ----------------------------#
-
 
 ################################################################################
 #
@@ -49,11 +51,11 @@ echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" > ~/.npmrc
 
 # Build NPM package again, because ...
 #
-# a) script must succeed even if it is called without prior call to `ci/test.sh`
+# a) script must succeed even if it is called without prior call to `scripts/test.sh`
 #    where the package is built,
-# b) we don't know what happened in the meanwhile (between `ci/test.sh` & `ci/publish.sh`),
+# b) we don't know what happened in the meanwhile (between `scripts/test.sh` & `scripts/deploy.sh`),
 #    so, we build it again
-ci/build-wasm.sh
+"${HERE}/build-wasm.sh"
 
 echo "Publishing NPM package..."
 npm publish --access public target/npm/pkg
