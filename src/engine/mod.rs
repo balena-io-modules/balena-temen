@@ -380,21 +380,7 @@ impl Engine {
         data: &Value,
         context: &mut Context,
     ) -> Result<Number> {
-        if expression.filters.is_empty() {
-            // We can directly evaluate the value as a number, because
-            // we have no filters
-            return self.eval_value_as_number(&expression.value, position, data, context);
-        }
-
-        // In case of filters, just evaluate the expression as a generic one
-        // and check if the result is a Number
-        let value = &*self.eval_expression(expression, position, data, context)?;
-        match value {
-            Value::Number(num) => Ok(num.clone()),
-            _ => Err(unable_to_evaluate_as_a_number_error()
-                .context("expression", format!("{:?}", expression))
-                .context("reason", "result is not a number")),
-        }
+        self.eval_value_as_number(&expression.value, position, data, context)
     }
 
     fn eval_ternary_expression<'a>(
