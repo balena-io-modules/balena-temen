@@ -1,0 +1,6 @@
+{
+    "ssid": "Some Cool SSID Network!",
+    "id": {
+        "$$formula": "super.ssid | SLUGIFY"
+    }
+}
