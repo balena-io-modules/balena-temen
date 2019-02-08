@@ -1,4 +1,16 @@
 - commits:
+    - subject: Fix stack overflow
+      hash: a51fbb9516b8bbef3dac47faa8c30e7494fd3e82
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Robert Vojta <robert@balena.io>
+        signed-off-by: Robert Vojta <robert@balena.io>
+      author: Robert Vojta
+  version: 0.5.3
+  date: 2019-02-08T13:52:57.481Z
+- commits:
     - subject: Add Fuzzer support
       hash: 36e17e2a2df190e200f058f8991bfd620175f673
       body: ''
