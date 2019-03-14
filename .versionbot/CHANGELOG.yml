@@ -1,4 +1,25 @@
 - commits:
+    - subject: Delete .travis.yml
+      hash: 89b2ecab1d5ee804789dbbd4355727c28f9a0ec1
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Giovanni Garufi <giovanni@balena.io>
+        signed-off-by: Giovanni Garufi <giovanni@balena.io>
+      author: Giovanni Garufi
+    - subject: Change repo type to rust-public-crate
+      hash: f4f331b8c995dd70c0ed157f9c18a120749922fe
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Giovanni Garufi <giovanni@balena.io>
+        signed-off-by: Giovanni Garufi <giovanni@balena.io>
+      author: Giovanni Garufi
+  version: 0.5.4
+  date: 2019-03-14T15:38:01.072Z
+- commits:
     - subject: Fix stack overflow
       hash: a51fbb9516b8bbef3dac47faa8c30e7494fd3e82
       body: ''
