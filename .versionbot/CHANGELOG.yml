@@ -1,4 +1,25 @@
 - commits:
+    - subject: Fix cargo publish
+      hash: 9e3ca6b9a24e687fa7dfe5b5f2f9509593b0dbcc
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Giovanni Garufi <giovanni@balena.io>
+        signed-off-by: Giovanni Garufi <giovanni@balena.io>
+      author: Giovanni Garufi
+    - subject: Test CI publish
+      hash: ba9610788e6578a9c5be6ed04d561d0de5cd488d
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Giovanni Garufi <giovanni@balena.io>
+        signed-off-by: Giovanni Garufi <giovanni@balena.io>
+      author: Giovanni Garufi
+  version: 0.5.5
+  date: 2019-03-14T17:21:34.975Z
+- commits:
     - subject: Delete .travis.yml
       hash: 89b2ecab1d5ee804789dbbd4355727c28f9a0ec1
       body: ''
