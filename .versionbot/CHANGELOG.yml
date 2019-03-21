@@ -1,4 +1,18 @@
 - commits:
+    - subject: Update to newest version of webpack
+      hash: 331761c3421aa3a6913402aaeeae99d11d39d2c7
+      body: >
+        Updated all dependencies in the browser example project to avoid it
+
+        being affected by wasm loading issue -
+        https://github.com/webpack/webpack/issues/8781
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Cyryl Płotnicki
+  version: 0.5.6
+  date: 2019-03-21T13:56:50.284Z
+- commits:
     - subject: Fix CI build.
       hash: 38343b41eb08878cb7e7de59e70325e845a642f2
       body: |
