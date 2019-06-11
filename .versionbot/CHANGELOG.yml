@@ -1,4 +1,16 @@
 - commits:
+    - subject: Fix cargo lint warnings
+      hash: f5b79a2f08857f49064eddc9c9762e43a97e96fd
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Giovanni Garufi <giovanni@balena.io>
+        signed-off-by: Giovanni Garufi <giovanni@balena.io>
+      author: Giovanni Garufi
+  version: 0.5.7
+  date: 2019-06-11T12:10:54.662Z
+- commits:
     - subject: Update to newest version of webpack
       hash: 331761c3421aa3a6913402aaeeae99d11d39d2c7
       body: >
