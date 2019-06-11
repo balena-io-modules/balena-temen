@@ -53,7 +53,7 @@ fn parse_function_call(pair: Pair<Rule>) -> Result<FunctionCall> {
 
     for p in pair.into_inner() {
         match p.as_rule() {
-            Rule::function_identifier => name = Some(p.into_span().as_str().to_string()),
+            Rule::function_identifier => name = Some(p.as_span().as_str().to_string()),
             Rule::arg => args.push(parse_arg(p)?),
             _ => unreachable!("invalid grammar: {}", p.as_str()),
         };
@@ -73,7 +73,7 @@ fn parse_filter(pair: Pair<Rule>) -> Result<FunctionCall> {
     let mut args = vec![];
     for p in pair.into_inner() {
         match p.as_rule() {
-            Rule::function_identifier => name = Some(p.into_span().as_str().to_string()),
+            Rule::function_identifier => name = Some(p.as_span().as_str().to_string()),
             Rule::arg => args.push(parse_arg(p)?),
             Rule::function_call => {
                 return parse_function_call(p);
