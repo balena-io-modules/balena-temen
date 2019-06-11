@@ -119,7 +119,7 @@ impl<T> ResultExt<T> for Result<T> {
     }
 
     fn frame(self) -> Result<T> {
-        self.map_err(|e| e.frame())
+        self.map_err(Error::frame)
     }
 
     fn frame_with<F>(self, f: F) -> Result<T>
